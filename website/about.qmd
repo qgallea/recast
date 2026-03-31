@@ -128,7 +128,7 @@ If you use RECAST in your research, please cite:
   title  = {{RECAST}: Replication and Extension with Causal AI Statistical Toolkit},
   author = {Gallea, Quentin},
   year   = {2025},
-  url    = {https://github.com/qgallea/recast-causal-ai}
+  url    = {https://github.com/qgallea/recast}
 }
 ```
 

@@ -1,5 +1,0 @@
-0000000000000000000000000000000000000000 7569240321657dfe9a6fc237adf46494a0488877 Quentin Gallea <quentin@thecausalmindset.com> 1774882596 +0200	commit (initial): Initial commit: RECAST website with 4 published papers
-7569240321657dfe9a6fc237adf46494a0488877 a0746d3c7fd43ab388ed1572f85b77607e4bd7f5 Quentin Gallea <quentin@thecausalmindset.com> 1774883084 +0200	commit: Fix banner: inject above navbar via JS
-a0746d3c7fd43ab388ed1572f85b77607e4bd7f5 0b38500fb22556742ce43a27999f3fa2f41b81e3 Quentin Gallea <quentin@thecausalmindset.com> 1774897858 +0200	commit: Fix Djankov replication: correct controls, PASS at 0.69%
-0b38500fb22556742ce43a27999f3fa2f41b81e3 861d5ee5c48c17e70a9de413bb9c05ba87306002 Quentin Gallea <quentin@thecausalmindset.com> 1774899899 +0200	commit: Add methodological foundations section, reorder navbar
-861d5ee5c48c17e70a9de413bb9c05ba87306002 7ba6a86e8209fa6e889ec53810eb22c88759f7c5 Quentin Gallea <quentin@thecausalmindset.com> 1774948065 +0200	commit: Publish Nunn & Trefler (2010) RECAST

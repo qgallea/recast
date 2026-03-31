@@ -5,8 +5,8 @@ project:
 website:
   title: "RECAST"
   description: "Replication and Extension with Causal AI Statistical Toolkit — autonomous Causal ML replication of econometrics papers. By Quentin Gallea, Ph.D."
-  site-url: "https://qgallea.github.io/recast-causal-ai"
-  repo-url: "https://github.com/qgallea/recast-causal-ai"
+  site-url: "https://qgallea.github.io/recast"
+  repo-url: "https://github.com/qgallea/recast"
   repo-actions: [issue]
 
   # favicon: assets/favicon.ico  # add a favicon file later
@@ -28,12 +28,12 @@ website:
         href: about.qmd
     right:
       - icon: github
-        href: "https://github.com/qgallea/recast-causal-ai"
+        href: "https://github.com/qgallea/recast"
         aria-label: "GitHub repository"
 
   page-footer:
     left: "**RECAST** by [Quentin Gallea, Ph.D.](https://thecausalmindset.com) · Built with [Claude Code](https://claude.ai/code) & [Quarto](https://quarto.org)"
-    right: "[GitHub](https://github.com/qgallea/recast-causal-ai) · [Claude Code for Research](https://thecausalmindset.com/training/claude-code-for-research)"
+    right: "[GitHub](https://github.com/qgallea/recast) · [Claude Code for Research](https://thecausalmindset.com/training/claude-code-for-research)"
 
   sidebar: false
 

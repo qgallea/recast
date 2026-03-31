@@ -1,6 +1,6 @@
 # RECAST — Replication and Extension with Causal AI Statistical Toolkit
 
-**[Browse RECASTed papers](https://qgallea.github.io/recast-causal-ai)** | **[Website repo](https://github.com/qgallea/recast-causal-ai)**
+**[Browse RECASTed papers](https://qgallea.github.io/recast)**
 
 RECAST is an autonomous multi-agent pipeline built on [Claude Code](https://claude.ai/code) that takes a published econometrics paper and its replication data, reproduces the original results, extends them with Double/Debiased Machine Learning and Causal Forests, puts the findings through a structured AI peer review, and publishes a report — end to end.
 
@@ -145,11 +145,11 @@ nano ~/papers/my_paper/config.yaml
 
 | Paper | Year | Method | Replication | Key DML finding |
 |-------|------|--------|-------------|----------------|
-| [Djankov et al.](https://qgallea.github.io/recast-causal-ai/papers/djankov2010-dml/) | 2010 | DML | PASS (0.69%) | Tax effect significant with DML where OLS was not |
-| [Nunn & Trefler](https://qgallea.github.io/recast-causal-ai/papers/nunntrefler2010-dml/) | 2010 | DML | PASS (5.11%) | Tariff effect 40-55% smaller, not robust to nonlinear controls |
-| [Finkelstein et al.](https://qgallea.github.io/recast-causal-ai/papers/finkelstein2012-dml/) | 2012 | DML | PASS (1.28%) | Insurance effect 24% larger than published IV |
-| [Finkelstein et al.](https://qgallea.github.io/recast-causal-ai/papers/finkelstein2012-cf/) | 2012 | CF | PASS (1.28%) | CF-LATE 37% larger, heterogeneity detected |
-| [Ashraf & Galor](https://qgallea.github.io/recast-causal-ai/papers/ashraf2013-cf/) | 2013 | CF | PASS (0.71%) | Hump-shaped diversity-development relationship confirmed |
+| [Djankov et al.](https://qgallea.github.io/recast/papers/djankov2010-dml/) | 2010 | DML | PASS (0.69%) | Tax effect significant with DML where OLS was not |
+| [Nunn & Trefler](https://qgallea.github.io/recast/papers/nunntrefler2010-dml/) | 2010 | DML | PASS (5.11%) | Tariff effect 40-55% smaller, not robust to nonlinear controls |
+| [Finkelstein et al.](https://qgallea.github.io/recast/papers/finkelstein2012-dml/) | 2012 | DML | PASS (1.28%) | Insurance effect 24% larger than published IV |
+| [Finkelstein et al.](https://qgallea.github.io/recast/papers/finkelstein2012-cf/) | 2012 | CF | PASS (1.28%) | CF-LATE 37% larger, heterogeneity detected |
+| [Ashraf & Galor](https://qgallea.github.io/recast/papers/ashraf2013-cf/) | 2013 | CF | PASS (0.71%) | Hump-shaped diversity-development relationship confirmed |
 
 ## Status
 
