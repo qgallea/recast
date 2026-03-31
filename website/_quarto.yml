@@ -1,0 +1,53 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "RECAST"
+  description: "Replication and Extension with Causal AI Statistical Toolkit — autonomous Causal ML replication of econometrics papers. By Quentin Gallea, Ph.D."
+  site-url: "https://qgallea.github.io/recast-causal-ai"
+  repo-url: "https://github.com/qgallea/recast-causal-ai"
+  repo-actions: [issue]
+
+  # favicon: assets/favicon.ico  # add a favicon file later
+
+  navbar:
+    title: "RECAST"
+    left:
+      - text: "Home"
+        href: index.qmd
+      - text: "Papers"
+        href: papers.qmd
+      - text: "Framework"
+        href: framework.qmd
+      - text: "Tracker"
+        href: submissions.qmd
+      - text: "Submit"
+        href: submit.qmd
+      - text: "About"
+        href: about.qmd
+    right:
+      - icon: github
+        href: "https://github.com/qgallea/recast-causal-ai"
+        aria-label: "GitHub repository"
+
+  page-footer:
+    left: "**RECAST** by [Quentin Gallea, Ph.D.](https://thecausalmindset.com) · Built with [Claude Code](https://claude.ai/code) & [Quarto](https://quarto.org)"
+    right: "[GitHub](https://github.com/qgallea/recast-causal-ai) · [Claude Code for Research](https://thecausalmindset.com/training/claude-code-for-research)"
+
+  sidebar: false
+
+format:
+  html:
+    theme:
+      - cosmo
+      - assets/styles.css
+    include-in-header: assets/banner-inject.html
+    toc: true
+    toc-depth: 3
+    code-copy: true
+    link-external-newwindow: true
+    link-external-icon: false
+
+execute:
+  freeze: auto

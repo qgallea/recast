@@ -1,0 +1,329 @@
+---
+title: "Pipeline Architecture"
+page-layout: full
+toc: false
+---
+
+```{=html}
+<style>
+.pipeline-diagram {
+  max-width: 780px;
+  margin: 0 auto 3rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.phase-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6c757d;
+  margin: 2rem 0 0.5rem;
+  padding-left: 4px;
+}
+
+.pipe-node {
+  position: relative;
+  border-radius: 8px;
+  padding: 1rem 1.4rem;
+  margin: 0.6rem 0;
+  color: #fff;
+  text-align: center;
+}
+
+.pipe-node h4 {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.pipe-node p {
+  margin: 0;
+  font-size: 0.82rem;
+  opacity: 0.85;
+}
+
+.pipe-node .output-tag {
+  display: inline-block;
+  background: rgba(255,255,255,0.18);
+  border-radius: 3px;
+  padding: 1px 7px;
+  font-size: 0.72rem;
+  font-family: monospace;
+  margin-top: 0.4rem;
+}
+
+/* Node colours */
+.node-read    { background: #2d6a4f; }
+.node-data    { background: #4a6741; }
+.node-rep     { background: #7b6b3a; }
+.node-extend  { background: #1b6b5a; }
+.node-extend-alt { background: #0e5c4a; }
+.node-diag    { background: #8b6914; }
+.node-report  { background: #1b6b5a; }
+.node-gate    { background: #b44d2d; }
+.node-referee { background: #4a3f8a; }
+.node-synth   { background: #1b6b5a; }
+.node-revision{ background: #7b6b3a; }
+.node-final   { background: #1b6b5a; }
+.node-output  { background: #2d6a4f; border: 2px solid #52b788; }
+
+/* Arrows */
+.arrow {
+  text-align: center;
+  color: #adb5bd;
+  font-size: 1.3rem;
+  line-height: 1;
+  margin: 0.15rem 0;
+}
+
+/* Side annotations */
+.annotation-right {
+  position: absolute;
+  right: -170px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.72rem;
+  color: #e07a5f;
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.annotation-left {
+  position: absolute;
+  left: -130px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.72rem;
+  color: #e07a5f;
+  font-style: italic;
+  white-space: nowrap;
+}
+
+/* Branch container */
+.branch-row {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  margin: 0.6rem 0;
+}
+
+.branch-row .pipe-node {
+  flex: 1;
+  max-width: 230px;
+  margin: 0;
+}
+
+/* Referee row */
+.referee-row {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin: 0.6rem 0;
+}
+
+.referee-row .pipe-node {
+  flex: 1;
+  max-width: 220px;
+  margin: 0;
+  padding: 0.8rem 0.6rem;
+}
+
+.referee-row .pipe-node h4 {
+  font-size: 0.9rem;
+}
+
+.referee-row .pipe-node p {
+  font-size: 0.72rem;
+}
+
+/* Isolation banner */
+.isolation-banner {
+  text-align: center;
+  font-size: 0.72rem;
+  color: #6c757d;
+  letter-spacing: 0.04em;
+  margin: 0.4rem 0 0.2rem;
+  font-style: italic;
+}
+
+/* OR divider */
+.or-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 0.3rem 0;
+}
+.or-divider::before, .or-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #dee2e6;
+}
+.or-divider span {
+  font-size: 0.75rem;
+  color: #6c757d;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Loop arrow */
+.loop-annotation {
+  text-align: left;
+  font-size: 0.72rem;
+  color: #e07a5f;
+  font-style: italic;
+  margin: 0.3rem 0 0.3rem 1rem;
+}
+</style>
+
+<div class="pipeline-diagram">
+
+  <div class="phase-label">Phase 1 · Intelligence</div>
+
+  <div class="pipe-node node-read">
+    <h4>Paper Intelligence Agent</h4>
+    <p>Reads the PDF, extracts identification strategy, variables, specifications</p>
+    <span class="output-tag">→ paper_spec.json</span>
+    <span class="annotation-right">spec mismatch → fix & re-run</span>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <div class="pipe-node node-data">
+    <h4>Data Agent</h4>
+    <p>Merges raw .dta/.csv files, constructs variables, applies sample filters</p>
+    <span class="output-tag">→ dataset.parquet</span>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <div class="phase-label">Phase 2 · Analysis</div>
+
+  <div class="pipe-node node-rep">
+    <h4>Replication Agent</h4>
+    <p>OLS / IV / 2SLS — reproduces the original paper's main table</p>
+    <span class="output-tag">→ replication_check.json</span>
+    <span class="output-tag">→ table_replication.tex</span>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <div class="or-divider"><span>/recast or /recast-cf</span></div>
+
+  <div class="branch-row">
+    <div class="pipe-node node-extend">
+      <h4>DML Extension</h4>
+      <p>DoubleML PLIV / PLR<br>RF + Lasso learners<br>GATE heterogeneity</p>
+      <span class="output-tag">→ dml_results.json</span>
+      <span class="annotation-right" style="right:-140px;">N learners</span>
+    </div>
+    <div class="pipe-node node-extend-alt">
+      <h4>Causal Forest</h4>
+      <p>CausalForestDML / CausalIVForest<br>Individual CATEs<br>Feature importances</p>
+      <span class="output-tag">→ causal_forest_results.json</span>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <div class="pipe-node node-diag">
+    <h4>Diagnostics Agent</h4>
+    <p>Replication tolerance · nuisance R² · CI coverage · CATE plausibility · SE sanity check</p>
+    <span class="output-tag">→ diagnostics_flags.json</span>
+    <span class="annotation-right">critical flag → hard fail</span>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <div class="pipe-node node-report">
+    <h4>Report Agent</h4>
+    <p>Compiles LaTeX paper with tables, figures, and interpretation</p>
+    <span class="output-tag">→ paper.tex → paper.pdf</span>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <div class="phase-label">Phase 3 · Review</div>
+
+  <div class="pipe-node node-gate">
+    <h4>Advisor Gate · 3 independent checks</h4>
+    <p>Code audit · Identification validity · Data quality — all must pass</p>
+    <span class="annotation-left">hard fail → stop</span>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <div class="isolation-banner">independent · same draft · no shared context</div>
+
+  <div class="referee-row">
+    <div class="pipe-node node-referee">
+      <h4>Referee 1</h4>
+      <p>Identification<br>Estimand validity<br>Instrument strength</p>
+    </div>
+    <div class="pipe-node node-referee">
+      <h4>Referee 2</h4>
+      <p>DML / CF mechanics<br>Learner choice<br>SE plausibility</p>
+    </div>
+    <div class="pipe-node node-referee">
+      <h4>Referee 3</h4>
+      <p>Robustness<br>Table replication<br>Sensitivity checks</p>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <div class="pipe-node node-synth">
+    <h4>Synthesis Referee</h4>
+    <p>Deduplicates · ranks severity · flags disagreements</p>
+    <span class="output-tag">→ synthesis.md</span>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <div class="loop-annotation">↻ re-loop if blocking issues remain (max 3 rounds)</div>
+
+  <div class="pipe-node node-revision">
+    <h4>Revision Agent</h4>
+    <p>Edits paper.tex directly · patches notebooks if blocking · writes changelog</p>
+    <span class="output-tag">→ changelog_N.md</span>
+    <span class="annotation-right">RERUN_NEEDED → /stage 4</span>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <div class="phase-label">Phase 4 · Output</div>
+
+  <div class="pipe-node node-final">
+    <h4>Final Referee · human-readable report</h4>
+    <p>Remaining issues · severity table · key numbers comparison · recommendation</p>
+    <span class="output-tag">→ final_report.md</span>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <div class="branch-row">
+    <div class="pipe-node node-output">
+      <h4>Quarto report</h4>
+      <p>/publish → website</p>
+    </div>
+    <div class="pipe-node node-output">
+      <h4>Referee reader report</h4>
+      <p>final_report.md</p>
+    </div>
+  </div>
+
+</div>
+```
+
+This diagram shows the full RECAST pipeline from paper ingestion to published output.
+**Left path annotations** (red) show failure modes. **Right path annotations** show
+feedback loops and re-run triggers.
+
+The pipeline runs one of two extension methods depending on the command:
+
+- **`/recast`** → DoubleML (PLIV/PLR) with learner comparison and GATE analysis
+- **`/recast-cf`** → Causal Forest with individual CATEs and feature importances
+
+Both paths share the same replication stage (1–3), diagnostics, and review loop.

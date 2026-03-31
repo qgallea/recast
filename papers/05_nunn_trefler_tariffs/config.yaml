@@ -1,0 +1,83 @@
+# RECAST Project Configuration — Nunn & Trefler (2010 AEJ:Macro)
+# "The Structure of Tariffs and Long-term Growth"
+# Revisited by Baiardi & Naghi (2024, Econometrics Journal), Section 2.2
+
+paper:
+  title: "The Structure of Tariffs and Long-term Growth"
+  authors: "Nunn, N. and Trefler, D."
+  year: 2010
+  journal: "American Economic Journal: Macroeconomics"
+  slug: "nunntrefler2010"
+
+identification:
+  type: OLS
+  primary_data_file: "data_tariffs.csv"
+  # Primary specification: Table 2 Panel A (country-level, skill tariff correlation)
+  outcome_variable: "growth"                 # log annual per capita GDP growth
+  treatment_variable: "skill1_corr"          # skill tariff correlation
+  functional_form: linear
+  # EXACT 17 controls from B&N dml_tariffs_T2.R line 52-54
+  controls:
+    - avg_tar
+    - init
+    - inv
+    - human_cap
+    - w_africa
+    - e_africa
+    - s_c_africa
+    - n_afr_me
+    - e_europe
+    - lat_america
+    - e_asia
+    - s_e_asia
+    - s_w_asia
+    - dum80_83
+    - dum85_87
+    - ln_init_q_skilla
+    - ln_init_q_unskilla
+  secondary_datasets: []
+
+  # Data subsetting: Table 2 uses only industry=="211212" (country-level)
+  # The pipeline should filter: data = data[data.industry == "211212"]
+  data_filter: "industry == '211212'"
+
+  # Additional outcomes (for multi-spec grid)
+  # Table 2 uses growth; Tables S3.3/S3.4 use prod_growth (industry-level, full data)
+  additional_outcomes: []
+  #  - variable: "prod_growth"
+  #    label: "Industry-level output growth"
+
+  # Additional treatments (B&N run all 3)
+  additional_treatments:
+    - variable: "diffa"
+      label: "Tariff differential (low cut-off)"
+    - variable: "diffg"
+      label: "Tariff differential (high cut-off)"
+
+dml:
+  model_type: PLR                    # Partial Linear Regression (OLS setting)
+  ml_methods:                        # B&N use: Forest, Trees, Lasso, Nnet, Ensemble
+    - LassoCV
+    - DecisionTree
+    - GradientBoosting
+    - RandomForest
+    - NeuralNetwork
+    - Ensemble
+  n_folds: 2                         # B&N use nfold=2 (line 162 of dml_tariffs_T2.R)
+  n_rep: 20                          # B&N use 100; 20 is practical minimum
+  aggregation: median
+  se_formula: adjusted
+
+causal_forest:
+  enabled: true
+  method: CausalForestDML
+  n_estimators: 2000                 # B&N use 2000-5000 trees
+  max_depth: null
+  min_samples_leaf: 5
+  honest: true
+  criterion: mse
+  cv: 5
+
+review:
+  max_rounds: 3
+  blocking_threshold: major

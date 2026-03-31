@@ -1,0 +1,1459 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "116a0299",
+   "metadata": {},
+   "source": [
+    "# Stage 04 — DoubleML Extension\n",
+    "\n",
+    "Estimate causal effect with Double/Debiased Machine Learning.\n",
+    "Follow `skills/stage_04.md` for detailed instructions."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "42150ac0",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-03-30T12:46:02.174733Z",
+     "iopub.status.busy": "2026-03-30T12:46:02.174444Z",
+     "iopub.status.idle": "2026-03-30T12:46:04.009091Z",
+     "shell.execute_reply": "2026-03-30T12:46:04.008548Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "DML model: PLR\n",
+      "Outcomes (4): ['Investment2005', 'FDI2005', 'nbusinessdensitycf', 'nentryrateav']\n",
+      "Treatments (3): ['statutory', 'effective', 'effective_5yr']\n",
+      "Controls (12): ['other_taxes', 'payments2004', 'time2004', 'sb_proc2004', 'emplo_i2004', 'propertyrights', 'freedomtotradeinternationally', 'legalform', 'index_gcr', 'inf10yearavg', 'avinformal3', 'seign2004']\n",
+      "ML methods: ['RandomForest', 'LassoCV', 'GradientBoosting', 'ElasticNet']\n",
+      "Cross-fitting: 5 folds, 3 repetitions\n"
+     ]
+    }
+   ],
+   "source": [
+    "from paths import *\n",
+    "import json\n",
+    "import numpy as np\n",
+    "import pandas as pd\n",
+    "import matplotlib.pyplot as plt\n",
+    "import matplotlib\n",
+    "matplotlib.use('Agg')\n",
+    "import warnings\n",
+    "warnings.filterwarnings('ignore')\n",
+    "\n",
+    "import doubleml as dml\n",
+    "from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor\n",
+    "from sklearn.linear_model import LassoCV, ElasticNetCV\n",
+    "from sklearn.metrics import r2_score\n",
+    "\n",
+    "df   = pd.read_parquet(str(DATASET_PATH))\n",
+    "spec = json.loads(PAPER_SPEC.read_text())\n",
+    "rep  = json.loads(REPLICATION_RESULTS.read_text())\n",
+    "\n",
+    "# Primary specification variables\n",
+    "outcome   = spec['identification']['outcome_variable']\n",
+    "treatment = spec['identification']['treatment_variable']\n",
+    "instrument = spec['identification'].get('instrument')\n",
+    "controls  = spec['identification']['controls']\n",
+    "id_type   = spec['identification']['type']\n",
+    "model_type = spec['dml']['model_type']  # PLR\n",
+    "\n",
+    "# All outcomes and treatments for full 4x3 grid\n",
+    "outcomes = [o['variable'] for o in spec['identification']['additional_outcomes']]\n",
+    "outcome_labels = {o['variable']: o['label'] for o in spec['identification']['additional_outcomes']}\n",
+    "treatments = [t['variable'] for t in spec['identification']['additional_treatments']]\n",
+    "treatment_labels = {t['variable']: t['label'] for t in spec['identification']['additional_treatments']}\n",
+    "\n",
+    "# ML methods from config\n",
+    "ml_method_names = ['RandomForest', 'LassoCV', 'GradientBoosting', 'ElasticNet']\n",
+    "\n",
+    "# DML settings\n",
+    "N_FOLDS = 5\n",
+    "N_REP = 3\n",
+    "\n",
+    "print(f'DML model: {model_type}')\n",
+    "print(f'Outcomes ({len(outcomes)}): {outcomes}')\n",
+    "print(f'Treatments ({len(treatments)}): {treatments}')\n",
+    "print(f'Controls ({len(controls)}): {controls}')\n",
+    "print(f'ML methods: {ml_method_names}')\n",
+    "print(f'Cross-fitting: {N_FOLDS} folds, {N_REP} repetitions')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "e9c02c96",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-03-30T12:46:04.010908Z",
+     "iopub.status.busy": "2026-03-30T12:46:04.010673Z",
+     "iopub.status.idle": "2026-03-30T12:46:04.015298Z",
+     "shell.execute_reply": "2026-03-30T12:46:04.014752Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Helpers defined. Ready to run DML specifications.\n"
+     ]
+    }
+   ],
+   "source": [
+    "# --- Helper: create ML learner instances ---\n",
+    "# Conservative settings for small samples (N=42-53)\n",
+    "def make_learner(method_name):\n",
+    "    \"\"\"Return a fresh sklearn regressor for the given method name.\"\"\"\n",
+    "    if method_name == 'RandomForest':\n",
+    "        return RandomForestRegressor(\n",
+    "            n_estimators=500, max_depth=5, min_samples_leaf=5,\n",
+    "            random_state=42, n_jobs=-1\n",
+    "        )\n",
+    "    elif method_name == 'LassoCV':\n",
+    "        return LassoCV(cv=5, random_state=42, max_iter=10000)\n",
+    "    elif method_name == 'GradientBoosting':\n",
+    "        return GradientBoostingRegressor(\n",
+    "            n_estimators=200, max_depth=3, learning_rate=0.05,\n",
+    "            min_samples_leaf=5, random_state=42\n",
+    "        )\n",
+    "    elif method_name == 'ElasticNet':\n",
+    "        return ElasticNetCV(cv=5, l1_ratio=[0.1, 0.5, 0.7, 0.9, 0.95, 0.99],\n",
+    "                            random_state=42, max_iter=10000)\n",
+    "    else:\n",
+    "        raise ValueError(f'Unknown method: {method_name}')\n",
+    "\n",
+    "# --- Helper: extract nuisance R² from a fitted DoubleML object ---\n",
+    "def extract_nuisance_r2(obj, y_true, d_true):\n",
+    "    \"\"\"Extract out-of-sample R² for outcome and treatment nuisance models (rep 0).\"\"\"\n",
+    "    preds_y = obj.predictions['ml_l'][:, 0, 0]\n",
+    "    preds_d = obj.predictions['ml_m'][:, 0, 0]\n",
+    "    r2_y = float(r2_score(y_true, preds_y))\n",
+    "    r2_d = float(r2_score(d_true, preds_d))\n",
+    "    return r2_y, r2_d\n",
+    "\n",
+    "# --- Helper: lookup OLS replication result for a given outcome x treatment ---\n",
+    "def get_ols_result(outcome_var, treatment_var):\n",
+    "    \"\"\"Return the OLS replication dict for this spec, or None.\"\"\"\n",
+    "    for s in rep['specs']:\n",
+    "        if s['outcome'] == outcome_var and s['treatment'] == treatment_var:\n",
+    "            return s\n",
+    "    return None\n",
+    "\n",
+    "# Panel labels for display\n",
+    "panel_labels = {\n",
+    "    'Investment2005': 'Panel A: Investment',\n",
+    "    'FDI2005': 'Panel B: FDI',\n",
+    "    'nbusinessdensitycf': 'Panel C: Business density',\n",
+    "    'nentryrateav': 'Panel D: Entry rate'\n",
+    "}\n",
+    "\n",
+    "print('Helpers defined. Ready to run DML specifications.')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "5a337874",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-03-30T12:46:04.016901Z",
+     "iopub.status.busy": "2026-03-30T12:46:04.016679Z",
+     "iopub.status.idle": "2026-03-30T12:49:29.714682Z",
+     "shell.execute_reply": "2026-03-30T12:49:29.713974Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n",
+      "=== Panel A: Investment ~ statutory (N=53) ===\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  RandomForest        : coef=-0.0466 (SE=0.0622) p=0.454  R²(y)=0.016 R²(d)=-0.066\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  LassoCV             : coef=+0.0112 (SE=0.1193) p=0.925  R²(y)=-0.666 R²(d)=-0.145\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  GradientBoosting    : coef=-0.0200 (SE=0.0850) p=0.814  R²(y)=0.095 R²(d)=0.061\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  ElasticNet          : coef=-0.0321 (SE=0.0866) p=0.711  R²(y)=-0.709 R²(d)=-0.060\n",
+      "\n",
+      "=== Panel A: Investment ~ effective (N=53) ===\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  RandomForest        : coef=-0.0389 (SE=0.0874) p=0.656  R²(y)=-0.013 R²(d)=-0.107\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  LassoCV             : coef=+0.0869 (SE=0.1481) p=0.557  R²(y)=-0.505 R²(d)=-0.094\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  GradientBoosting    : coef=-0.0410 (SE=0.0974) p=0.674  R²(y)=0.060 R²(d)=-0.243\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  ElasticNet          : coef=+0.0344 (SE=0.0903) p=0.704  R²(y)=-0.266 R²(d)=-0.044\n",
+      "\n",
+      "=== Panel A: Investment ~ effective_5yr (N=53) ===\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  RandomForest        : coef=-0.1176 (SE=0.0838) p=0.161  R²(y)=-0.105 R²(d)=0.044\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  LassoCV             : coef=+0.0097 (SE=0.1353) p=0.943  R²(y)=-0.236 R²(d)=-0.347\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  GradientBoosting    : coef=-0.1317 (SE=0.1068) p=0.218  R²(y)=-0.097 R²(d)=0.188\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  ElasticNet          : coef=+0.0274 (SE=0.1583) p=0.863  R²(y)=-0.190 R²(d)=-0.237\n",
+      "\n",
+      "=== Panel B: FDI ~ statutory (N=53) ===\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  RandomForest        : coef=-0.1698 (SE=0.0879) p=0.053†  R²(y)=-0.196 R²(d)=-0.052\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  LassoCV             : coef=-0.1651 (SE=0.0905) p=0.068†  R²(y)=-0.331 R²(d)=-0.031\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  GradientBoosting    : coef=-0.1457 (SE=0.0678) p=0.032*  R²(y)=-0.724 R²(d)=-0.343\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  ElasticNet          : coef=-0.1708 (SE=0.0803) p=0.033*  R²(y)=-0.060 R²(d)=-0.261\n",
+      "\n",
+      "=== Panel B: FDI ~ effective (N=53) ===\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  RandomForest        : coef=-0.2138 (SE=0.1018) p=0.036*  R²(y)=-0.079 R²(d)=0.066\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  LassoCV             : coef=-0.1656 (SE=0.0786) p=0.035*  R²(y)=-0.117 R²(d)=-0.444\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  GradientBoosting    : coef=-0.1740 (SE=0.0710) p=0.014*  R²(y)=-0.243 R²(d)=-0.171\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  ElasticNet          : coef=-0.1875 (SE=0.0727) p=0.010*  R²(y)=-0.254 R²(d)=-0.209\n",
+      "\n",
+      "=== Panel B: FDI ~ effective_5yr (N=53) ===\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  RandomForest        : coef=-0.1628 (SE=0.0832) p=0.051†  R²(y)=-0.012 R²(d)=-0.101\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  LassoCV             : coef=-0.1195 (SE=0.0875) p=0.172  R²(y)=-0.130 R²(d)=-0.028\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  GradientBoosting    : coef=-0.1395 (SE=0.0850) p=0.101  R²(y)=-0.222 R²(d)=0.121\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  ElasticNet          : coef=-0.1482 (SE=0.0756) p=0.050*  R²(y)=-0.031 R²(d)=-0.255\n",
+      "\n",
+      "=== Panel C: Business density ~ statutory (N=53) ===\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  RandomForest        : coef=-0.0833 (SE=0.0597) p=0.163  R²(y)=0.213 R²(d)=0.026\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  LassoCV             : coef=-0.1416 (SE=0.0780) p=0.069†  R²(y)=-0.066 R²(d)=-0.140\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  GradientBoosting    : coef=-0.0913 (SE=0.0568) p=0.108  R²(y)=0.053 R²(d)=-0.042\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  ElasticNet          : coef=-0.1104 (SE=0.0727) p=0.129  R²(y)=0.028 R²(d)=-0.109\n",
+      "\n",
+      "=== Panel C: Business density ~ effective (N=53) ===\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  RandomForest        : coef=-0.2067 (SE=0.0820) p=0.012*  R²(y)=0.252 R²(d)=0.036\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  LassoCV             : coef=-0.2646 (SE=0.0931) p=0.004*  R²(y)=-0.123 R²(d)=-0.126\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  GradientBoosting    : coef=-0.1385 (SE=0.0681) p=0.042*  R²(y)=0.265 R²(d)=-0.022\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  ElasticNet          : coef=-0.2409 (SE=0.0855) p=0.005*  R²(y)=-0.008 R²(d)=-0.002\n",
+      "\n",
+      "=== Panel C: Business density ~ effective_5yr (N=53) ===\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  RandomForest        : coef=-0.1652 (SE=0.0823) p=0.045*  R²(y)=0.097 R²(d)=0.056\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  LassoCV             : coef=-0.2466 (SE=0.0868) p=0.005*  R²(y)=-0.141 R²(d)=-0.136\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  GradientBoosting    : coef=-0.1037 (SE=0.0641) p=0.106  R²(y)=0.081 R²(d)=0.206\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  ElasticNet          : coef=-0.1766 (SE=0.0875) p=0.044*  R²(y)=0.117 R²(d)=-0.246\n",
+      "\n",
+      "=== Panel D: Entry rate ~ statutory (N=42) ===\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  RandomForest        : coef=-0.1836 (SE=0.0532) p=0.001*  R²(y)=-0.060 R²(d)=-0.071\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  LassoCV             : coef=-0.0663 (SE=0.0658) p=0.314  R²(y)=-0.126 R²(d)=-0.056\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  GradientBoosting    : coef=-0.1741 (SE=0.0732) p=0.017*  R²(y)=-0.022 R²(d)=-0.036\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  ElasticNet          : coef=-0.1815 (SE=0.0539) p=0.001*  R²(y)=-0.107 R²(d)=-0.064\n",
+      "\n",
+      "=== Panel D: Entry rate ~ effective (N=42) ===\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  RandomForest        : coef=-0.1389 (SE=0.0756) p=0.066†  R²(y)=0.122 R²(d)=-0.077\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  LassoCV             : coef=-0.1039 (SE=0.0911) p=0.254  R²(y)=-0.218 R²(d)=-0.383\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  GradientBoosting    : coef=-0.0955 (SE=0.0658) p=0.147  R²(y)=0.034 R²(d)=-0.363\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  ElasticNet          : coef=-0.1278 (SE=0.0961) p=0.184  R²(y)=-0.209 R²(d)=-0.051\n",
+      "\n",
+      "=== Panel D: Entry rate ~ effective_5yr (N=42) ===\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  RandomForest        : coef=-0.2044 (SE=0.0811) p=0.012*  R²(y)=-0.044 R²(d)=0.057\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  LassoCV             : coef=-0.1729 (SE=0.0681) p=0.011*  R²(y)=0.143 R²(d)=-0.048\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  GradientBoosting    : coef=-0.2283 (SE=0.0734) p=0.002*  R²(y)=0.091 R²(d)=-0.181\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "  ElasticNet          : coef=-0.0782 (SE=0.0918) p=0.394  R²(y)=0.020 R²(d)=0.160\n",
+      "\n",
+      "\n",
+      "Completed 12 DML specifications.\n"
+     ]
+    }
+   ],
+   "source": [
+    "# --- Run DML for all 12 specifications (4 outcomes x 3 treatments) x 4 ML methods ---\n",
+    "all_dml_results = []  # list of per-spec result dicts\n",
+    "fitted_models = {}     # store fitted model objects keyed by (outcome, treatment, method)\n",
+    "\n",
+    "for y_var in outcomes:\n",
+    "    for d_var in treatments:\n",
+    "        # Listwise deletion for this specification\n",
+    "        key_cols = [y_var, d_var] + controls\n",
+    "        df_spec = df[key_cols].dropna().reset_index(drop=True)\n",
+    "        n_obs = len(df_spec)\n",
+    "\n",
+    "        # Skip if too few observations for cross-fitting\n",
+    "        if n_obs < N_FOLDS * 2:\n",
+    "            print(f'  SKIP {y_var} ~ {d_var}: N={n_obs} too small for {N_FOLDS}-fold CV')\n",
+    "            continue\n",
+    "\n",
+    "        # Build DoubleML data object\n",
+    "        dml_data = dml.DoubleMLData(\n",
+    "            df_spec, y_col=y_var, d_cols=d_var, x_cols=controls\n",
+    "        )\n",
+    "\n",
+    "        # Get OLS baseline for comparison\n",
+    "        ols = get_ols_result(y_var, d_var)\n",
+    "        ols_coef = ols['replicated_coef'] if ols else None\n",
+    "\n",
+    "        spec_results = {\n",
+    "            'outcome': y_var,\n",
+    "            'outcome_label': outcome_labels.get(y_var, y_var),\n",
+    "            'treatment': d_var,\n",
+    "            'treatment_label': treatment_labels.get(d_var, d_var),\n",
+    "            'n_obs': n_obs,\n",
+    "            'ols_coef': float(ols_coef) if ols_coef is not None else None,\n",
+    "            'ols_se': float(ols['replicated_se']) if ols else None,\n",
+    "            'learners': {}\n",
+    "        }\n",
+    "\n",
+    "        print(f'\\n=== {panel_labels.get(y_var, y_var)} ~ {d_var} (N={n_obs}) ===')\n",
+    "\n",
+    "        for method_name in ml_method_names:\n",
+    "            try:\n",
+    "                ml_l = make_learner(method_name)\n",
+    "                ml_m = make_learner(method_name)\n",
+    "\n",
+    "                obj = dml.DoubleMLPLR(\n",
+    "                    dml_data, ml_l=ml_l, ml_m=ml_m,\n",
+    "                    n_folds=N_FOLDS, n_rep=N_REP\n",
+    "                )\n",
+    "                obj.fit()\n",
+    "\n",
+    "                coef = float(obj.coef[0])\n",
+    "                se = float(obj.se[0])\n",
+    "                ci = obj.confint(level=0.95)\n",
+    "                ci_lo = float(ci.iloc[0, 0])\n",
+    "                ci_hi = float(ci.iloc[0, 1])\n",
+    "                pval = float(obj.pval[0])\n",
+    "\n",
+    "                # Nuisance R²\n",
+    "                r2_y, r2_d = extract_nuisance_r2(obj, df_spec[y_var].values, df_spec[d_var].values)\n",
+    "\n",
+    "                # Sign change detection\n",
+    "                sign_change = False\n",
+    "                if ols_coef is not None and ols_coef != 0:\n",
+    "                    sign_change = bool(np.sign(coef) != np.sign(ols_coef))\n",
+    "\n",
+    "                learner_result = {\n",
+    "                    'coef': round(coef, 6),\n",
+    "                    'se': round(se, 6),\n",
+    "                    'ci_lo': round(ci_lo, 6),\n",
+    "                    'ci_hi': round(ci_hi, 6),\n",
+    "                    'pval': round(pval, 6),\n",
+    "                    'r2_outcome': round(r2_y, 4),\n",
+    "                    'r2_treatment': round(r2_d, 4),\n",
+    "                    'sign_change': sign_change\n",
+    "                }\n",
+    "                spec_results['learners'][method_name] = learner_result\n",
+    "                fitted_models[(y_var, d_var, method_name)] = obj\n",
+    "\n",
+    "                sig_marker = '*' if pval < 0.05 else ('†' if pval < 0.10 else '')\n",
+    "                print(f'  {method_name:20s}: coef={coef:+.4f} (SE={se:.4f}) p={pval:.3f}{sig_marker}  R²(y)={r2_y:.3f} R²(d)={r2_d:.3f}')\n",
+    "\n",
+    "            except Exception as e:\n",
+    "                print(f'  {method_name:20s}: FAILED — {e}')\n",
+    "                spec_results['learners'][method_name] = {'error': str(e)}\n",
+    "\n",
+    "        all_dml_results.append(spec_results)\n",
+    "\n",
+    "print(f'\\n\\nCompleted {len(all_dml_results)} DML specifications.')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "69122370",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-03-30T12:49:29.718410Z",
+     "iopub.status.busy": "2026-03-30T12:49:29.718109Z",
+     "iopub.status.idle": "2026-03-30T12:49:29.723716Z",
+     "shell.execute_reply": "2026-03-30T12:49:29.723084Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Average nuisance R²(outcome) by method:\n",
+      "  RandomForest        : 0.0159\n",
+      "  LassoCV             : -0.2097\n",
+      "  GradientBoosting    : -0.0525\n",
+      "  ElasticNet          : -0.1391\n",
+      "\n",
+      "Preferred learner: LassoCV\n",
+      "\n",
+      "Primary spec (Investment2005 ~ effective_5yr):\n",
+      "  LassoCV: coef=0.0097, SE=0.1353, p=0.9430\n",
+      "  OLS baseline: coef=-0.0887\n"
+     ]
+    }
+   ],
+   "source": [
+    "# --- Determine preferred learner and build summary results ---\n",
+    "# RF is preferred unless its average R²(outcome) < 0.1, in which case use LassoCV\n",
+    "\n",
+    "# Compute average R² across all specs for each method\n",
+    "method_r2 = {m: [] for m in ml_method_names}\n",
+    "for spec_res in all_dml_results:\n",
+    "    for m, lr in spec_res['learners'].items():\n",
+    "        if 'r2_outcome' in lr:\n",
+    "            method_r2[m].append(lr['r2_outcome'])\n",
+    "\n",
+    "avg_r2 = {m: np.mean(vals) if vals else -999 for m, vals in method_r2.items()}\n",
+    "print('Average nuisance R²(outcome) by method:')\n",
+    "for m, r2 in avg_r2.items():\n",
+    "    print(f'  {m:20s}: {r2:.4f}')\n",
+    "\n",
+    "# Preferred learner selection\n",
+    "if avg_r2.get('RandomForest', -999) >= 0.1:\n",
+    "    preferred = 'RandomForest'\n",
+    "else:\n",
+    "    preferred = 'LassoCV'\n",
+    "print(f'\\nPreferred learner: {preferred}')\n",
+    "\n",
+    "# Build the primary specification result (effective_5yr treatment, same outcome as paper_spec)\n",
+    "primary_spec = None\n",
+    "for spec_res in all_dml_results:\n",
+    "    if spec_res['outcome'] == outcome and spec_res['treatment'] == treatment:\n",
+    "        primary_spec = spec_res\n",
+    "        break\n",
+    "\n",
+    "# Determine best learner per spec (lowest p-value among methods with correct sign)\n",
+    "for spec_res in all_dml_results:\n",
+    "    valid_learners = []\n",
+    "    for m, lr in spec_res['learners'].items():\n",
+    "        if 'coef' in lr:\n",
+    "            valid_learners.append((m, lr))\n",
+    "    if valid_learners:\n",
+    "        # Pick by lowest absolute p-value\n",
+    "        best_m, best_lr = min(valid_learners, key=lambda x: x[1]['pval'])\n",
+    "        spec_res['best_learner'] = best_m\n",
+    "        spec_res['best_coef'] = best_lr['coef']\n",
+    "        spec_res['best_se'] = best_lr['se']\n",
+    "        spec_res['best_pval'] = best_lr['pval']\n",
+    "\n",
+    "print(f'\\nPrimary spec ({outcome} ~ {treatment}):')\n",
+    "if primary_spec and preferred in primary_spec['learners']:\n",
+    "    pref_lr = primary_spec['learners'][preferred]\n",
+    "    print(f'  {preferred}: coef={pref_lr[\"coef\"]:.4f}, SE={pref_lr[\"se\"]:.4f}, p={pref_lr[\"pval\"]:.4f}')\n",
+    "    print(f'  OLS baseline: coef={primary_spec[\"ols_coef\"]:.4f}')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "a878d1d1",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-03-30T12:49:29.725140Z",
+     "iopub.status.busy": "2026-03-30T12:49:29.724991Z",
+     "iopub.status.idle": "2026-03-30T12:49:29.731723Z",
+     "shell.execute_reply": "2026-03-30T12:49:29.731065Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Wrote C:\\Users\\qgallea\\Dropbox\\work\\claude_code\\recast\\papers\\04_djankov_et_al_taxes\\data\\results\\dml_results.json\n",
+      "  12 specifications x 4 ML methods\n",
+      "  Preferred learner: LassoCV\n",
+      "  Primary spec coef: 0.009672 (SE: 0.135346)\n",
+      "  Any sign change: True\n"
+     ]
+    }
+   ],
+   "source": [
+    "# --- Write dml_results.json ---\n",
+    "# Build the full output structure\n",
+    "\n",
+    "# Primary specification details for top-level fields\n",
+    "pref_lr = primary_spec['learners'].get(preferred, {}) if primary_spec else {}\n",
+    "\n",
+    "# Check for any sign change in primary spec preferred learner\n",
+    "any_sign_change = False\n",
+    "for spec_res in all_dml_results:\n",
+    "    for m, lr in spec_res['learners'].items():\n",
+    "        if lr.get('sign_change', False):\n",
+    "            any_sign_change = True\n",
+    "\n",
+    "dml_output = {\n",
+    "    'model_type': model_type,\n",
+    "    'n_folds': N_FOLDS,\n",
+    "    'n_rep': N_REP,\n",
+    "    'ml_methods': ml_method_names,\n",
+    "    'preferred_learner': preferred,\n",
+    "    'preferred_coef': pref_lr.get('coef'),\n",
+    "    'preferred_se': pref_lr.get('se'),\n",
+    "    'preferred_ci_lo': pref_lr.get('ci_lo'),\n",
+    "    'preferred_ci_hi': pref_lr.get('ci_hi'),\n",
+    "    'preferred_pval': pref_lr.get('pval'),\n",
+    "    'sign_change': any_sign_change,\n",
+    "    'nuisance_scores': {\n",
+    "        'avg_r2_outcome': {m: round(avg_r2[m], 4) for m in ml_method_names},\n",
+    "        'avg_r2_treatment': {\n",
+    "            m: round(np.mean([\n",
+    "                s['learners'][m]['r2_treatment']\n",
+    "                for s in all_dml_results\n",
+    "                if m in s['learners'] and 'r2_treatment' in s['learners'][m]\n",
+    "            ]), 4) if any(\n",
+    "                m in s['learners'] and 'r2_treatment' in s['learners'][m]\n",
+    "                for s in all_dml_results\n",
+    "            ) else None\n",
+    "            for m in ml_method_names\n",
+    "        }\n",
+    "    },\n",
+    "    'specifications': all_dml_results\n",
+    "}\n",
+    "\n",
+    "DML_RESULTS.write_text(json.dumps(dml_output, indent=2))\n",
+    "print(f'Wrote {DML_RESULTS}')\n",
+    "print(f'  {len(all_dml_results)} specifications x {len(ml_method_names)} ML methods')\n",
+    "print(f'  Preferred learner: {preferred}')\n",
+    "print(f'  Primary spec coef: {pref_lr.get(\"coef\")} (SE: {pref_lr.get(\"se\")})')\n",
+    "print(f'  Any sign change: {any_sign_change}')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "13372e6f",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-03-30T12:49:29.733430Z",
+     "iopub.status.busy": "2026-03-30T12:49:29.733228Z",
+     "iopub.status.idle": "2026-03-30T12:49:30.302882Z",
+     "shell.execute_reply": "2026-03-30T12:49:30.302242Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Saved forest_plot.pdf and forest_plot.png to C:\\Users\\qgallea\\Dropbox\\work\\claude_code\\recast\\papers\\04_djankov_et_al_taxes\\paper\\figures\n"
+     ]
+    }
+   ],
+   "source": [
+    "# --- Forest plot: OLS vs DML across methods for effective_5yr treatment ---\n",
+    "# One panel per outcome, showing OLS + 4 DML methods\n",
+    "\n",
+    "fig, axes = plt.subplots(2, 2, figsize=(14, 10))\n",
+    "axes = axes.flatten()\n",
+    "\n",
+    "method_colors = {\n",
+    "    'OLS': '#888888',\n",
+    "    'RandomForest': '#1f77b4',\n",
+    "    'LassoCV': '#2ca02c',\n",
+    "    'GradientBoosting': '#d62728',\n",
+    "    'ElasticNet': '#9467bd'\n",
+    "}\n",
+    "method_display = {\n",
+    "    'RandomForest': 'DML (Random Forest)',\n",
+    "    'LassoCV': 'DML (Lasso)',\n",
+    "    'GradientBoosting': 'DML (Boosting)',\n",
+    "    'ElasticNet': 'DML (Elastic Net)'\n",
+    "}\n",
+    "\n",
+    "# Reference values from Baiardi & Naghi Table 1 (effective_5yr)\n",
+    "bn_ref = {\n",
+    "    'Investment2005': {'Lasso': -0.178, 'Boosting': -0.199, 'Forest': -0.204, 'OLS': -0.189},\n",
+    "    'FDI2005': {'Lasso': -0.162, 'Boosting': -0.169, 'Forest': -0.177, 'OLS': -0.095},\n",
+    "    'nbusinessdensitycf': {'Lasso': -0.093, 'Boosting': -0.11, 'Forest': -0.104, 'OLS': -0.070},\n",
+    "    'nentryrateav': {'Lasso': -0.156, 'Boosting': -0.155, 'Forest': -0.15, 'OLS': -0.133}\n",
+    "}\n",
+    "\n",
+    "for idx, y_var in enumerate(outcomes):\n",
+    "    ax = axes[idx]\n",
+    "\n",
+    "    # Find this spec (effective_5yr treatment)\n",
+    "    spec_res = None\n",
+    "    for s in all_dml_results:\n",
+    "        if s['outcome'] == y_var and s['treatment'] == 'effective_5yr':\n",
+    "            spec_res = s\n",
+    "            break\n",
+    "\n",
+    "    if spec_res is None:\n",
+    "        ax.set_title(panel_labels.get(y_var, y_var) + ' — no results')\n",
+    "        continue\n",
+    "\n",
+    "    labels = []\n",
+    "    coefs = []\n",
+    "    ci_los = []\n",
+    "    ci_his = []\n",
+    "    colors = []\n",
+    "\n",
+    "    # OLS baseline\n",
+    "    if spec_res['ols_coef'] is not None:\n",
+    "        labels.append('OLS (replicated)')\n",
+    "        coefs.append(spec_res['ols_coef'])\n",
+    "        ci_los.append(spec_res['ols_coef'] - 1.96 * spec_res['ols_se'])\n",
+    "        ci_his.append(spec_res['ols_coef'] + 1.96 * spec_res['ols_se'])\n",
+    "        colors.append(method_colors['OLS'])\n",
+    "\n",
+    "    # DML methods\n",
+    "    for m in ml_method_names:\n",
+    "        if m in spec_res['learners'] and 'coef' in spec_res['learners'][m]:\n",
+    "            lr = spec_res['learners'][m]\n",
+    "            labels.append(method_display.get(m, m))\n",
+    "            coefs.append(lr['coef'])\n",
+    "            ci_los.append(lr['ci_lo'])\n",
+    "            ci_his.append(lr['ci_hi'])\n",
+    "            colors.append(method_colors.get(m, '#333333'))\n",
+    "\n",
+    "    y_pos = np.arange(len(labels))\n",
+    "    xerr_lo = [c - lo for c, lo in zip(coefs, ci_los)]\n",
+    "    xerr_hi = [hi - c for c, hi in zip(coefs, ci_his)]\n",
+    "\n",
+    "    ax.errorbar(coefs, y_pos, xerr=[xerr_lo, xerr_hi],\n",
+    "                fmt='o', capsize=4, capthick=1.5, markersize=7,\n",
+    "                color='black', ecolor='black', elinewidth=1.5)\n",
+    "    # Color the markers\n",
+    "    for i, (c, color) in enumerate(zip(coefs, colors)):\n",
+    "        ax.plot(c, y_pos[i], 'o', color=color, markersize=8, zorder=5)\n",
+    "\n",
+    "    ax.axvline(x=0, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)\n",
+    "    ax.set_yticks(y_pos)\n",
+    "    ax.set_yticklabels(labels, fontsize=9)\n",
+    "    ax.invert_yaxis()\n",
+    "    ax.set_xlabel('Coefficient estimate', fontsize=9)\n",
+    "    ax.set_title(f'{panel_labels.get(y_var, y_var)} (N={spec_res[\"n_obs\"]})', fontsize=11, fontweight='bold')\n",
+    "    ax.tick_params(axis='x', labelsize=8)\n",
+    "\n",
+    "fig.suptitle('OLS vs DML Estimates — Five-year Effective Tax Rate\\n(Djankov et al. 2010, Table 5D specifications)',\n",
+    "             fontsize=13, fontweight='bold', y=1.02)\n",
+    "fig.tight_layout()\n",
+    "\n",
+    "for ext in ['pdf', 'png']:\n",
+    "    fig.savefig(str(FIGURES_DIR / f'forest_plot.{ext}'), dpi=200, bbox_inches='tight')\n",
+    "plt.close(fig)\n",
+    "print(f'Saved forest_plot.pdf and forest_plot.png to {FIGURES_DIR}')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "b66a4510",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-03-30T12:49:30.304662Z",
+     "iopub.status.busy": "2026-03-30T12:49:30.304398Z",
+     "iopub.status.idle": "2026-03-30T12:49:30.312530Z",
+     "shell.execute_reply": "2026-03-30T12:49:30.311729Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Wrote C:\\Users\\qgallea\\Dropbox\\work\\claude_code\\recast\\papers\\04_djankov_et_al_taxes\\paper\\tables\\table_dml.tex\n",
+      "\n",
+      "\\begin{table}[htbp]\n",
+      "\\centering\n",
+      "\\caption{OLS vs.\\ DML Estimates --- Five-year Effective Tax Rate (Table 5D Specifications)}\n",
+      "\\label{tab:dml_comparison}\n",
+      "\\small\n",
+      "\\begin{tabular}{lcccccc}\n",
+      "\\toprule\n",
+      " & OLS & DML (Lasso) & DML (Boosting) & DML (Forest) & DML (Elastic Net) & $N$ \\\\\n",
+      "\\midrule\n",
+      "\\multicolumn{7}{l}{\\textit{Panel A: Investment}} \\\\\n",
+      "  Coef. & -0.089 & 0.010 & -0.132 & -0.118 & 0.027 & 53 \\\\\n",
+      "  SE & (0.145) & (0.135) & (0.107) & (0.084) & (0.158) & \\\\\n",
+      "  95\\% CI & [-0.372, 0.195] & [-0.256, 0.275] & [-0.321, 0.078] & [-0.282, 0.047] & [-0.246, 0.338] & \\\\\n",
+      "\\addlinespace\n",
+      "\\multicolumn{7}{l}{\\textit{Panel B: FDI}} \\\\\n",
+      "  Coef. & -0.121 & -0.120 & -0.139 & -0.163* & -0.148** & 53 \\\\\n",
+      "  SE & (0.093) & (0.088) & (0.085) & (0.083) & (0.076) & \\\\\n",
+      "  95\\% CI & [-0.304, 0.061] & [-0.291, 0.052] & [-0.316, 0.027] & [-0.325, 0.000] & [-0.285, -0.000] & \\\\\n",
+      "\\addlinespace\n",
+      "\\multicolumn{7}{l}{\\textit{Panel C: Business density}} \\\\\n",
+      "  Coef. & -0.195* & -0.247*** & -0.104 & -0.165** & -0.177** & 53 \\\\\n",
+      "  SE & (0.107) & (0.087) & (0.064) & (0.082) & (0.088) & \\\\\n",
+      "  95\\% CI & [-0.405, 0.016] & [-0.465, -0.076] & [-0.263, 0.022] & [-0.322, -0.004] & [-0.348, -0.005] & \\\\\n",
+      "\\addlinespace\n",
+      "\\multicolumn{7}{l}{\\textit{Panel D: Entry rate}} \\\\\n",
+      "  Coef. & -0.128 & -0.173** & -0.228*** & -0.204** & -0.078 & 42 \\\\\n",
+      "  SE & (0.134) & (0.068) & (0.073) & (0.081) & (0.092) & \\\\\n",
+      "  95\\% CI & [-0.390, 0.134] & [-0.306, -0.039] & [-0.362, -0.084] & [-0.362, -0.045] & [-0.258, 0.102] & \\\\\n",
+      "\\addlinespace\n",
+      "\\bottomrule\n",
+      "\\end{tabular}\n",
+      "\\begin{minipage}{\\textwidth}\n",
+      "\\footnotesize\n",
+      "\\textit{Notes:} DML estimates use DoubleMLPLR with 5-fold cross-fitting and 3 repetitions.\n",
+      " Significance: $^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.\n",
+      " Controls: all 12 variables from Table 5D specification.\n",
+      "\\end{minipage}\n",
+      "\\end{table}\n"
+     ]
+    }
+   ],
+   "source": [
+    "# --- LaTeX comparison table: OLS vs DML (4 methods) for effective_5yr ---\n",
+    "# One panel per outcome (like Baiardi & Naghi Table 1)\n",
+    "\n",
+    "def fmt_coef(val, pval=None):\n",
+    "    \"\"\"Format coefficient with significance stars.\"\"\"\n",
+    "    if val is None:\n",
+    "        return '---'\n",
+    "    stars = ''\n",
+    "    if pval is not None:\n",
+    "        if pval < 0.01:\n",
+    "            stars = '***'\n",
+    "        elif pval < 0.05:\n",
+    "            stars = '**'\n",
+    "        elif pval < 0.10:\n",
+    "            stars = '*'\n",
+    "    return f'{val:.3f}{stars}'\n",
+    "\n",
+    "def fmt_se(val):\n",
+    "    if val is None:\n",
+    "        return ''\n",
+    "    return f'({val:.3f})'\n",
+    "\n",
+    "def fmt_ci(lo, hi):\n",
+    "    if lo is None or hi is None:\n",
+    "        return ''\n",
+    "    return f'[{lo:.3f}, {hi:.3f}]'\n",
+    "\n",
+    "lines = []\n",
+    "lines.append(r'\\begin{table}[htbp]')\n",
+    "lines.append(r'\\centering')\n",
+    "lines.append(r'\\caption{OLS vs.\\ DML Estimates --- Five-year Effective Tax Rate (Table 5D Specifications)}')\n",
+    "lines.append(r'\\label{tab:dml_comparison}')\n",
+    "lines.append(r'\\small')\n",
+    "lines.append(r'\\begin{tabular}{lcccccc}')\n",
+    "lines.append(r'\\toprule')\n",
+    "lines.append(r' & OLS & DML (Lasso) & DML (Boosting) & DML (Forest) & DML (Elastic Net) & $N$ \\\\')\n",
+    "lines.append(r'\\midrule')\n",
+    "\n",
+    "for y_var in outcomes:\n",
+    "    spec_res = None\n",
+    "    for s in all_dml_results:\n",
+    "        if s['outcome'] == y_var and s['treatment'] == 'effective_5yr':\n",
+    "            spec_res = s\n",
+    "            break\n",
+    "    if spec_res is None:\n",
+    "        continue\n",
+    "\n",
+    "    panel = panel_labels.get(y_var, y_var)\n",
+    "    lines.append(r'\\multicolumn{7}{l}{\\textit{' + panel + r'}} \\\\')\n",
+    "\n",
+    "    # Coefficient row\n",
+    "    ols_p = None\n",
+    "    ols_r = get_ols_result(y_var, 'effective_5yr')\n",
+    "    if ols_r:\n",
+    "        ols_p = ols_r.get('p_value')\n",
+    "    ols_c = fmt_coef(spec_res['ols_coef'], ols_p)\n",
+    "\n",
+    "    dml_cols = []\n",
+    "    for m in ['LassoCV', 'GradientBoosting', 'RandomForest', 'ElasticNet']:\n",
+    "        lr = spec_res['learners'].get(m, {})\n",
+    "        dml_cols.append(fmt_coef(lr.get('coef'), lr.get('pval')))\n",
+    "\n",
+    "    lines.append(f'  Coef. & {ols_c} & {\" & \".join(dml_cols)} & {spec_res[\"n_obs\"]} \\\\\\\\')\n",
+    "\n",
+    "    # SE row\n",
+    "    ols_se = fmt_se(spec_res['ols_se'])\n",
+    "    se_cols = []\n",
+    "    for m in ['LassoCV', 'GradientBoosting', 'RandomForest', 'ElasticNet']:\n",
+    "        lr = spec_res['learners'].get(m, {})\n",
+    "        se_cols.append(fmt_se(lr.get('se')))\n",
+    "    lines.append(f'  SE & {ols_se} & {\" & \".join(se_cols)} & \\\\\\\\')\n",
+    "\n",
+    "    # CI row\n",
+    "    if ols_r:\n",
+    "        ols_ci = fmt_ci(ols_r.get('ci_lo'), ols_r.get('ci_hi'))\n",
+    "    else:\n",
+    "        ols_ci = ''\n",
+    "    ci_cols = []\n",
+    "    for m in ['LassoCV', 'GradientBoosting', 'RandomForest', 'ElasticNet']:\n",
+    "        lr = spec_res['learners'].get(m, {})\n",
+    "        ci_cols.append(fmt_ci(lr.get('ci_lo'), lr.get('ci_hi')))\n",
+    "    lines.append(f'  95\\\\% CI & {ols_ci} & {\" & \".join(ci_cols)} & \\\\\\\\')\n",
+    "\n",
+    "    lines.append(r'\\addlinespace')\n",
+    "\n",
+    "lines.append(r'\\bottomrule')\n",
+    "lines.append(r'\\end{tabular}')\n",
+    "lines.append(r'\\begin{minipage}{\\textwidth}')\n",
+    "lines.append(r'\\footnotesize')\n",
+    "lines.append(r'\\textit{Notes:} DML estimates use DoubleMLPLR with ' + str(N_FOLDS) + r'-fold cross-fitting and ' + str(N_REP) + r' repetitions.')\n",
+    "lines.append(r' Significance: $^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.')\n",
+    "lines.append(r' Controls: all 12 variables from Table 5D specification.')\n",
+    "lines.append(r'\\end{minipage}')\n",
+    "lines.append(r'\\end{table}')\n",
+    "\n",
+    "table_tex = '\\n'.join(lines)\n",
+    "(TABLES_DIR / 'table_dml.tex').write_text(table_tex)\n",
+    "print(f'Wrote {TABLES_DIR / \"table_dml.tex\"}')\n",
+    "print()\n",
+    "print(table_tex)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "x3wjim88n9c",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-03-30T12:49:30.314156Z",
+     "iopub.status.busy": "2026-03-30T12:49:30.313958Z",
+     "iopub.status.idle": "2026-03-30T12:49:30.534219Z",
+     "shell.execute_reply": "2026-03-30T12:49:30.533473Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Re-fitted LassoCV with n_rep=1 for GATE/CATE: coef=-0.0707\n",
+      "GATE grouping variable: other_taxes (nunique=52)\n",
+      "Group sizes: {'Q1 (low)': 14, 'Q2': 13, 'Q3': 13, 'Q4 (high)': 13}\n",
+      "\n",
+      "GATE results:\n",
+      "                    2.5 %    effect    97.5 %\n",
+      "group_Q1 (low)  -0.821354 -0.161742  0.497870\n",
+      "group_Q2        -0.892190  0.141491  1.175172\n",
+      "group_Q3        -1.196594 -0.190342  0.815910\n",
+      "group_Q4 (high) -0.439640 -0.031649  0.376342\n",
+      "\n",
+      "Heterogeneity detected: False\n",
+      "  Q1 (low): coef=-0.1617  CI=[-0.8214, 0.4979]\n",
+      "  Q2: coef=0.1415  CI=[-0.8922, 1.1752]\n",
+      "  Q3: coef=-0.1903  CI=[-1.1966, 0.8159]\n",
+      "  Q4 (high): coef=-0.0316  CI=[-0.4396, 0.3763]\n"
+     ]
+    }
+   ],
+   "source": [
+    "# --- GATE: Group Average Treatment Effects ---\n",
+    "# DoubleML gate()/cate() requires n_rep=1, so we re-fit the preferred learner\n",
+    "# with n_rep=1 for the primary specification.\n",
+    "\n",
+    "obj_preferred_main = fitted_models.get((outcome, treatment, preferred))\n",
+    "if obj_preferred_main is None:\n",
+    "    print('WARNING: No fitted model for primary spec. Skipping GATE.')\n",
+    "    hte_results = None\n",
+    "    obj_gate = None\n",
+    "else:\n",
+    "    # Prepare clean data for primary spec\n",
+    "    key_cols_primary = [outcome, treatment] + controls\n",
+    "    df_primary = df[key_cols_primary].dropna().reset_index(drop=True)\n",
+    "\n",
+    "    # Re-fit with n_rep=1 for GATE/CATE compatibility\n",
+    "    dml_data_gate = dml.DoubleMLData(\n",
+    "        df_primary, y_col=outcome, d_cols=treatment, x_cols=controls\n",
+    "    )\n",
+    "    ml_l_gate = make_learner(preferred)\n",
+    "    ml_m_gate = make_learner(preferred)\n",
+    "    obj_gate = dml.DoubleMLPLR(\n",
+    "        dml_data_gate, ml_l=ml_l_gate, ml_m=ml_m_gate,\n",
+    "        n_folds=N_FOLDS, n_rep=1\n",
+    "    )\n",
+    "    obj_gate.fit()\n",
+    "    print(f'Re-fitted {preferred} with n_rep=1 for GATE/CATE: coef={obj_gate.coef[0]:.4f}')\n",
+    "\n",
+    "    # Choose grouping variable - use first control if continuous\n",
+    "    group_var = controls[0]  # other_taxes\n",
+    "    n_unique = df_primary[group_var].nunique()\n",
+    "    if n_unique < 4:\n",
+    "        group_var = treatment\n",
+    "    print(f'GATE grouping variable: {group_var} (nunique={df_primary[group_var].nunique()})')\n",
+    "\n",
+    "    # Create quartile groups\n",
+    "    try:\n",
+    "        quartiles = pd.qcut(df_primary[group_var], q=4, labels=['Q1 (low)', 'Q2', 'Q3', 'Q4 (high)'])\n",
+    "    except ValueError:\n",
+    "        quartiles = pd.qcut(df_primary[group_var].rank(method='first'), q=4,\n",
+    "                           labels=['Q1 (low)', 'Q2', 'Q3', 'Q4 (high)'])\n",
+    "\n",
+    "    # DoubleML gate() requires bool dtype (bug in v0.11.2 type check)\n",
+    "    groups_df = pd.get_dummies(quartiles, prefix='group', dtype=bool)\n",
+    "    print(f'Group sizes: {quartiles.value_counts().sort_index().to_dict()}')\n",
+    "\n",
+    "    # Fit GATE\n",
+    "    gate = obj_gate.gate(groups=groups_df)\n",
+    "    gate_ci = gate.confint(level=0.95, joint=True)\n",
+    "    print('\\nGATE results:')\n",
+    "    print(gate_ci)\n",
+    "\n",
+    "    # Extract GATE results\n",
+    "    group_labels = ['Q1 (low)', 'Q2', 'Q3', 'Q4 (high)']\n",
+    "    gate_groups = []\n",
+    "    for i, label in enumerate(group_labels):\n",
+    "        row = gate_ci.iloc[i]\n",
+    "        if len(row) >= 3:\n",
+    "            gate_groups.append({\n",
+    "                'label': label,\n",
+    "                'coef': round(float(row.iloc[1]), 4),\n",
+    "                'ci_lo': round(float(row.iloc[0]), 4),\n",
+    "                'ci_hi': round(float(row.iloc[2]), 4)\n",
+    "            })\n",
+    "        else:\n",
+    "            gate_groups.append({\n",
+    "                'label': label,\n",
+    "                'coef': round(float(gate.coef[i]), 4),\n",
+    "                'ci_lo': round(float(row.iloc[0]), 4),\n",
+    "                'ci_hi': round(float(row.iloc[-1]), 4)\n",
+    "            })\n",
+    "\n",
+    "    # Detect heterogeneity: check if any two CIs do not overlap\n",
+    "    heterogeneity_detected = False\n",
+    "    for i in range(len(gate_groups)):\n",
+    "        for j in range(i + 1, len(gate_groups)):\n",
+    "            ci_i = (gate_groups[i]['ci_lo'], gate_groups[i]['ci_hi'])\n",
+    "            ci_j = (gate_groups[j]['ci_lo'], gate_groups[j]['ci_hi'])\n",
+    "            if ci_i[0] > ci_j[1] or ci_j[0] > ci_i[1]:\n",
+    "                heterogeneity_detected = True\n",
+    "                break\n",
+    "        if heterogeneity_detected:\n",
+    "            break\n",
+    "\n",
+    "    hte_results = {\n",
+    "        'method': 'GATE',\n",
+    "        'grouping_variable': group_var,\n",
+    "        'n_groups': 4,\n",
+    "        'groups': gate_groups,\n",
+    "        'heterogeneity_detected': heterogeneity_detected,\n",
+    "        'cate_summary': None  # filled in next cell\n",
+    "    }\n",
+    "\n",
+    "    print(f'\\nHeterogeneity detected: {heterogeneity_detected}')\n",
+    "    for g in gate_groups:\n",
+    "        print(f'  {g[\"label\"]}: coef={g[\"coef\"]:.4f}  CI=[{g[\"ci_lo\"]:.4f}, {g[\"ci_hi\"]:.4f}]')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "xeg0ajn7lkh",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-03-30T12:49:30.535977Z",
+     "iopub.status.busy": "2026-03-30T12:49:30.535753Z",
+     "iopub.status.idle": "2026-03-30T12:49:30.548689Z",
+     "shell.execute_reply": "2026-03-30T12:49:30.548068Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "B-spline basis: 5 columns (df=5)\n",
+      "CATE summary: {'mean': -0.4444, 'sd': 1.5797, 'min': -3.2516, 'max': 1.4324}\n",
+      "\n",
+      "CATE confidence intervals:\n",
+      "                              2.5 %    effect    97.5 %\n",
+      "bs(other_taxes, df=5)[0]  -0.450320  0.580303  1.610926\n",
+      "bs(other_taxes, df=5)[1]  -1.552328 -0.391613  0.769102\n",
+      "bs(other_taxes, df=5)[2]  -2.297824  1.432424  5.162672\n",
+      "bs(other_taxes, df=5)[3] -10.968927 -3.251622  4.465683\n",
+      "bs(other_taxes, df=5)[4]  -0.679955 -0.591730 -0.503505\n",
+      "\n",
+      "Wrote C:\\Users\\qgallea\\Dropbox\\work\\claude_code\\recast\\papers\\04_djankov_et_al_taxes\\data\\results\\hte_results.json\n"
+     ]
+    }
+   ],
+   "source": [
+    "# --- CATE: Conditional Average Treatment Effects (PLR only) ---\n",
+    "# Use the n_rep=1 model (obj_gate) for CATE estimation\n",
+    "\n",
+    "if obj_gate is not None and model_type in ('PLR', 'PLIV'):\n",
+    "    try:\n",
+    "        import patsy\n",
+    "\n",
+    "        # Build B-spline basis with df=5 (or less for small samples)\n",
+    "        n_primary = len(df_primary)\n",
+    "        spline_df = min(5, max(3, n_primary // 10))\n",
+    "\n",
+    "        basis = patsy.dmatrix(\n",
+    "            f'bs({group_var}, df={spline_df}) - 1',\n",
+    "            df_primary,\n",
+    "            return_type='dataframe'\n",
+    "        )\n",
+    "        print(f'B-spline basis: {basis.shape[1]} columns (df={spline_df})')\n",
+    "\n",
+    "        cate = obj_gate.cate(basis=basis)\n",
+    "        cate_ci = cate.confint(level=0.95, joint=True)\n",
+    "\n",
+    "        # Extract CATE coefficients\n",
+    "        try:\n",
+    "            cate_coefs = cate.coef\n",
+    "            cate_summary = {\n",
+    "                'mean': round(float(np.mean(cate_coefs)), 4),\n",
+    "                'sd': round(float(np.std(cate_coefs)), 4),\n",
+    "                'min': round(float(np.min(cate_coefs)), 4),\n",
+    "                'max': round(float(np.max(cate_coefs)), 4)\n",
+    "            }\n",
+    "        except Exception:\n",
+    "            ci_midpoints = (cate_ci.iloc[:, 0].values + cate_ci.iloc[:, -1].values) / 2\n",
+    "            cate_summary = {\n",
+    "                'mean': round(float(np.mean(ci_midpoints)), 4),\n",
+    "                'sd': round(float(np.std(ci_midpoints)), 4),\n",
+    "                'min': round(float(np.min(ci_midpoints)), 4),\n",
+    "                'max': round(float(np.max(ci_midpoints)), 4)\n",
+    "            }\n",
+    "\n",
+    "        print(f'CATE summary: {cate_summary}')\n",
+    "        print('\\nCATE confidence intervals:')\n",
+    "        print(cate_ci)\n",
+    "\n",
+    "        # Update hte_results with CATE summary\n",
+    "        if hte_results is not None:\n",
+    "            hte_results['cate_summary'] = cate_summary\n",
+    "\n",
+    "    except ImportError:\n",
+    "        print('patsy not installed — skipping CATE analysis')\n",
+    "    except Exception as e:\n",
+    "        print(f'CATE estimation failed: {e}')\n",
+    "        import traceback\n",
+    "        traceback.print_exc()\n",
+    "else:\n",
+    "    if obj_gate is None:\n",
+    "        print('Skipping CATE (no fitted model)')\n",
+    "    else:\n",
+    "        print('Skipping CATE (model type is IRM)')\n",
+    "\n",
+    "# Write hte_results.json\n",
+    "HTE_RESULTS = RESULTS_DIR / 'hte_results.json'\n",
+    "if hte_results is not None:\n",
+    "    HTE_RESULTS.write_text(json.dumps(hte_results, indent=2))\n",
+    "    print(f'\\nWrote {HTE_RESULTS}')\n",
+    "else:\n",
+    "    print('No HTE results to write.')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "id": "lqvft9r8uzp",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-03-30T12:49:30.550435Z",
+     "iopub.status.busy": "2026-03-30T12:49:30.550229Z",
+     "iopub.status.idle": "2026-03-30T12:49:30.684425Z",
+     "shell.execute_reply": "2026-03-30T12:49:30.683651Z"
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Saved gate_plot.pdf and gate_plot.png to C:\\Users\\qgallea\\Dropbox\\work\\claude_code\\recast\\papers\\04_djankov_et_al_taxes\\paper\\figures\n",
+      "Wrote C:\\Users\\qgallea\\Dropbox\\work\\claude_code\\recast\\papers\\04_djankov_et_al_taxes\\paper\\tables\\table_gate.tex\n",
+      "\n",
+      "============================================================\n",
+      "STAGE 4 SUMMARY — DML Extension\n",
+      "============================================================\n",
+      "Model: DoubleML PLR\n",
+      "Specifications: 12 (4 outcomes x 3 treatments)\n",
+      "ML methods: RandomForest, LassoCV, GradientBoosting, ElasticNet\n",
+      "Cross-fitting: 5 folds, 3 repetitions\n",
+      "Preferred learner: LassoCV\n",
+      "\n",
+      "Primary spec (Investment2005 ~ effective_5yr):\n",
+      "  OLS:  coef = -0.0887\n",
+      "  DML (LassoCV): coef = 0.0097 (SE = 0.1353, p = 0.9430)\n",
+      "\n",
+      "Outputs:\n",
+      "  C:\\Users\\qgallea\\Dropbox\\work\\claude_code\\recast\\papers\\04_djankov_et_al_taxes\\data\\results\\dml_results.json\n",
+      "  C:\\Users\\qgallea\\Dropbox\\work\\claude_code\\recast\\papers\\04_djankov_et_al_taxes\\paper\\figures\\forest_plot.pdf\n",
+      "  C:\\Users\\qgallea\\Dropbox\\work\\claude_code\\recast\\papers\\04_djankov_et_al_taxes\\paper\\tables\\table_dml.tex\n",
+      "  C:\\Users\\qgallea\\Dropbox\\work\\claude_code\\recast\\papers\\04_djankov_et_al_taxes\\data\\results\\hte_results.json\n",
+      "  C:\\Users\\qgallea\\Dropbox\\work\\claude_code\\recast\\papers\\04_djankov_et_al_taxes\\paper\\figures\\gate_plot.pdf\n",
+      "  C:\\Users\\qgallea\\Dropbox\\work\\claude_code\\recast\\papers\\04_djankov_et_al_taxes\\paper\\tables\\table_gate.tex\n"
+     ]
+    }
+   ],
+   "source": [
+    "# --- GATE plot + LaTeX table ---\n",
+    "\n",
+    "if hte_results is not None and hte_results.get('groups'):\n",
+    "    groups = hte_results['groups']\n",
+    "\n",
+    "    # --- GATE Plot ---\n",
+    "    fig, ax = plt.subplots(figsize=(8, 4))\n",
+    "\n",
+    "    labels = [g['label'] for g in groups]\n",
+    "    coefs = [g['coef'] for g in groups]\n",
+    "    ci_los = [g['ci_lo'] for g in groups]\n",
+    "    ci_his = [g['ci_hi'] for g in groups]\n",
+    "\n",
+    "    y_pos = np.arange(len(labels))\n",
+    "    xerr_lo = [c - lo for c, lo in zip(coefs, ci_los)]\n",
+    "    xerr_hi = [hi - c for c, hi in zip(coefs, ci_his)]\n",
+    "\n",
+    "    ax.errorbar(coefs, y_pos, xerr=[xerr_lo, xerr_hi],\n",
+    "                fmt='o', capsize=5, capthick=1.5, markersize=8,\n",
+    "                color='#1f77b4', ecolor='#1f77b4', elinewidth=1.5)\n",
+    "    ax.axvline(x=0, color='grey', linestyle='--', linewidth=0.8, alpha=0.7)\n",
+    "    ax.set_yticks(y_pos)\n",
+    "    ax.set_yticklabels(labels, fontsize=10)\n",
+    "    ax.invert_yaxis()\n",
+    "    ax.set_xlabel('GATE Coefficient (jointly valid 95% CI)', fontsize=10)\n",
+    "    ax.set_title(f'Group Average Treatment Effects\\n(grouped by {group_var})', fontsize=12, fontweight='bold')\n",
+    "\n",
+    "    fig.tight_layout()\n",
+    "    for ext in ['pdf', 'png']:\n",
+    "        fig.savefig(str(FIGURES_DIR / f'gate_plot.{ext}'), dpi=200, bbox_inches='tight')\n",
+    "    plt.close(fig)\n",
+    "    print(f'Saved gate_plot.pdf and gate_plot.png to {FIGURES_DIR}')\n",
+    "\n",
+    "    # --- GATE LaTeX table ---\n",
+    "    gate_lines = []\n",
+    "    gate_lines.append(r'\\begin{table}[h]')\n",
+    "    gate_lines.append(r'\\centering')\n",
+    "    gate_lines.append(r'\\caption{Group Average Treatment Effects (GATE)}')\n",
+    "    gate_lines.append(r'\\label{tab:gate}')\n",
+    "    gate_lines.append(r'\\begin{tabular}{lccc}')\n",
+    "    gate_lines.append(r'\\toprule')\n",
+    "    gate_lines.append(r'Group & Coef. & 95\\% CI (joint) \\\\')\n",
+    "    gate_lines.append(r'\\midrule')\n",
+    "    for g in groups:\n",
+    "        gate_lines.append(f'{g[\"label\"]} & {g[\"coef\"]:.3f} & [{g[\"ci_lo\"]:.3f}, {g[\"ci_hi\"]:.3f}] \\\\\\\\')\n",
+    "    gate_lines.append(r'\\bottomrule')\n",
+    "    gate_lines.append(r'\\end{tabular}')\n",
+    "    gate_lines.append(r'\\begin{minipage}{0.8\\textwidth}')\n",
+    "    gate_lines.append(r'\\footnotesize')\n",
+    "    gate_lines.append(r'\\textit{Notes:} Groups based on quartiles of ' + group_var.replace('_', r'\\_') + '.')\n",
+    "    gate_lines.append(r' CIs are jointly valid via Gaussian multiplier bootstrap.')\n",
+    "    het_str = 'Yes' if hte_results['heterogeneity_detected'] else 'No'\n",
+    "    gate_lines.append(r' Heterogeneity detected: ' + het_str + '.')\n",
+    "    gate_lines.append(r'\\end{minipage}')\n",
+    "    gate_lines.append(r'\\end{table}')\n",
+    "\n",
+    "    gate_tex = '\\n'.join(gate_lines)\n",
+    "    (TABLES_DIR / 'table_gate.tex').write_text(gate_tex)\n",
+    "    print(f'Wrote {TABLES_DIR / \"table_gate.tex\"}')\n",
+    "else:\n",
+    "    print('No GATE results to plot or tabulate.')\n",
+    "\n",
+    "# --- Summary print ---\n",
+    "print('\\n' + '='*60)\n",
+    "print('STAGE 4 SUMMARY — DML Extension')\n",
+    "print('='*60)\n",
+    "print(f'Model: DoubleML PLR')\n",
+    "print(f'Specifications: {len(all_dml_results)} (4 outcomes x 3 treatments)')\n",
+    "print(f'ML methods: {\", \".join(ml_method_names)}')\n",
+    "print(f'Cross-fitting: {N_FOLDS} folds, {N_REP} repetitions')\n",
+    "print(f'Preferred learner: {preferred}')\n",
+    "if primary_spec and preferred in primary_spec['learners']:\n",
+    "    pref = primary_spec['learners'][preferred]\n",
+    "    print(f'\\nPrimary spec ({outcome} ~ {treatment}):')\n",
+    "    print(f'  OLS:  coef = {primary_spec[\"ols_coef\"]:.4f}')\n",
+    "    print(f'  DML ({preferred}): coef = {pref[\"coef\"]:.4f} (SE = {pref[\"se\"]:.4f}, p = {pref[\"pval\"]:.4f})')\n",
+    "print(f'\\nOutputs:')\n",
+    "print(f'  {DML_RESULTS}')\n",
+    "print(f'  {FIGURES_DIR / \"forest_plot.pdf\"}')\n",
+    "print(f'  {TABLES_DIR / \"table_dml.tex\"}')\n",
+    "if hte_results:\n",
+    "    print(f'  {RESULTS_DIR / \"hte_results.json\"}')\n",
+    "    print(f'  {FIGURES_DIR / \"gate_plot.pdf\"}')\n",
+    "    print(f'  {TABLES_DIR / \"table_gate.tex\"}')"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.14.3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

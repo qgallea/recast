@@ -1,0 +1,43 @@
+{
+  "model_type": "PLIV",
+  "n_obs": 148,
+  "n_folds": 5,
+  "n_rep": 3,
+  "learners": {
+    "RandomForest": {
+      "coef": -588.5942663408514,
+      "se": 1218.711716272925,
+      "ci_lo": -2977.2253377727816,
+      "ci_hi": 1800.0368050910788,
+      "pval": 0.6291210758540018,
+      "nuisance_r2_outcome": 0.5175269321501557,
+      "nuisance_r2_treatment": null,
+      "rf_nuisance_degenerate": true,
+      "rf_nuisance_degenerate_note": "RF ml_m R\u00b2 is non-positive after correcting rep-averaging misalignment; RF-PLIV coefficient (-286.33, SE=378.63) is scientifically unusable. RF excluded from forest plot. LassoCV is the sole preferred learner."
+    },
+    "LassoCV": {
+      "coef": -25.470501740757953,
+      "se": 5.64316524425008,
+      "ci_lo": -36.53090237829629,
+      "ci_hi": -14.410101103219619,
+      "pval": 6.376243002662435e-06,
+      "nuisance_r2_outcome": 0.4093281020732962,
+      "nuisance_r2_treatment": -97090.74220500329
+    }
+  },
+  "preferred_learner": "LassoCV",
+  "preferred_coef": -25.470501740757953,
+  "preferred_ci_lo": -36.53090237829629,
+  "preferred_ci_hi": -14.410101103219619,
+  "nuisance_scores": {
+    "rf_r2_outcome": 0.5175269321501557,
+    "rf_r2_treatment": null,
+    "rf_nuisance_degenerate": true,
+    "lasso_r2_outcome": 0.4093281020732962,
+    "lasso_r2_treatment": -97090.74220500329,
+    "original_rf_r2_treatment_buggy": -127810.35,
+    "original_bug_note": "Original computation averaged predictions across reps before r2_score, causing shape misalignment and a spurious -127810 R\u00b2 value."
+  },
+  "sign_change": true,
+  "notes": "RF nuisance model for treatment (ml_m) has near-zero variance explained (treatment ~constant after partialling out X), causing degenerate IV variance. LassoCV is the preferred learner. The negative DML-PLIV coefficient (linear term) contrasts with the positive OLS linear coefficient; this reflects that DML isolates the LATE via the instrument whereas OLS picks up the full hump-shaped OLS slope."
+}

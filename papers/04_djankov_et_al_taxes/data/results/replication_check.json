@@ -1,0 +1,6 @@
+{
+  "pass": true,
+  "summary": "4/4 reference specs replicated within 5.0% (12 total regressions run)",
+  "worst_rel_diff_pct": 0.69,
+  "failure_notes": null
+}

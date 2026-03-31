@@ -1,0 +1,70 @@
+# RECAST Project Configuration — Djankov et al. (2010 AEJ:Macro)
+# "The Effect of Corporate Taxes on Investment and Entrepreneurship"
+
+paper:
+  title: "The Effect of Corporate Taxes on Investment and Entrepreneurship"
+  authors: "Djankov, S., Ganser, T., McLiesh, C., Ramalho, R. and Shleifer, A."
+  year: 2010
+  journal: "American Economic Journal: Macroeconomics"
+  slug: "djankov2010"
+
+identification:
+  type: OLS
+  primary_data_file: "data_taxes.csv"
+  outcome_variable: "Investment2005"           # Investment as % of GDP 2003-2005 (Panel A)
+  treatment_variable: "effective_5yr"          # Five-year effective tax rate
+  functional_form: linear
+  controls:                          # exact 12 controls from B&N taxes_inv_03_05_A.R line 67
+    - other_taxes
+    - vatsales
+    - pit2004
+    - lnpayments2004
+    - lngdppc2003
+    - propertyrights
+    - sb_proc2004
+    - emplo_i2004
+    - freedomtotradeinternationally
+    - seign2004
+    - inf10yearavg
+    - index_gcr
+  secondary_datasets: []
+  # Notes:
+  #   The paper examines 4 outcomes (Investment, FDI, Business density, Entry rate)
+  #   and 3 treatment variables (statutory, effective, effective_5yr).
+  #   We configure the primary specification here (Panel A, 5-year effective rate)
+  #   and the pipeline should replicate all 4 panels x 3 treatment measures.
+
+  # Additional outcome variables for full replication:
+  #   - Investment2005    (Panel A: Investment as % of GDP)
+  #   - FDI2005           (Panel B: FDI as % of GDP)
+  #   - nbusinessdensitycf (Panel C: Business density per 100 people)
+  #   - nentryrateav      (Panel D: Average entry rate 2000-2004)
+  #
+  # Additional treatment variables:
+  #   - statutory         (Statutory corporate tax rate)
+  #   - effective         (First-year effective tax rate)
+  #   - effective_5yr     (Five-year effective tax rate)
+
+dml:
+  model_type: PLR                    # Partial Linear Regression (OLS setting)
+  ml_methods:
+    - RandomForest
+    - LassoCV
+    - GradientBoosting
+    - ElasticNet
+  n_folds: 5
+  n_rep: 3
+
+causal_forest:
+  enabled: true
+  method: CausalForestDML
+  n_estimators: 1000
+  max_depth: null
+  min_samples_leaf: 5
+  honest: true
+  criterion: mse
+  cv: 5
+
+review:
+  max_rounds: 3
+  blocking_threshold: major

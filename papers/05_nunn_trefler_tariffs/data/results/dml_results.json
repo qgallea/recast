@@ -1,0 +1,435 @@
+{
+  "model_type": "PLR",
+  "aggregation": "median_across_reps",
+  "se_formula": "B&N adjusted: median(sqrt(SE_k^2 + (coef_k - median_coef)^2))",
+  "specifications": [
+    {
+      "outcome": {
+        "variable": "growth",
+        "label": "Log annual per capita GDP growth"
+      },
+      "treatment": {
+        "variable": "skill1_corr",
+        "label": "Skill-tariff correlation (Table 2 Panel A primary treatment)"
+      },
+      "n_obs": 63,
+      "n_folds": 2,
+      "n_rep": 20,
+      "learners": {
+        "Lasso": {
+          "coef": 0.019767844096597147,
+          "se": 0.013302320279588213,
+          "ci_lo": -0.006304703651395752,
+          "ci_hi": 0.045840391844590045,
+          "pval": 0.13726726718235138,
+          "nuisance": {
+            "mse_outcome": 0.00032687951963323263,
+            "mse_treatment": 0.04302021697201142,
+            "r2_outcome": 0.11759348401135672,
+            "r2_treatment": 0.3095143689468919
+          },
+          "lasso_diagnostics": {
+            "outcome_model": {
+              "n_nonzero": 6,
+              "total_p": 17,
+              "top_variables": {
+                "inv": 0.009619,
+                "init": -0.008224,
+                "human_cap": 0.006434,
+                "w_africa": -0.003203,
+                "avg_tar": -0.000896
+              }
+            },
+            "treatment_model": {
+              "n_nonzero": 2,
+              "total_p": 17,
+              "top_variables": {
+                "avg_tar": -0.029935,
+                "ln_init_q_skilla": 0.011539
+              }
+            }
+          }
+        },
+        "DecisionTree": {
+          "coef": 0.013210229861465516,
+          "se": 0.01116714261019352,
+          "ci_lo": -0.008677369654513782,
+          "ci_hi": 0.035097829377444816,
+          "pval": 0.23682688730402734,
+          "nuisance": {
+            "mse_outcome": 0.0003816917658658371,
+            "mse_treatment": 0.04536661035537479,
+            "r2_outcome": -0.030371378656983028,
+            "r2_treatment": 0.2718541470780774
+          },
+          "lasso_diagnostics": null
+        },
+        "Boosting": {
+          "coef": 0.019717729210399083,
+          "se": 0.012366400843441424,
+          "ci_lo": -0.0045204164427461065,
+          "ci_hi": 0.04395587486354427,
+          "pval": 0.1108330842252856,
+          "nuisance": {
+            "mse_outcome": 0.0003133510236223574,
+            "mse_treatment": 0.039745320462172676,
+            "r2_outcome": 0.15411346251878055,
+            "r2_treatment": 0.362077306616425
+          },
+          "lasso_diagnostics": null
+        },
+        "Forest": {
+          "coef": 0.017534026186539778,
+          "se": 0.010501111486427914,
+          "ci_lo": -0.003048152326858934,
+          "ci_hi": 0.03811620469993849,
+          "pval": 0.09497269542152442,
+          "nuisance": {
+            "mse_outcome": 0.00034318099976630024,
+            "mse_treatment": 0.04527704296713187,
+            "r2_outcome": 0.07358787513803822,
+            "r2_treatment": 0.27329172687068803
+          },
+          "lasso_diagnostics": null
+        },
+        "NeuralNet": {
+          "coef": 0.26676302242462024,
+          "se": 0.09900889623406714,
+          "ci_lo": 0.07270558580584865,
+          "ci_hi": 0.46082045904339186,
+          "pval": 0.0070529476855838436,
+          "nuisance": {
+            "mse_outcome": 0.018177621079593694,
+            "mse_treatment": 0.07353511554857867,
+            "r2_outcome": -48.07022411132808,
+            "r2_treatment": -0.1802576611168023
+          },
+          "lasso_diagnostics": null
+        },
+        "Ensemble": {
+          "coef": 0.01890110912630849,
+          "se": 0.01228636149078013,
+          "ci_lo": -0.005180159395620561,
+          "ci_hi": 0.04298237764823754,
+          "pval": 0.12395540454872234,
+          "weights": {
+            "Lasso": 0.258,
+            "DecisionTree": 0.221,
+            "Boosting": 0.27,
+            "Forest": 0.246,
+            "NeuralNet": 0.005
+          }
+        },
+        "Best": {
+          "coef": 0.019717729210399083,
+          "se": 0.012366400843441424,
+          "ci_lo": -0.0045204164427461065,
+          "ci_hi": 0.04395587486354427,
+          "pval": 0.1108330842252856,
+          "nuisance": {
+            "mse_outcome": 0.0003133510236223574,
+            "mse_treatment": 0.039745320462172676,
+            "r2_outcome": 0.15411346251878055,
+            "r2_treatment": 0.362077306616425
+          },
+          "lasso_diagnostics": null,
+          "best_outcome_method": "Boosting",
+          "best_treatment_method": "Boosting",
+          "selection_criterion": "lowest_nuisance_MSE"
+        }
+      },
+      "ols_coef": 0.03483858746537481,
+      "ols_se": 0.012183536639320027,
+      "preferred_learner": "Best",
+      "preferred_coef": 0.019717729210399083,
+      "preferred_ci_lo": -0.0045204164427461065,
+      "preferred_ci_hi": 0.04395587486354427,
+      "sign_change_vs_published": false
+    },
+    {
+      "outcome": {
+        "variable": "growth",
+        "label": "Log annual per capita GDP growth"
+      },
+      "treatment": {
+        "variable": "diffa",
+        "label": "Tariff differential (low skill cut-off, Table 2 Panel B)"
+      },
+      "n_obs": 63,
+      "n_folds": 2,
+      "n_rep": 20,
+      "learners": {
+        "Lasso": {
+          "coef": 0.008114641092246218,
+          "se": 0.005916307773740647,
+          "ci_lo": -0.00348132214428545,
+          "ci_hi": 0.019710604328777886,
+          "pval": 0.17019676762694602,
+          "nuisance": {
+            "mse_outcome": 0.00034042259985043603,
+            "mse_treatment": 0.21260884138798644,
+            "r2_outcome": 0.08103413565075601,
+            "r2_treatment": 0.28938051540043874
+          },
+          "lasso_diagnostics": {
+            "outcome_model": {
+              "n_nonzero": 4,
+              "total_p": 17,
+              "top_variables": {
+                "human_cap": 0.006664,
+                "inv": 0.004011,
+                "avg_tar": -0.001476,
+                "ln_init_q_unskilla": 0.000337
+              }
+            },
+            "treatment_model": {
+              "n_nonzero": 13,
+              "total_p": 17,
+              "top_variables": {
+                "s_e_asia": 0.715462,
+                "init": 0.288577,
+                "w_africa": 0.271419,
+                "n_afr_me": -0.194242,
+                "inv": 0.171417
+              }
+            }
+          }
+        },
+        "DecisionTree": {
+          "coef": 0.005650100680228666,
+          "se": 0.005331262000622884,
+          "ci_lo": -0.004799172840992187,
+          "ci_hi": 0.01609937420144952,
+          "pval": 0.2892331035228146,
+          "nuisance": {
+            "mse_outcome": 0.00037786984231129534,
+            "mse_treatment": 0.18112143638423472,
+            "r2_outcome": -0.020054151527176378,
+            "r2_treatment": 0.3946233800389365
+          },
+          "lasso_diagnostics": null
+        },
+        "Boosting": {
+          "coef": 0.010977692909436086,
+          "se": 0.005916925256436528,
+          "ci_lo": -0.0006194805931795094,
+          "ci_hi": 0.022574866412051683,
+          "pval": 0.06355288007976756,
+          "nuisance": {
+            "mse_outcome": 0.00030927926391681953,
+            "mse_treatment": 0.17871620734776666,
+            "r2_outcome": 0.16510511870983824,
+            "r2_treatment": 0.40266256884726903
+          },
+          "lasso_diagnostics": null
+        },
+        "Forest": {
+          "coef": 0.009853656670985757,
+          "se": 0.005074564375513209,
+          "ci_lo": -9.248950502013277e-05,
+          "ci_hi": 0.01979980284699165,
+          "pval": 0.052164477547365085,
+          "nuisance": {
+            "mse_outcome": 0.0003415176398036357,
+            "mse_treatment": 0.1970232885002106,
+            "r2_outcome": 0.07807809120032538,
+            "r2_treatment": 0.34147335165318493
+          },
+          "lasso_diagnostics": null
+        },
+        "NeuralNet": {
+          "coef": 0.10860378881742284,
+          "se": 0.0447365245586729,
+          "ci_lo": 0.020920200682423964,
+          "ci_hi": 0.1962873769524217,
+          "pval": 0.015197783155896927,
+          "nuisance": {
+            "mse_outcome": 0.018637397240320923,
+            "mse_treatment": 0.281775902084043,
+            "r2_outcome": -49.31138317989611,
+            "r2_treatment": 0.05819793285956232
+          },
+          "lasso_diagnostics": null
+        },
+        "Ensemble": {
+          "coef": 0.00923497127746228,
+          "se": 0.005752898465989267,
+          "ci_lo": -0.0020407097158766842,
+          "ci_hi": 0.020510652270801247,
+          "pval": 0.1084337881522317,
+          "weights": {
+            "Lasso": 0.249,
+            "DecisionTree": 0.224,
+            "Boosting": 0.274,
+            "Forest": 0.248,
+            "NeuralNet": 0.005
+          }
+        },
+        "Best": {
+          "coef": 0.010977692909436086,
+          "se": 0.005916925256436528,
+          "ci_lo": -0.0006194805931795094,
+          "ci_hi": 0.022574866412051683,
+          "pval": 0.06355288007976756,
+          "nuisance": {
+            "mse_outcome": 0.00030927926391681953,
+            "mse_treatment": 0.17871620734776666,
+            "r2_outcome": 0.16510511870983824,
+            "r2_treatment": 0.40266256884726903
+          },
+          "lasso_diagnostics": null,
+          "best_outcome_method": "Boosting",
+          "best_treatment_method": "Boosting",
+          "selection_criterion": "lowest_nuisance_MSE"
+        }
+      },
+      "ols_coef": 0.016262443378164494,
+      "ols_se": 0.005716167143222052,
+      "preferred_learner": "Best",
+      "preferred_coef": 0.010977692909436086,
+      "preferred_ci_lo": -0.0006194805931795094,
+      "preferred_ci_hi": 0.022574866412051683,
+      "sign_change_vs_published": false
+    },
+    {
+      "outcome": {
+        "variable": "growth",
+        "label": "Log annual per capita GDP growth"
+      },
+      "treatment": {
+        "variable": "diffg",
+        "label": "Tariff differential (high skill cut-off, Table 2 Panel C)"
+      },
+      "n_obs": 63,
+      "n_folds": 2,
+      "n_rep": 20,
+      "learners": {
+        "Lasso": {
+          "coef": 0.006053736560664969,
+          "se": 0.005699703230050955,
+          "ci_lo": -0.005117681770234903,
+          "ci_hi": 0.017225154891564842,
+          "pval": 0.2881837787610748,
+          "nuisance": {
+            "mse_outcome": 0.00032605276302469027,
+            "mse_treatment": 0.26015806989910967,
+            "r2_outcome": 0.11982530146915582,
+            "r2_treatment": 0.24969270044535186
+          },
+          "lasso_diagnostics": {
+            "outcome_model": {
+              "n_nonzero": 2,
+              "total_p": 17,
+              "top_variables": {
+                "human_cap": 0.003829,
+                "ln_init_q_skilla": 0.001579
+              }
+            },
+            "treatment_model": {
+              "n_nonzero": 2,
+              "total_p": 17,
+              "top_variables": {
+                "avg_tar": -0.088542,
+                "ln_init_q_skilla": 0.075557
+              }
+            }
+          }
+        },
+        "DecisionTree": {
+          "coef": 0.0031874462543857616,
+          "se": 0.004905892490818583,
+          "ci_lo": -0.006428103027618661,
+          "ci_hi": 0.012802995536390183,
+          "pval": 0.515874447782644,
+          "nuisance": {
+            "mse_outcome": 0.0003855296461944515,
+            "mse_treatment": 0.2671416652302291,
+            "r2_outcome": -0.040731680866658904,
+            "r2_treatment": 0.2295517047956429
+          },
+          "lasso_diagnostics": null
+        },
+        "Boosting": {
+          "coef": 0.006404805777478312,
+          "se": 0.00538409587134879,
+          "ci_lo": -0.004148022130365317,
+          "ci_hi": 0.01695763368532194,
+          "pval": 0.23421202098682592,
+          "nuisance": {
+            "mse_outcome": 0.00030444031501665654,
+            "mse_treatment": 0.244782503561048,
+            "r2_outcome": 0.17816779098992153,
+            "r2_treatment": 0.29403650904874545
+          },
+          "lasso_diagnostics": null
+        },
+        "Forest": {
+          "coef": 0.006491505203118518,
+          "se": 0.004988595396485685,
+          "ci_lo": -0.0032861417739934243,
+          "ci_hi": 0.01626915218023046,
+          "pval": 0.19316634908008123,
+          "nuisance": {
+            "mse_outcome": 0.0003533897446683422,
+            "mse_treatment": 0.24804839726839228,
+            "r2_outcome": 0.04602951653626608,
+            "r2_treatment": 0.28461752816093255
+          },
+          "lasso_diagnostics": null
+        },
+        "NeuralNet": {
+          "coef": 0.10260691099491488,
+          "se": 0.048778477131660586,
+          "ci_lo": 0.007001095816860134,
+          "ci_hi": 0.19821272617296964,
+          "pval": 0.03541960712483472,
+          "nuisance": {
+            "mse_outcome": 0.017516163049598847,
+            "mse_treatment": 0.27917694600808196,
+            "r2_outcome": -46.28462776569174,
+            "r2_treatment": 0.19484142645096303
+          },
+          "lasso_diagnostics": null
+        },
+        "Ensemble": {
+          "coef": 0.006093414506427621,
+          "se": 0.005475862159857084,
+          "ci_lo": -0.004639275326892262,
+          "ci_hi": 0.016826104339747506,
+          "pval": 0.2658041342507942,
+          "weights": {
+            "Lasso": 0.259,
+            "DecisionTree": 0.219,
+            "Boosting": 0.278,
+            "Forest": 0.239,
+            "NeuralNet": 0.005
+          }
+        },
+        "Best": {
+          "coef": 0.006404805777478312,
+          "se": 0.00538409587134879,
+          "ci_lo": -0.004148022130365317,
+          "ci_hi": 0.01695763368532194,
+          "pval": 0.23421202098682592,
+          "nuisance": {
+            "mse_outcome": 0.00030444031501665654,
+            "mse_treatment": 0.244782503561048,
+            "r2_outcome": 0.17816779098992153,
+            "r2_treatment": 0.29403650904874545
+          },
+          "lasso_diagnostics": null,
+          "best_outcome_method": "Boosting",
+          "best_treatment_method": "Boosting",
+          "selection_criterion": "lowest_nuisance_MSE"
+        }
+      },
+      "ols_coef": 0.018978296815519286,
+      "ols_se": 0.004935403910328477,
+      "preferred_learner": "Best",
+      "preferred_coef": 0.006404805777478312,
+      "preferred_ci_lo": -0.004148022130365317,
+      "preferred_ci_hi": 0.01695763368532194,
+      "sign_change_vs_published": false
+    }
+  ]
+}

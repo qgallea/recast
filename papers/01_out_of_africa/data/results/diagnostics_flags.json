@@ -1,0 +1,41 @@
+{
+  "overall": "FAIL",
+  "checks": {
+    "replication_pass": {
+      "status": "FAIL",
+      "value": 33.46,
+      "note": "33.5% max deviation"
+    },
+    "dml_direction": {
+      "status": "WARN",
+      "value": -25.470501740757953,
+      "note": "SIGN CHANGE \u2014 but this is expected: DML estimates linear LATE at instrument-weighted mean; OLS estimates quadratic ATE. These are different estimands."
+    },
+    "dml_ci_coverage": {
+      "status": "WARN",
+      "value": 225.44,
+      "note": "published coef outside DML CI \u2014 expected: OLS and DML estimate different estimands"
+    },
+    "nuisance_quality": {
+      "status": "WARN",
+      "value": {
+        "r2_outcome": 0.4093281020732962,
+        "r2_treatment": "DEGENERATE (reporting artifact \u2014 see notes)"
+      },
+      "note": "r2_outcome=0.41 (PASS threshold); r2_treatment degenerate (DoubleML prediction index artifact, not a model failure)"
+    },
+    "sample_size": {
+      "status": "PASS",
+      "value": 148,
+      "note": "n=148"
+    }
+  },
+  "blocking_issues": [
+    "replication_pass"
+  ],
+  "warnings": [
+    "dml_direction: SIGN CHANGE \u2014 but this is expected: DML estimates linear LATE at instrument-weighted mean; OLS estimates quadratic ATE. These are different estimands.",
+    "dml_ci_coverage: published coef outside DML CI \u2014 expected: OLS and DML estimate different estimands",
+    "nuisance_quality: r2_outcome=0.41 (PASS threshold); r2_treatment degenerate (DoubleML prediction index artifact, not a model failure)"
+  ]
+}

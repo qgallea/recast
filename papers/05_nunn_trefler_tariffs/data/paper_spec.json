@@ -1,0 +1,161 @@
+{
+  "title": "The Structure of Tariffs and Long-term Growth",
+  "authors": [
+    "Nunn, N.",
+    "Trefler, D."
+  ],
+  "year": 2010,
+  "journal": "American Economic Journal: Macroeconomics",
+  "slug": "nunntrefler2010",
+  "identification": {
+    "type": "OLS",
+    "narrative": "Nunn and Trefler (2010) examine whether skill-biased tariff protection affects long-term economic growth. Using cross-country data, they regress log annual per capita GDP growth on measures of tariff skill-bias (skill1_corr, diffa, diffg) controlling for initial GDP, investment, human capital, average tariff level, and region dummies. The country-level sample (industry=='211212') contains 63 observations. There is no instrument; the identification relies on selection-on-observables with a rich set of 17 controls including regional dummies and initial skill-intensity measures. Baiardi and Naghi (2024) revisit this paper using Double/Debiased ML (DML2 with 2-fold cross-fitting, 100 repetitions) and find that DML estimates are substantially smaller than OLS, suggesting OLS suffers from regularization bias when the number of controls is large relative to n=63.",
+    "outcome_variable": "growth",
+    "outcome_label": "Log annual per capita GDP growth",
+    "treatment_variable": "skill1_corr",
+    "treatment_label": "Skill-tariff correlation (Table 2 Panel A primary treatment)",
+    "instrument": null,
+    "instrument_label": null,
+    "functional_form": "linear",
+    "controls": [
+      "avg_tar",
+      "init",
+      "inv",
+      "human_cap",
+      "w_africa",
+      "e_africa",
+      "s_c_africa",
+      "n_afr_me",
+      "e_europe",
+      "lat_america",
+      "e_asia",
+      "s_e_asia",
+      "s_w_asia",
+      "dum80_83",
+      "dum85_87",
+      "ln_init_q_skilla",
+      "ln_init_q_unskilla"
+    ],
+    "fixed_effects": [],
+    "cluster_se": null,
+    "primary_data_file": "data_tariffs.csv",
+    "secondary_datasets": [],
+    "data_filter": "industry == 211212",
+    "additional_treatments": [
+      {
+        "variable": "diffa",
+        "label": "Tariff differential (low skill cut-off, Table 2 Panel B)"
+      },
+      {
+        "variable": "diffg",
+        "label": "Tariff differential (high skill cut-off, Table 2 Panel C)"
+      }
+    ]
+  },
+  "main_results": [
+    {
+      "table": "Table 2, Panel A",
+      "spec": "OLS \u2014 growth on skill1_corr, 17 controls, country-level",
+      "coef": 0.035,
+      "se": null,
+      "ci_lo": null,
+      "ci_hi": null,
+      "n_obs": 63,
+      "notes": "OLS baseline from Nunn & Trefler (2010) Table 2 Panel A"
+    },
+    {
+      "table": "B&N Table 2, Panel A \u2014 DML Lasso",
+      "spec": "DML2 PLR \u2014 growth on skill1_corr, Lasso, 2-fold, 100 reps",
+      "coef": 0.019,
+      "se": null,
+      "ci_lo": null,
+      "ci_hi": null,
+      "n_obs": 63,
+      "notes": "Baiardi & Naghi (2024) DML replication; median over 100 repetitions"
+    },
+    {
+      "table": "B&N Table 2, Panel A \u2014 DML Boosting",
+      "spec": "DML2 PLR \u2014 growth on skill1_corr, Boosting, 2-fold, 100 reps",
+      "coef": 0.016,
+      "se": null,
+      "ci_lo": null,
+      "ci_hi": null,
+      "n_obs": 63,
+      "notes": "Baiardi & Naghi (2024) DML replication; median over 100 repetitions"
+    },
+    {
+      "table": "B&N Table 2, Panel A \u2014 DML Forest",
+      "spec": "DML2 PLR \u2014 growth on skill1_corr, Forest, 2-fold, 100 reps",
+      "coef": 0.016,
+      "se": null,
+      "ci_lo": null,
+      "ci_hi": null,
+      "n_obs": 63,
+      "notes": "Baiardi & Naghi (2024) DML replication; median over 100 repetitions"
+    },
+    {
+      "table": "B&N Table 2, Panel B \u2014 OLS",
+      "spec": "OLS \u2014 growth on diffa, 17 controls, country-level",
+      "coef": 0.016,
+      "se": null,
+      "ci_lo": null,
+      "ci_hi": null,
+      "n_obs": 63,
+      "notes": "OLS baseline, Panel B treatment=diffa"
+    },
+    {
+      "table": "B&N Table 2, Panel B \u2014 DML Lasso",
+      "spec": "DML2 PLR \u2014 growth on diffa, Lasso, 2-fold, 100 reps",
+      "coef": 0.01,
+      "se": null,
+      "ci_lo": null,
+      "ci_hi": null,
+      "n_obs": 63,
+      "notes": "Baiardi & Naghi (2024) DML replication; median over 100 repetitions"
+    },
+    {
+      "table": "B&N Table 2, Panel B \u2014 DML Forest",
+      "spec": "DML2 PLR \u2014 growth on diffa, Forest, 2-fold, 100 reps",
+      "coef": 0.008,
+      "se": null,
+      "ci_lo": null,
+      "ci_hi": null,
+      "n_obs": 63,
+      "notes": "Baiardi & Naghi (2024) DML replication; median over 100 repetitions"
+    },
+    {
+      "table": "B&N Table 2, Panel C \u2014 OLS",
+      "spec": "OLS \u2014 growth on diffg, 17 controls, country-level",
+      "coef": 0.02,
+      "se": null,
+      "ci_lo": null,
+      "ci_hi": null,
+      "n_obs": 63,
+      "notes": "OLS baseline, Panel C treatment=diffg"
+    },
+    {
+      "table": "B&N Table 2, Panel C \u2014 DML Lasso",
+      "spec": "DML2 PLR \u2014 growth on diffg, Lasso, 2-fold, 100 reps",
+      "coef": 0.009,
+      "se": null,
+      "ci_lo": null,
+      "ci_hi": null,
+      "n_obs": 63,
+      "notes": "Baiardi & Naghi (2024) DML replication; median over 100 repetitions"
+    },
+    {
+      "table": "B&N Table 2, Panel C \u2014 DML Forest",
+      "spec": "DML2 PLR \u2014 growth on diffg, Forest, 2-fold, 100 reps",
+      "coef": 0.008,
+      "se": null,
+      "ci_lo": null,
+      "ci_hi": null,
+      "n_obs": 63,
+      "notes": "Baiardi & Naghi (2024) DML replication; median over 100 repetitions"
+    }
+  ],
+  "dml": {
+    "model_type": "PLR",
+    "rationale": "Nunn & Trefler (2010) use OLS with no instrument (z=NULL in the R code), making Partial Linear Regression (PLR / 'plinear') the correct DoubleML model. B&N confirm this by setting est='plinear' in their DML code. The treatment is continuous and the identification is selection-on-observables."
+  }
+}

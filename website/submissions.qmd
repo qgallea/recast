@@ -1,0 +1,121 @@
+---
+title: "Submission Tracker"
+subtitle: "Status of all submitted papers"
+toc: false
+page-layout: full
+---
+
+All paper submissions are listed below with their current status. Papers move through the pipeline from **Waiting** → **Running** → **Published** (or **Failed** / **Rejected**).
+
+```{=html}
+<style>
+.status-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+}
+.status-published { background: #198754; }
+.status-running   { background: #0d6efd; }
+.status-waiting   { background: #6c757d; }
+.status-failed    { background: #dc3545; }
+.status-rejected  { background: #495057; }
+
+.tracker-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.tracker-table th {
+  background: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+}
+.tracker-table td {
+  padding: 0.5rem 0.8rem;
+  border-bottom: 1px solid #eee;
+}
+.tracker-table tr:hover {
+  background: #f8f9fa;
+}
+</style>
+
+<table class="tracker-table">
+<thead>
+<tr>
+  <th>Paper</th>
+  <th>Authors</th>
+  <th>Journal / Year</th>
+  <th>ID Strategy</th>
+  <th>Method</th>
+  <th>Status</th>
+  <th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>The Oregon Health Insurance Experiment</td>
+  <td>Finkelstein et al.</td>
+  <td>QJE 2012</td>
+  <td>IV</td>
+  <td>Causal Forest</td>
+  <td><span class="status-badge status-published">Published</span></td>
+  <td><a href="papers/finkelstein2012-cf/">View →</a></td>
+</tr>
+<tr>
+  <td>The Oregon Health Insurance Experiment</td>
+  <td>Finkelstein et al.</td>
+  <td>QJE 2012</td>
+  <td>IV</td>
+  <td>DoubleML</td>
+  <td><span class="status-badge status-published">Published</span></td>
+  <td><a href="papers/finkelstein2012-dml/">View →</a></td>
+</tr>
+<tr>
+  <td>Out of Africa: Genetic Diversity and Economic Development</td>
+  <td>Ashraf, Galor</td>
+  <td>AER 2013</td>
+  <td>IV</td>
+  <td>Causal Forest</td>
+  <td><span class="status-badge status-published">Published</span></td>
+  <td><a href="papers/ashraf2013-cf/">View →</a></td>
+</tr>
+<tr>
+  <td>The Slave Trade and the Origins of Mistrust in Africa</td>
+  <td>Nunn, Wantchekon</td>
+  <td>AER 2011</td>
+  <td>IV</td>
+  <td>—</td>
+  <td><span class="status-badge status-rejected">Not suitable</span></td>
+  <td>Group-level treatment blocks individual-level CF/DML</td>
+</tr>
+</tbody>
+</table>
+```
+
+---
+
+### Status key
+
+| Status | Meaning |
+|--------|---------|
+| <span class="status-badge status-waiting">Waiting</span> | Submission received, not yet started |
+| <span class="status-badge status-running">Running</span> | Pipeline is currently running |
+| <span class="status-badge status-published">Published</span> | Successfully RECASTed — results available |
+| <span class="status-badge status-failed">Failed</span> | Replication failed or pipeline encountered blocking issues |
+| <span class="status-badge status-rejected">Not suitable</span> | Paper does not meet requirements (e.g., no public data, group-level treatment) |
+
+---
+
+[Submit a paper →](submit.qmd)
+
+<!--
+TO EMBED GOOGLE SHEET INSTEAD:
+1. In Google Sheets: File → Share → Publish to web → Embed
+2. Replace the HTML table above with:
+   <iframe src="YOUR_GOOGLE_SHEET_EMBED_URL" width="100%" height="600" frameborder="0"></iframe>
+This will auto-update when you edit the sheet.
+-->

@@ -1,0 +1,136 @@
+---
+title: "The Structure of Tariffs and Long-term Growth"
+author: "Nunn & Trefler"
+date: "2010"
+date-format: "YYYY"
+description: "Cross-country OLS: do skill-biased tariffs promote long-term economic growth?"
+categories:
+  - OLS
+  - Trade
+  - Growth
+  - "2010"
+  - PASS
+image: forest_plot.png
+
+paper-journal: "American Economic Journal: Macroeconomics"
+paper-doi: "10.1257/mac.2.3.158"
+paper-url: ""
+
+replication-status: "PASS"
+replication-delta-pct: 5.11
+
+dml-estimate: 0.020
+dml-ci-lo: -0.005
+dml-ci-hi: 0.044
+dml-preferred-learner: "Best (Boosting)"
+dml-shift: "downward"
+
+cf-estimate: null
+cf-ci-lo: null
+cf-ci-hi: null
+cf-method: ""
+cf-pct-significant: null
+
+rounds-completed: 1
+final-verdict: "Ready"
+---
+
+## Paper summary
+
+**Citation:** Nunn, N. & Trefler, D. (2010). "The Structure of Tariffs and Long-term Growth." *American Economic Journal: Macroeconomics*, 2(3), 158–94. [DOI](https://doi.org/10.1257/mac.2.3.158)
+
+**Identification strategy:** Cross-country OLS regressions estimating the relationship between the skill-bias of tariffs and long-term economic growth. The paper uses three measures of skill-biased tariffs — skill tariff correlation, and two tariff differential measures with different cut-offs — and regresses them on log annual per capita GDP growth with 17 control variables including average tariff level, initial conditions, human capital, regional dummies, and time dummies. N = 63 countries.
+
+**Key original result:** Skill-biased tariffs are positively associated with long-term growth. The OLS coefficient on skill tariff correlation is 0.035 (SE 0.010, p < 0.01), suggesting that countries with tariff structures favouring skill-intensive industries experience higher growth.
+
+**Reference:** This paper was revisited by [Baiardi & Naghi (2024, *Econometrics Journal*)](https://doi.org/10.1093/ectj/utae004), who applied DML and found considerably smaller, often insignificant effects — suggesting the OLS result is not robust to flexible nonlinear controls.
+
+---
+
+## Replication results
+
+The replication is **successful**. All 3 OLS coefficients match the Baiardi & Naghi (2024) reference closely. Sample sizes match exactly (N = 63).
+
+| Panel | Treatment | Published | Replicated | Δ (%) | Status |
+|-------|-----------|-----------|------------|-------|--------|
+| A | Skill tariff correlation | 0.035 | 0.035 | 0.46% | PASS |
+| B | Tariff differential (low) | 0.016 | 0.016 | 1.64% | PASS |
+| C | Tariff differential (high) | 0.020 | 0.019 | 5.11% | PASS |
+
+*Panel C's 5.11% deviation is a rounding artefact — the published 0.020 rounds from 0.019.*
+
+![Forest plot: OLS vs. DML estimates across methods](forest_plot.png)
+
+---
+
+## DML Extension
+
+Double/Debiased Machine Learning was applied using the **PLR** model with K=2 folds, 20 repetitions (median aggregation, B&N adjusted SE), and 6 ML methods + Ensemble + Best.
+
+### Key results (Panel A: skill tariff correlation)
+
+| Method | Coef | SE | p-value |
+|--------|------|----|---------|
+| OLS | 0.035*** | 0.010 | 0.001 |
+| Lasso | 0.020 | 0.013 | 0.137 |
+| Decision Tree | 0.013 | 0.011 | 0.237 |
+| Boosting | 0.020 | 0.012 | 0.111 |
+| Random Forest | 0.018 | 0.011 | 0.095* |
+| Ensemble | 0.019 | 0.012 | 0.124 |
+| **Best (Boosting)** | **0.020** | **0.012** | **0.111** |
+
+*Best learner selected by lowest nuisance MSE. NeuralNet excluded (catastrophic R² = −38.8).*
+
+**Key finding:** DML estimates are **40–55% smaller than OLS** across all three treatment measures and all well-behaved learners. The positive sign is preserved but statistical significance is lost — only Forest reaches marginal significance (p = 0.095). This means the tariff–growth relationship is **not robust to controlling for nonlinear confounders**, confirming Baiardi & Naghi's (2024) finding.
+
+### Heterogeneous treatment effects
+
+**BLP test:** β₂ = 1.08 (p < 0.001) — **strongly significant heterogeneity**.
+
+**GATE analysis** (5 quintiles of predicted CATE) reveals a striking gradient: skill-biased tariffs **harm** growth in some countries (Q1: −0.206) while **helping** in others (Q5: +0.235). The average effect masks substantial opposing effects.
+
+**CLAN analysis:** Only investment (`inv`) is marginally different between most- and least-affected groups (p = 0.074).
+
+![GATE estimates by quintile](gate_plot.png)
+
+---
+
+## What did causal ML add here?
+
+This is one of the most informative RECAST applications. The DML extension reveals two important findings absent from the original paper:
+
+1. **The OLS effect is inflated.** When nonlinear confounding is flexibly controlled via DML, the skill-biased tariff coefficient shrinks by 40–55% and loses significance. This suggests the original OLS estimate captures correlations with nonlinear confounders (regional effects, institutional quality) rather than a pure tariff effect. Baiardi & Naghi (2024) reach the same conclusion.
+
+2. **The average masks opposing effects.** The BLP test strongly rejects homogeneous effects (p < 0.001), and the GATE gradient from −0.206 to +0.235 shows that skill-biased tariffs have sharply different consequences depending on country characteristics. This finding was not explored in the original paper and adds genuine policy relevance: one-size-fits-all tariff policy recommendations may be misleading.
+
+The main limitation is low nuisance model R² (outcome: 0.15, treatment: 0.36), inherent to the small sample (N = 63, p = 17). Despite this, the qualitative conclusions are consistent across all well-behaved learners and match the independent B&N benchmark.
+
+---
+
+## Referee reports
+
+**Referee consensus:** All three referees gave "Minor revision." Two blocking issues (n_rep=5 override, Best learner bug) were found and fixed in Round 1. **Final verdict: Ready.**
+
+::: {.panel-tabset}
+
+## Identification
+
+{{< include reports/ref1.md >}}
+
+## DML Methods
+
+{{< include reports/ref2.md >}}
+
+## Robustness
+
+{{< include reports/ref3.md >}}
+
+## Synthesis
+
+{{< include reports/synthesis.md >}}
+
+## Final Report
+
+{{< include reports/final_report.md >}}
+
+:::

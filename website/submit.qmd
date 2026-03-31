@@ -1,0 +1,60 @@
+---
+title: "Submit a Paper"
+subtitle: "Suggest a paper to be RECASTed"
+toc: false
+---
+
+## How it works
+
+1. **You submit** a paper and its replication data using the form below
+2. **We review** whether the paper has a clear identification strategy and public replication data
+3. **We RECAST it** — replicate, extend with DoubleML or Causal Forest, and run AI peer review
+4. **Results appear** on the [Tracker](submissions.qmd) page and, if successful, on the [Papers](papers.qmd) page
+
+### What makes a good candidate?
+
+- A published empirical paper with a clear causal identification strategy (OLS, IV, DID, RDD)
+- Publicly available replication data (Stata .dta, CSV, or similar)
+- A well-defined treatment variable and outcome
+- Ideally N > 100 for Causal Forest, any N for DoubleML
+
+### What we need from you
+
+- A link to the paper (DOI, journal page, or PDF)
+- A link to the replication data (Dataverse, journal supplement, GitHub, etc.)
+- A brief note on the identification strategy
+
+---
+
+## Submission form
+
+```{=html}
+<div style="max-width: 700px; margin: 0 auto;">
+<p style="text-align: center; padding: 2rem; background: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6;">
+  <strong>Google Form coming soon.</strong><br><br>
+  In the meantime, email your suggestion to<br>
+  <a href="mailto:quentin@thecausalmindset.com">quentin@thecausalmindset.com</a><br><br>
+  Include: paper title, authors, journal/year, link to paper, link to replication data, and identification strategy (OLS/IV/DID/RDD).
+</p>
+</div>
+```
+
+<!--
+TO ACTIVATE THE GOOGLE FORM:
+1. Create a Google Form with these fields:
+   - Paper title (short text, required)
+   - Authors (short text, required)
+   - Journal and year (short text, required)
+   - Link to paper (URL, required)
+   - Link to replication data (URL, required)
+   - Identification strategy (dropdown: OLS / IV / DID / RDD / Other)
+   - Brief description of the causal question (paragraph, optional)
+   - Your email (short text, optional)
+2. Get the embed URL from Google Forms (three dots → Get pre-filled link → Share → Embed)
+3. Replace the placeholder above with:
+   <iframe src="YOUR_GOOGLE_FORM_EMBED_URL" width="100%" height="900" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+-->
+
+---
+
+[View the submission tracker →](submissions.qmd)

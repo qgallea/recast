@@ -1,0 +1,217 @@
+digraph RECAST {
+	graph [bgcolor="#FAFAFA" dpi=150 fontname=Helvetica fontsize=14 label=<<B><FONT POINT-SIZE='28' COLOR='#1a1a2e'>RECAST Pipeline Architecture</FONT></B><BR/><FONT POINT-SIZE='14' COLOR='#555'>Replication and Extension with Causal AI Statistical Toolkit</FONT>> labeljust=c labelloc=t nodesep=0.6 pad=0.8 rankdir=TB ranksep=0.7]
+	node [fontname=Helvetica fontsize=11 penwidth=1.5 style=filled]
+	edge [arrowsize=0.8 color="#666666" fontname=Helvetica fontsize=9]
+	subgraph cluster_entry {
+		bgcolor="#E3F2FD" color="#2196F3" fontname=Helvetica fontsize=12 label=<<B>Entry Points</B>  <FONT POINT-SIZE='9' COLOR='#666'>(slash commands)</FONT>> style=dashed
+		cmd_run [label="/run  &  /recast" color="#1565C0" fillcolor="#2196F3" fontcolor=white fontsize=10 height=0.45 shape=box style="filled,rounded,bold" width=1.6]
+		cmd_cf [label="/recast-cf" color="#1565C0" fillcolor="#2196F3" fontcolor=white fontsize=10 height=0.45 shape=box style="filled,rounded,bold" width=1.6]
+		cmd_init [label="/init" color="#1565C0" fillcolor="#2196F3" fontcolor=white fontsize=10 height=0.45 shape=box style="filled,rounded,bold" width=1.6]
+		cmd_stage [label="/stage N" color="#1565C0" fillcolor="#2196F3" fontcolor=white fontsize=10 height=0.45 shape=box style="filled,rounded,bold" width=1.6]
+		cmd_review [label="/review" color="#1565C0" fillcolor="#2196F3" fontcolor=white fontsize=10 height=0.45 shape=box style="filled,rounded,bold" width=1.6]
+		cmd_final [label="/final" color="#1565C0" fillcolor="#2196F3" fontcolor=white fontsize=10 height=0.45 shape=box style="filled,rounded,bold" width=1.6]
+		cmd_publish [label="/publish" color="#1565C0" fillcolor="#2196F3" fontcolor=white fontsize=10 height=0.45 shape=box style="filled,rounded,bold" width=1.6]
+	}
+	cmd_run -> cmd_cf [style=invis]
+	cmd_cf -> cmd_init [style=invis]
+	cmd_init -> cmd_stage [style=invis]
+	cmd_stage -> cmd_review [style=invis]
+	cmd_review -> cmd_final [style=invis]
+	cmd_final -> cmd_publish [style=invis]
+	orch [label=<<B>Orchestrator</B><BR/><FONT POINT-SIZE='9'>State manager &amp; dispatcher<BR/>Reads config.yaml + orchestrator.md</FONT>> color="#263238" fillcolor="#37474F" fontcolor=white shape=box3d style=filled width=3.5]
+	cmd_run -> orch [label="  full pipeline" color="#2196F3"]
+	cmd_cf -> orch [label="  CF pipeline" color="#2196F3"]
+	cmd_stage -> orch [label="  from stage N" color="#2196F3"]
+	s1 [label=<<B>Stage 1</B><BR/><FONT POINT-SIZE='9'>Paper Intelligence</FONT><BR/><FONT POINT-SIZE='8' COLOR='#C8E6C9'>01_paper_intelligence.ipynb</FONT>> color="#333" fillcolor="#4CAF50" fontcolor=white shape=box style="filled,rounded" tooltip=""]
+	s2 [label=<<B>Stage 2</B><BR/><FONT POINT-SIZE='9'>Data Preparation</FONT><BR/><FONT POINT-SIZE='8' COLOR='#C8E6C9'>02_data.ipynb</FONT>> color="#333" fillcolor="#4CAF50" fontcolor=white shape=box style="filled,rounded" tooltip=""]
+	s3 [label=<<B>Stage 3</B><BR/><FONT POINT-SIZE='9'>Replication</FONT><BR/><FONT POINT-SIZE='8' COLOR='#C8E6C9'>03_replication.ipynb</FONT>> color="#333" fillcolor="#4CAF50" fontcolor=white shape=box style="filled,rounded" tooltip=""]
+	s4_choice [label="Pipeline
+variant?" color="#333" fillcolor="#FFC107" fontcolor="#1a1a2e" fontsize=10 height=1.0 shape=diamond style=filled width=2.0]
+	s4_dml [label=<<B>Stage 4</B><BR/><FONT POINT-SIZE='9'>DoubleML Extension</FONT><BR/><FONT POINT-SIZE='8' COLOR='#C8E6C9'>04_dml_extension.ipynb</FONT><BR/><FONT POINT-SIZE='8' COLOR='#C8E6C9'>+ Causal Forest (optional)</FONT>> color="#333" fillcolor="#66BB6A" fontcolor=white shape=box style="filled,rounded" tooltip=""]
+	s4_cf [label=<<B>Stage 4cf</B><BR/><FONT POINT-SIZE='9'>Causal Forest Only</FONT><BR/><FONT POINT-SIZE='8' COLOR='#C8E6C9'>04_causal_forest.ipynb</FONT>> color="#333" fillcolor="#66BB6A" fontcolor=white shape=box style="filled,rounded" tooltip=""]
+	s4_merge [label="" color="#333" fillcolor="#333" height=0.15 shape=point width=0.15]
+	s5 [label=<<B>Stage 5</B><BR/><FONT POINT-SIZE='9'>Diagnostics</FONT><BR/><FONT POINT-SIZE='8' COLOR='#C8E6C9'>05_diagnostics.ipynb</FONT><BR/><FONT POINT-SIZE='8' COLOR='#C8E6C9'>9 automated checks</FONT>> color="#333" fillcolor="#4CAF50" fontcolor=white shape=box style="filled,rounded" tooltip=""]
+	s6 [label=<<B>Stage 6</B><BR/><FONT POINT-SIZE='9'>Report Generation</FONT><BR/><FONT POINT-SIZE='8' COLOR='#C8E6C9'>06_report.ipynb</FONT><BR/><FONT POINT-SIZE='8' COLOR='#C8E6C9'>paper.tex + paper.pdf</FONT>> color="#333" fillcolor="#4CAF50" fontcolor=white shape=box style="filled,rounded" tooltip=""]
+	subgraph cluster_stages {
+		bgcolor="#E8F5E9" color="#4CAF50" fontname=Helvetica fontsize=12 label=<<B>Notebook Stages</B>  <FONT POINT-SIZE='9' COLOR='#666'>(sequential execution via notebook_runner)</FONT>> style="rounded,dashed"
+	}
+	orch -> s1 [label="  notebook_runner" color="#4CAF50" penwidth=2]
+	s1 -> s2 [label="paper_spec.json" color="#4CAF50" fontcolor="#666" penwidth=2]
+	s2 -> s3 [label="dataset.parquet" color="#4CAF50" fontcolor="#666" penwidth=2]
+	s3 -> s4_choice [label="replication_*.json" color="#4CAF50" fontcolor="#666" penwidth=2]
+	s4_choice -> s4_dml [label="  /recast (DML)" color="#66BB6A" fontcolor="#333" penwidth=2]
+	s4_choice -> s4_cf [label="  /recast-cf (CF)" color="#66BB6A" fontcolor="#333" penwidth=2]
+	s4_dml -> s4_merge [color="#4CAF50" penwidth=2]
+	s4_cf -> s4_merge [color="#4CAF50" penwidth=2]
+	s4_merge -> s5 [label="  *_results.json" color="#4CAF50" fontcolor="#666" penwidth=2]
+	s5 -> s6 [label="diagnostics_flags.json" color="#4CAF50" fontcolor="#666" penwidth=2]
+	subgraph cluster_gate {
+		bgcolor="#FFF3E0" color="#FF9800" fontname=Helvetica fontsize=12 label=<<B>Advisor Gate</B>  <FONT POINT-SIZE='9' COLOR='#666'>(all 3 must PASS)</FONT>> style="rounded,dashed"
+		g1 [label=<<B>Check 1</B><BR/><FONT POINT-SIZE='9'>Code Auditor</FONT><BR/><FONT POINT-SIZE='8' COLOR='#FFE0B2'>Replication tolerance</FONT>> color="#E65100" fillcolor="#FF9800" fontcolor=white shape=box style="filled,rounded"]
+		g2 [label=<<B>Check 2</B><BR/><FONT POINT-SIZE='9'>Identification</FONT><BR/><FONT POINT-SIZE='8' COLOR='#FFE0B2'>Estimand &amp; strategy</FONT>> color="#E65100" fillcolor="#FF9800" fontcolor=white shape=box style="filled,rounded"]
+		g3 [label=<<B>Check 3</B><BR/><FONT POINT-SIZE='9'>Data Validator</FONT><BR/><FONT POINT-SIZE='8' COLOR='#FFE0B2'>Flags &amp; missingness</FONT>> color="#E65100" fillcolor="#FF9800" fontcolor=white shape=box style="filled,rounded"]
+	}
+	gate_dec [label="All 3
+PASS?" color="#333" fillcolor="#FFC107" fontcolor="#1a1a2e" fontsize=10 height=1.0 shape=diamond style=filled width=2.0]
+	s6 -> g1 [color="#FF9800" lhead=cluster_gate penwidth=2]
+	s6 -> g2 [style=invis]
+	s6 -> g3 [style=invis]
+	g1 -> gate_dec [color="#FF9800" penwidth=1.2]
+	g2 -> gate_dec [color="#FF9800" penwidth=1.2]
+	g3 -> gate_dec [color="#FF9800" penwidth=1.2]
+	gate_fail [label=<<B>STOP</B><BR/><FONT POINT-SIZE='9'>Report failed check(s)</FONT>> color="#B71C1C" fillcolor="#D32F2F" fontcolor=white shape=octagon style=filled]
+	gate_dec -> gate_fail [label="  FAIL" color="#D32F2F" fontcolor="#D32F2F" penwidth=1.5]
+	blocking_dec [label="Blocking
+issues?" color="#333" fillcolor="#FFC107" fontcolor="#1a1a2e" fontsize=10 height=1.0 shape=diamond style=filled width=2.0]
+	subgraph cluster_review {
+		bgcolor="#F3E5F5" color="#9C27B0" fontname=Helvetica fontsize=12 label=<<B>Review Loop</B>  <FONT POINT-SIZE='9' COLOR='#666'>(up to 3 rounds)</FONT>> style="rounded,dashed"
+		subgraph cluster_refs {
+			bgcolor="#FCE4EC" color="#E91E63" fontsize=10 label=<<B>Isolated Referees</B>  <FONT POINT-SIZE='8' COLOR='#888'>(no cross-communication)</FONT>> style="rounded,dotted"
+			ref1 [label=<<B>Referee 1</B><BR/><FONT POINT-SIZE='9'>Identification</FONT><BR/><FONT POINT-SIZE='8' COLOR='#F8BBD0'>7-item checklist</FONT>> color="#AD1457" fillcolor="#E91E63" fontcolor=white shape=box style="filled,rounded"]
+			ref2 [label=<<B>Referee 2</B><BR/><FONT POINT-SIZE='9'>DML &amp; CF Methods</FONT><BR/><FONT POINT-SIZE='8' COLOR='#F8BBD0'>21-item checklist</FONT>> color="#AD1457" fillcolor="#E91E63" fontcolor=white shape=box style="filled,rounded"]
+			ref3 [label=<<B>Referee 3</B><BR/><FONT POINT-SIZE='9'>Robustness</FONT><BR/><FONT POINT-SIZE='8' COLOR='#F8BBD0'>8-item checklist</FONT>> color="#AD1457" fillcolor="#E91E63" fontcolor=white shape=box style="filled,rounded"]
+		}
+		synth [label=<<B>Synthesis Referee</B><BR/><FONT POINT-SIZE='9'>Deduplicates &amp; ranks issues</FONT><BR/><FONT POINT-SIZE='8' COLOR='#E1BEE7'>First agent to see all 3 reports</FONT>> color="#6A1B9A" fillcolor="#9C27B0" fontcolor=white shape=box style="filled,rounded"]
+		revision [label=<<B>Revision Agent</B><BR/><FONT POINT-SIZE='9'>Edits paper.tex &amp; code_build/</FONT><BR/><FONT POINT-SIZE='8' COLOR='#FFCDD2'>Only agent that writes to outputs</FONT>> color="#B71C1C" fillcolor="#F44336" fontcolor=white shape=box style="filled,rounded"]
+	}
+	gate_dec -> ref1 [label="  PASS  " color="#4CAF50" fontcolor="#4CAF50" lhead=cluster_refs penwidth=2]
+	gate_dec -> ref2 [style=invis]
+	gate_dec -> ref3 [style=invis]
+	ref1 -> synth [label="ref1.md" color="#9C27B0" fontcolor="#888" penwidth=1.2]
+	ref2 -> synth [label="ref2.md" color="#9C27B0" fontcolor="#888" penwidth=1.2]
+	ref3 -> synth [label="ref3.md" color="#9C27B0" fontcolor="#888" penwidth=1.2]
+	synth -> revision [label="synthesis.md" color="#9C27B0" fontcolor="#888" penwidth=1.5]
+	revision -> blocking_dec [label="changelog_N.md" color="#9C27B0" fontcolor="#888" penwidth=1.5]
+	blocking_dec -> s4_choice [label="  YES  →  RERUN /stage 4
+  (re-execute notebooks 4–6)" color="#D32F2F" constraint=false fontcolor="#D32F2F" penwidth=2 style=dashed]
+	round_dec [label="Max
+rounds?" color="#333" fillcolor="#FFC107" fontcolor="#1a1a2e" fontsize=10 height=1.0 shape=diamond style=filled width=2.0]
+	blocking_dec -> round_dec [label="  NO" color="#4CAF50" fontcolor="#4CAF50" penwidth=1.5]
+	round_dec -> ref1 [label="  < max → next round" color="#9C27B0" constraint=false fontcolor="#9C27B0" penwidth=1.2 style=dashed]
+	final_ref [label=<<B>Final Referee</B><BR/><FONT POINT-SIZE='9'>Reads entire review history</FONT><BR/><FONT POINT-SIZE='8' COLOR='#B2EBF2'>Writes final_report.md</FONT>> color="#00838F" fillcolor="#00BCD4" fontcolor=white shape=box style="filled,rounded"]
+	publish_node [label=<<B>Publish</B><BR/><FONT POINT-SIZE='9'>Generate Quarto page</FONT><BR/><FONT POINT-SIZE='8' COLOR='#B2EBF2'>website/papers/&lt;slug&gt;/</FONT>> color="#00838F" fillcolor="#00BCD4" fontcolor=white shape=box style="filled,rounded"]
+	round_dec -> final_ref [label="  done / max reached" color="#00BCD4" fontcolor="#333" penwidth=2]
+	cmd_final -> final_ref [label="  direct" color="#2196F3" style=dashed]
+	cmd_review -> ref1 [label="  direct" color="#2196F3" lhead=cluster_refs style=dashed]
+	final_ref -> publish_node [label="final_report.md" color="#00BCD4" fontcolor="#888" penwidth=1.5]
+	cmd_publish -> publish_node [label="  direct" color="#2196F3" style=dashed]
+	f_spec [label="paper_spec.json
+(read-only after S1)" color="#999" fillcolor="#ECEFF1" fontcolor="#333" fontsize=9 shape=note style=filled]
+	f_parq [label="dataset.parquet" color="#999" fillcolor="#ECEFF1" fontcolor="#333" fontsize=9 shape=note style=filled]
+	f_repl [label="replication_*.json
+table_replication.tex" color="#999" fillcolor="#ECEFF1" fontcolor="#333" fontsize=9 shape=note style=filled]
+	f_dml [label="dml_results.json
+causal_forest_results.json
+hte_results.json" color="#999" fillcolor="#ECEFF1" fontcolor="#333" fontsize=9 shape=note style=filled]
+	f_diag [label="diagnostics_flags.json" color="#999" fillcolor="#ECEFF1" fontcolor="#333" fontsize=9 shape=note style=filled]
+	f_paper [label="paper.tex / paper.pdf
+forest_plot.pdf" color="#999" fillcolor="#ECEFF1" fontcolor="#333" fontsize=9 shape=note style=filled]
+	f_rev [label="review_history/
+round_N/ + final_report.md" color="#999" fillcolor="#ECEFF1" fontcolor="#333" fontsize=9 shape=note style=filled]
+	f_web [label="website/papers/<slug>/
+index.qmd" color="#999" fillcolor="#ECEFF1" fontcolor="#333" fontsize=9 shape=note style=filled]
+	subgraph cluster_outputs {
+		bgcolor="#FAFAFA" color="#999" fontsize=12 label=<<B>Outputs</B>  <FONT POINT-SIZE='9' COLOR='#666'>(filesystem = state)</FONT>> style="rounded,dashed"
+	}
+	s1 -> f_spec [arrowsize=0.6 color="#999" style=dotted]
+	s2 -> f_parq [arrowsize=0.6 color="#999" style=dotted]
+	s3 -> f_repl [arrowsize=0.6 color="#999" style=dotted]
+	s4_merge -> f_dml [arrowsize=0.6 color="#999" style=dotted]
+	s5 -> f_diag [arrowsize=0.6 color="#999" style=dotted]
+	s6 -> f_paper [arrowsize=0.6 color="#999" style=dotted]
+	revision -> f_rev [arrowsize=0.6 color="#999" style=dotted]
+	publish_node -> f_web [arrowsize=0.6 color="#999" style=dotted]
+	subgraph cluster_legend {
+		bgcolor="#FFFFFF" color="#333" fontname=Helvetica fontsize=13 label=<<B>Legend — Agents &amp; Roles</B>> margin=20 style=rounded
+		legend [label=<
+    <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="6" CELLPADDING="4">
+    <TR>
+      <TD BGCOLOR="#2196F3" WIDTH="20"> </TD>
+      <TD ALIGN="LEFT"><B>Slash Commands</B> — User entry points (/run, /recast, /init, /stage, /review, /final, /publish)</TD>
+    </TR>
+    <TR>
+      <TD BGCOLOR="#37474F" WIDTH="20"> </TD>
+      <TD ALIGN="LEFT"><B>Orchestrator</B> — Master state manager; dispatches notebook_runner for each stage</TD>
+    </TR>
+    <TR>
+      <TD BGCOLOR="#4CAF50" WIDTH="20"> </TD>
+      <TD ALIGN="LEFT"><B>Notebook Stages 1–6</B> — Sequential Jupyter notebooks executed via nbconvert (timeout: 30 min)</TD>
+    </TR>
+    <TR>
+      <TD BGCOLOR="#66BB6A" WIDTH="20"> </TD>
+      <TD ALIGN="LEFT"><B>Stage 4 Variants</B> — DoubleML (/recast) <I>or</I> Causal Forest (/recast-cf); mutually exclusive paths</TD>
+    </TR>
+    <TR>
+      <TD BGCOLOR="#FF9800" WIDTH="20"> </TD>
+      <TD ALIGN="LEFT"><B>Advisor Gate</B> — 3 independent validators: Code Auditor, Identification, Data Validator (all must PASS)</TD>
+    </TR>
+    <TR>
+      <TD BGCOLOR="#E91E63" WIDTH="20"> </TD>
+      <TD ALIGN="LEFT"><B>Referees 1–3</B> — Isolated peer reviewers (Identification, DML/CF Methods, Robustness); no cross-communication</TD>
+    </TR>
+    <TR>
+      <TD BGCOLOR="#9C27B0" WIDTH="20"> </TD>
+      <TD ALIGN="LEFT"><B>Synthesis Referee</B> — First agent to see all 3 reports; deduplicates &amp; ranks issues by severity</TD>
+    </TR>
+    <TR>
+      <TD BGCOLOR="#F44336" WIDTH="20"> </TD>
+      <TD ALIGN="LEFT"><B>Revision Agent</B> — Only agent that edits paper.tex &amp; code_build/; appends, never overwrites</TD>
+    </TR>
+    <TR>
+      <TD BGCOLOR="#00BCD4" WIDTH="20"> </TD>
+      <TD ALIGN="LEFT"><B>Final Referee &amp; Publish</B> — Writes final_report.md; publishes Quarto page to website</TD>
+    </TR>
+    <TR>
+      <TD BGCOLOR="#FFC107" WIDTH="20"> </TD>
+      <TD ALIGN="LEFT"><B>Decision Points</B> — Pipeline variant, gate pass/fail, blocking issues, max rounds</TD>
+    </TR>
+    <TR>
+      <TD BGCOLOR="#ECEFF1" WIDTH="20"> </TD>
+      <TD ALIGN="LEFT"><B>File Artifacts</B> — All state is filesystem-based; agents communicate via JSON/LaTeX/Markdown files</TD>
+    </TR>
+    <TR><TD> </TD><TD> </TD></TR>
+    <TR>
+      <TD COLSPAN="2" ALIGN="LEFT"><FONT POINT-SIZE="10" COLOR="#666">
+        <B>Key Design Principles:</B>  (1) State = filesystem, no in-memory passing &nbsp;
+        (2) Referee isolation — independent reviews &nbsp;
+        (3) Append-only review history &nbsp;
+        (4) Blocking issues trigger /stage 4 re-run &nbsp;
+        (5) paper_spec.json is read-only after Stage 1
+      </FONT></TD>
+    </TR>
+    </TABLE>
+    > fontsize=11 shape=plaintext]
+	}
+	{
+		rank=same
+		cmd_run
+		cmd_cf
+		cmd_init
+		cmd_stage
+		cmd_review
+		cmd_final
+		cmd_publish
+	}
+	{
+		rank=same
+		s4_dml
+		s4_cf
+	}
+	{
+		rank=same
+		g1
+		g2
+		g3
+	}
+	{
+		rank=same
+		ref1
+		ref2
+		ref3
+	}
+	{
+		rank=same
+		final_ref
+		publish_node
+	}
+}

@@ -1,0 +1,141 @@
+{
+  "title": "The 'Out of Africa' Hypothesis, Human Genetic Diversity, and Comparative Economic Development",
+  "authors": [
+    "Ashraf, Q.",
+    "Galor, O."
+  ],
+  "year": 2013,
+  "journal": "American Economic Review",
+  "slug": "ashrafgalor2013",
+  "identification": {
+    "type": "IV",
+    "narrative": "The paper argues that prehistoric migratory distance from East Africa (Addis Ababa) shaped genetic diversity through the serial founder effect, whereby sub-groups carrying only a subset of parental genetic diversity established new settlements farther away. Genetic diversity has a hump-shaped (quadratic) effect on economic development: too little diversity (Native American populations) and too much diversity (African populations) are both detrimental, while intermediate levels (European and Asian populations) are most conducive to growth. The IV strategy instruments observed/predicted genetic diversity with migratory distance from East Africa, which is plausibly exogenous to contemporary development outcomes. The main contemporary outcome is log income per capita in 2000 CE; the historical outcome is log population density in 1500 CE.",
+    "outcome_variable": "ln_gdppc2000",
+    "outcome_label": "Log income per capita in 2000 CE",
+    "treatment_variable": "pdiv_aa",
+    "treatment_label": "Predicted genetic diversity (ancestry adjusted)",
+    "treatment_variable_sq": "pdiv_aa_sqr",
+    "treatment_label_sq": "Predicted genetic diversity (ancestry adjusted) square",
+    "instrument": "mdist_addis",
+    "instrument_label": "Migratory distance from East Africa (Addis Ababa)",
+    "functional_form": "quadratic",
+    "controls": [
+      "ln_yst",
+      "ln_arable",
+      "ln_abslat",
+      "ln_soilsuit",
+      "abslat",
+      "temp",
+      "precip"
+    ],
+    "fixed_effects": [
+      "continent"
+    ],
+    "cluster_se": null,
+    "se_notes": "Bootstrap SE (generated regressor); Conley (1999) spatial SE for limited-sample historical regressions; heteroskedasticity-robust SE elsewhere",
+    "primary_data_file": "country.dta",
+    "secondary_datasets": [
+      "ethnic.dta",
+      "ethnicpair.dta"
+    ],
+    "historical_outcome_variable": "ln_pd1500",
+    "historical_outcome_label": "Log population density in 1500 CE",
+    "config_mismatches": {
+      "outcome_variable": "config.yaml says 'ln_gdp_pc'; actual column is 'ln_gdppc2000'",
+      "treatment_variable": "config.yaml says 'pdiv_pdum'; actual column is 'pdiv_aa' (ancestry-adjusted predicted diversity used in contemporary analysis) or 'pdiv' (unadjusted); 'pdiv_pdum' does not exist",
+      "landlocked": "config.yaml lists 'landlocked' as control; column does not exist in country.dta",
+      "island": "config.yaml lists 'island' as control; column does not exist in country.dta",
+      "ln_land_area": "config.yaml lists 'ln_land_area' as control; column does not exist in country.dta (use 'area' or 'ln_arable' instead)"
+    }
+  },
+  "main_results": [
+    {
+      "table": "Table 1",
+      "spec": "OLS col 4 - observed diversity + all controls (21-country limited sample, historical)",
+      "outcome": "ln_pd1500",
+      "treatment": "adiv (observed genetic diversity)",
+      "coef_linear": 225.44,
+      "se_linear": 73.781,
+      "coef_sq": -161.158,
+      "se_sq": 56.155,
+      "n_obs": 21,
+      "r_squared": 0.89,
+      "optimal_diversity": 0.699,
+      "notes": "Controls: log Neolithic transition timing, log arable land, log absolute latitude, log land suitability. Heteroskedasticity-robust SE."
+    },
+    {
+      "table": "Table 3",
+      "spec": "OLS col 5 - predicted diversity + all controls (145-country extended sample, historical)",
+      "outcome": "ln_pd1500",
+      "treatment": "pdiv (predicted genetic diversity)",
+      "coef_linear": 195.416,
+      "se_linear": 55.916,
+      "coef_sq": -137.977,
+      "se_sq": 40.773,
+      "n_obs": 145,
+      "r_squared": 0.67,
+      "optimal_diversity": 0.708,
+      "notes": "Controls: log Neolithic transition timing, log arable land, log absolute latitude, log land suitability. Bootstrap SE. Continent FE: No."
+    },
+    {
+      "table": "Table 3",
+      "spec": "OLS col 6 - predicted diversity + all controls + continent FE (145-country, historical, BASELINE)",
+      "outcome": "ln_pd1500",
+      "treatment": "pdiv (predicted genetic diversity)",
+      "coef_linear": 199.727,
+      "se_linear": 80.281,
+      "coef_sq": -146.167,
+      "se_sq": 56.251,
+      "n_obs": 145,
+      "r_squared": 0.69,
+      "optimal_diversity": 0.683,
+      "notes": "Baseline regression equation (8). Controls: log Neolithic transition timing, log arable land, log absolute latitude, log land suitability. Continent FE: Yes. Bootstrap SE."
+    },
+    {
+      "table": "Table 6",
+      "spec": "OLS col 1 - ancestry-adjusted diversity + baseline controls + continent FE (143-country, contemporary)",
+      "outcome": "ln_gdppc2000",
+      "treatment": "pdiv_aa (ancestry-adjusted predicted genetic diversity)",
+      "coef_linear": 203.443,
+      "se_linear": 83.368,
+      "coef_sq": -142.663,
+      "se_sq": 59.037,
+      "n_obs": 143,
+      "r_squared": 0.57,
+      "optimal_diversity": 0.713,
+      "notes": "Controls: log Neolithic transition timing (unadj.), log arable land, log absolute latitude, log land suitability. Continent FE: Yes. Bootstrap SE."
+    },
+    {
+      "table": "Table 7",
+      "spec": "OLS col 5 - ancestry-adjusted diversity + full controls + continent/OPEC/legal/religion FE (109-country, contemporary, BASELINE)",
+      "outcome": "ln_gdppc2000",
+      "treatment": "pdiv_aa (ancestry-adjusted predicted genetic diversity)",
+      "coef_linear": 281.173,
+      "se_linear": 70.459,
+      "coef_sq": -195.01,
+      "se_sq": 49.764,
+      "n_obs": 109,
+      "r_squared": 0.9,
+      "optimal_diversity": 0.721,
+      "notes": "Controls: log Neolithic transition timing, log arable land, log absolute latitude, social infrastructure, ethnic fractionalization, malaria risk, tropical zones, waterway distance. Continent + OPEC + legal origin + religion FE. Bootstrap SE. Preferred contemporary specification."
+    },
+    {
+      "table": "Table 2",
+      "spec": "2SLS col 5 - observed diversity instrumented by migratory distance (21-country, historical)",
+      "outcome": "ln_pd1500",
+      "treatment": "adiv instrumented by mdist_addis",
+      "coef_linear": 285.19,
+      "se_linear": 88.064,
+      "coef_sq": -206.576,
+      "se_sq": 66.852,
+      "n_obs": 21,
+      "r_squared": null,
+      "optimal_diversity": null,
+      "notes": "Controls: log Neolithic transition timing, log arable land, log absolute latitude, log land suitability. Instrument: migratory distance from East Africa (linear + square). Heteroskedasticity-robust SE."
+    }
+  ],
+  "dml": {
+    "model_type": "PLIV",
+    "rationale": "The paper's main identification is IV (migratory distance instruments for genetic diversity), with a quadratic treatment; PLIV (Partial Linear IV) accommodates the continuous instrument and nonlinear treatment while using ML for the high-dimensional set of geographic, institutional, and cultural controls."
+  }
+}

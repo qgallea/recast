@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Quarto Website Preview",
+      "runtimeExecutable": "quarto",
+      "runtimeArgs": ["preview", "website/"],
+      "port": 4200
+    },
+    {
+      "name": "Jupyter Lab",
+      "runtimeExecutable": "jupyter",
+      "runtimeArgs": ["lab", "--notebook-dir=."],
+      "port": 8888
+    }
+  ]
+}

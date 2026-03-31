@@ -1,0 +1,150 @@
+---
+# ── Listing card fields ───────────────────────────────────────────────────────
+title: "Paper Title Here"
+author: "Author(s) Last Name(s)"
+date: 2001                         # publication year
+date-format: "YYYY"
+description: "One-sentence description of identification strategy"
+categories:
+  - IV                             # identification: IV | OLS | RDD | DID | LATE
+  - Development                    # topic tag(s)
+  - "2001"                         # year as string for filtering
+  - PASS                           # replication status: PASS or FAIL
+image: forest_plot.png
+
+# ── Paper metadata ────────────────────────────────────────────────────────────
+paper-journal: "Journal Name"
+paper-doi: "10.xxxx/xxxxxx"
+paper-url: ""                      # optional link to paper PDF/page
+
+# ── Replication results ───────────────────────────────────────────────────────
+replication-status: PASS           # PASS or FAIL
+replication-delta-pct: 0.0        # max % deviation from published coefficients
+
+# ── DML results ───────────────────────────────────────────────────────────────
+dml-estimate: 0.00
+dml-ci-lo: 0.00
+dml-ci-hi: 0.00
+dml-preferred-learner: "Random Forest"
+dml-shift: "negligible"            # negligible | upward | downward | sign-change
+
+# ── Causal Forest results (if applicable) ────────────────────────────────────
+cf-estimate: null
+cf-ci-lo: null
+cf-ci-hi: null
+cf-method: ""
+cf-pct-significant: null
+
+# ── Review process ────────────────────────────────────────────────────────────
+rounds-completed: 1
+final-verdict: "Ready"             # Ready | Minor manual revision needed | Major issues remain
+---
+
+## Paper summary
+
+**Citation:** Author(s) (Year). *Paper Title*. *Journal*, vol(issue), pp–pp. [DOI](https://doi.org/10.xxxx/xxxxxx)
+
+**Identification strategy:** Describe the causal identification argument in 2–3 sentences. What is the treatment variable? What instrument or design provides exogenous variation? What is the estimand (LATE, ATE, ATT)?
+
+**Key original result:** The original paper finds [describe main result with coefficient and standard error].
+
+---
+
+## Replication results
+
+The replication [passed / failed]. Maximum coefficient deviation from the published table: **X.X%**.
+
+| Specification | Original | Replicated | Δ (%) |
+|---------------|----------|------------|-------|
+| Baseline OLS  | 0.00 (0.00) | 0.00 (0.00) | 0.0% |
+| IV (main)     | 0.00 (0.00) | 0.00 (0.00) | 0.0% |
+
+![Forest plot: original vs. replicated vs. DML estimates](forest_plot.png)
+
+---
+
+## DML Extension
+
+Double/Debiased Machine Learning was applied using the [PLR / PLIV / IRM] model with 5-fold cross-fitting.
+
+| Learner | Estimate | 95% CI |
+|---------|----------|--------|
+| LASSO   | 0.00 | [0.00, 0.00] |
+| Random Forest | 0.00 | [0.00, 0.00] |
+| XGBoost | 0.00 | [0.00, 0.00] |
+
+**Preferred learner:** Random Forest (lowest cross-fit RMSE on nuisance functions).
+
+**Interpretation:** The DML estimate is [negligibly different from / X% higher than / X% lower than] the original IV estimate, [supporting / qualifying] the original conclusion.
+
+---
+
+## Causal Forest Extension
+
+::: {.callout-note collapse="true" title="Causal Forest results (expand if applicable)"}
+
+A Causal Forest (EconML `CausalForestDML` / `CausalIVForest`) was fitted to estimate individual-level treatment effects.
+
+**ATE estimate:** [cf-estimate] ([cf-ci-lo], [cf-ci-hi])
+
+**Share of units with statistically significant CATEs:** [cf-pct-significant]%
+
+**GATE analysis (by quartile of predicted CATE):**
+
+| GATE group | Mean CATE | 95% CI | N |
+|------------|-----------|--------|---|
+| Q1 (lowest) | 0.00 | [0.00, 0.00] | 0 |
+| Q2 | 0.00 | [0.00, 0.00] | 0 |
+| Q3 | 0.00 | [0.00, 0.00] | 0 |
+| Q4 (highest) | 0.00 | [0.00, 0.00] | 0 |
+
+**Key heterogeneity drivers:** [List top 2–3 covariates from feature importance or SHAP analysis that most strongly predict treatment effect heterogeneity.]
+
+**Interpretation:** [Does the forest detect meaningful heterogeneity? Is the difference between Q1 and Q4 large and statistically significant? What does this tell us about who benefits most?]
+
+:::
+
+---
+
+## What did causal ML add here?
+
+[2-3 paragraphs providing an honest assessment of whether the ML extension
+was informative in this context. Did it confirm or challenge the original?
+What was the most useful output? What were the limitations?]
+
+---
+
+## Referee reports
+
+**Referee consensus:** [1-2 sentence summary of the overall verdict and key concerns]
+
+::: {.panel-tabset}
+
+## Identification
+
+{{< include reports/ref1.md >}}
+
+## DML Methods
+
+{{< include reports/ref2.md >}}
+
+## Robustness
+
+{{< include reports/ref3.md >}}
+
+## Synthesis
+
+{{< include reports/synthesis.md >}}
+
+## Final Report
+
+{{< include reports/final_report.md >}}
+
+:::
+
+---
+
+## Downloads
+
+- [Paper PDF](paper.pdf) *(add to this folder)*
+- [Forest plot (PDF)](forest_plot.pdf) *(add to this folder)*

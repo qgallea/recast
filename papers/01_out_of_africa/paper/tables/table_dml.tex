@@ -1,0 +1,30 @@
+\begin{table}[htbp]
+\centering
+\caption{Genetic Diversity and Log GDP per Capita (2000): OLS vs.\ DML-PLIV}
+\label{tab:dml_comparison}
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{2}{c}{OLS} & \multicolumn{2}{c}{DML-PLIV} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+ & Baseline (T6c1) & Full Controls (T7c5) & Random Forest & LassoCV \\
+\midrule
+Coefficient       & 210.341 & 263.542 & -588.594 & -25.471 \\
+Std.~Error        & (82.077) & (60.204) & (1218.712) & (5.643) \\
+95\% CI           & [49.470,\;371.212] & [145.542,\;381.542] & [-2977.225,\;1800.037] & [-36.531,\;-14.410] \\
+$N$               & 143 & 106 & 148 & 148 \\
+\midrule
+Estimator         & OLS & OLS & PLIV & PLIV \\
+ML Learner        & \textemdash & \textemdash & RF & Lasso \\
+Controls          & Baseline & Full & Baseline & Baseline \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}
+\footnotesize
+\textit{Notes:} Dependent variable: log income per capita in 2000.
+Treatment: ancestry-adjusted predicted genetic diversity (\texttt{pdiv\_aa}), linear term.
+Instrument (DML): migratory distance from East Africa (\texttt{mdist\_addis}).
+OLS results from replication of Ashraf \& Galor (2013).
+DML-PLIV uses 5-fold cross-fitting with 3 repetitions.
+95\% CI computed from asymptotic normal approximation.
+\end{flushleft}
+\end{table}

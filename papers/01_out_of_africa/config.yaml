@@ -1,0 +1,44 @@
+# RECAST Project Configuration — Ashraf & Galor (2013 AER)
+# "The 'Out of Africa' Hypothesis, Human Genetic Diversity,
+#  and Comparative Economic Development"
+
+paper:
+  title: "The 'Out of Africa' Hypothesis, Human Genetic Diversity, and Comparative Economic Development"
+  authors: "Ashraf, Q. and Galor, O."
+  year: 2013
+  journal: "American Economic Review"
+  slug: "ashrafgalor2013"
+
+identification:
+  type: IV
+  primary_data_file: "country.dta"
+  # Stage 01 will inspect the .dta and confirm exact variable names.
+  # Names below are best guesses from the README and paper — stage 01 corrects any mismatches.
+  outcome_variable: "ln_gdp_pc"         # log GDP per capita
+  treatment_variable: "pdiv_pdum"       # predicted genetic diversity (from migratory distance)
+  instrument: "mdist_addis"             # migratory distance from Addis Ababa (East Africa)
+  functional_form: quadratic            # hump-shaped: diversity + diversity^2
+  controls:
+    - abslat                            # absolute latitude
+    - meantemp                          # mean temperature
+    - precip                            # precipitation
+    - landlocked                        # landlocked dummy
+    - island                            # island dummy
+    - ln_land_area                      # log land area
+  fixed_effects:
+    - continent                         # continent dummies
+  secondary_datasets:
+    - "ethnic.dta"                      # ethnicity-level (HGDP-CEPH 53 groups)
+    - "ethnicpair.dta"                  # ethnicity pair-level
+
+dml:
+  model_type: PLIV                      # Partial Linear IV (instrument present)
+  ml_methods:
+    - RandomForest
+    - LassoCV
+  n_folds: 5
+  n_rep: 3
+
+review:
+  max_rounds: 3
+  blocking_threshold: major

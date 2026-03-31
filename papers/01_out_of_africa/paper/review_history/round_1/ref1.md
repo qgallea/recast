@@ -1,0 +1,44 @@
+## Referee 1 Report: Identification
+
+**Round:** 1
+**Overall verdict:** Major concerns
+
+---
+
+### Blocking issues (re-analysis required)
+
+- **DML sign change without quadratic treatment (Section 3.3 / diagnostics_flags.json):** The PLIV model is estimated with only the linear term of `pdiv_aa`, while the paper's entire causal claim rests on a quadratic (hump-shaped) relationship. Estimating a linear PLIV on a treatment whose true effect is quadratic does not recover a LATE for the originally stated estimand — it recovers a misspecified projection. The sign flip to $-23.19$ is the predictable consequence of linearising a concave curve above its mode: at the sample mean of $\approx 0.72$, the marginal effect of diversity is already negative. This is not a legitimate DML extension of the original IV strategy; it is a different model. The PLIV must be re-specified to include both `pdiv_aa` and `pdiv_aa_sqr` as the treatment vector (or equivalent), or the paper must clearly label the DML estimate as a different estimand (e.g., slope at the mean) and not compare it against the original quadratic linear coefficient.
+
+- **Nuisance quality failure for treatment equation (diagnostics_flags.json):** The treatment nuisance $R^2$ is reported as $-127{,}810.35$, which is numerically pathological — a negative $R^2$ of this magnitude indicates that the nuisance model for the first stage ($D$ residual) is producing predictions far worse than the unconditional mean. This invalidates the PLIV score function and renders the coefficient $\hat{\theta} = -23.19$ untrustworthy even conditional on the sign-change concern above. The nuisance learner choice and feature set for the treatment equation must be debugged and re-estimated before the DML results can be interpreted.
+
+---
+
+### Major issues (prose/table edits required)
+
+- **Estimand definition in Section 3.1:** The paper describes the PLIV model with a scalar treatment $D = \texttt{pdiv\_aa}$ (linear term only), but the stated estimand in the original paper — and repeated in `paper_spec.json` — is a quadratic ATE. The PLIV equation as written does not share the same estimand. Section 3.1 must explicitly define the estimand being recovered by the PLIV (e.g., the slope of income with respect to diversity at the instrument-weighted mean, integrated over the support of the instrument), distinguish it from the ATE recovered by the quadratic OLS, and justify why this alternative estimand is of scientific interest.
+
+- **Exclusion restriction discussion (Section 2.1):** The paper states that the exclusion restriction "requires that migratory distance affects contemporary income only through its effect on genetic diversity" but provides no evaluation of threats. Migratory distance from Addis Ababa is correlated with distance to major trade routes, Neolithic transition timing (which is itself a control, creating a partial collinearity), and contemporary disease burden — channels that may operate independently of genetic diversity. The paper must acknowledge these threats and cite the original paper's or subsequent literature's responses to them (e.g., Spolaore and Wacziarg, 2013 robustness checks), even if only briefly.
+
+- **First-stage F-statistic not reported:** `paper_spec.json` records a 2SLS specification (Table 2, col 5) with `mdist_addis` as instrument, but no first-stage F-statistic is reported anywhere in the paper or the results JSON. For IV validity, the first-stage F must exceed 10 (Staiger-Stock rule of thumb). This figure should be computed and reported for both the 21-country and 145-country samples. The omission is particularly consequential given that the 21-country 2SLS already shows a 33.5% deviation from published coefficients.
+
+---
+
+### Minor issues
+
+- **`config_mismatches` in `paper_spec.json`:** The config file originally listed `ln_gdp_pc`, `pdiv_pdum`, `landlocked`, `island`, and `ln_land_area` as variable names, none of which exist in the data. The paper should include a brief data appendix note confirming that the RECAST analysis uses `ln_gdppc2000`, `pdiv_aa`, and the geographic controls actually present in `country.dta`, so that readers can reconcile these with the original Ashraf-Galor variable documentation.
+
+- **Sample size inconsistency:** The PLIV is estimated on $N = 148$ (from `diagnostics_flags.json`), while the baseline OLS contemporary specification uses $N = 143$ (Table 6, col 1) or $N = 109$ (Table 7, col 5). The paper does not explain why the DML sample is larger. If the DML sample includes observations that the original paper excluded (e.g., on missing controls or outlier flags), the instrument-weighted LATE is not comparable even in principle. The sample construction for the DML must be documented and reconciled with the OLS/IV samples.
+
+- **Conley spatial SE replication failure acknowledged but not qualified:** Section 2.2 notes that the 21-country small-sample failures are "highly sensitive to data-version differences" and that Conley spatial SEs "cannot be exactly reproduced." This is an honest disclosure, but the paper should note whether the sign and approximate magnitude of the small-sample coefficients are nonetheless preserved, since the failure may be a precision issue rather than a qualitative discrepancy.
+
+---
+
+### Comments to the authors
+
+**On the identification strategy of the original paper.** The IV design in Ashraf and Galor (2013) is internally coherent given its premises: migratory distance is pre-determined relative to any contemporary institution, and the serial founder effect provides a well-documented biological mechanism for the first stage. The first-stage relationship between distance and genetic diversity is among the most robust empirical regularities in population genetics and is not materially contested. The RECAST paper correctly summarises this strategy in Section 2.1. The exclusion restriction, however, is harder than the paper lets on. Migratory distance is a summary statistic for the cumulative history of a population's geographic trajectory, and many channels — disease ecology, agricultural potential, contact with Eurasian trade networks — are only partially absorbed by the included controls. The original paper devotes substantial space to robustness checks on this point; the RECAST should either summarise or cite those defences rather than leaving the exclusion restriction as a bare assertion.
+
+**On the quadratic treatment and PLIV specification.** The most substantive identification concern in this RECAST is the mismatch between the original estimand (a quadratic ATE) and the DML estimand (a linearised PLIV coefficient). The paper's own explanation in Section 3.3 — that the negative sign arises because the sample mean lies above the hump — is correct as far as it goes, but this means the DML is estimating a \emph{different} quantity from the original paper. This is not an extension of Ashraf and Galor's causal claim; it is a new and arguably less interesting claim (the slope of a concave function above its peak is negative by construction). To genuinely extend the identification strategy, the PLIV should treat both $\texttt{pdiv\_aa}$ and $\texttt{pdiv\_aa\_sqr}$ as the treatment vector. Alternatively, if the goal is simply to stress-test the linear instrument relationship, the paper should frame the DML as a robustness check on the monotone first-stage rather than as an extension of the quadratic structural claim.
+
+**On the nuisance quality failure.** The $R^2 = -127{,}810$ for the treatment nuisance is almost certainly a code-level error — possibly the nuisance model for the treatment partialling is being fitted on the wrong target variable, is using unscaled features, or is running on a misspecified formula. This must be diagnosed and corrected before the paper can be considered complete. The LassoCV result ($\hat{\theta} = -23.19$) may or may not survive a corrected nuisance estimation; until the treatment nuisance is well-behaved, no inference on the PLIV coefficient is reliable.
+
+**On replication quality.** The four passing specifications (Tables 3 and 6--7) cover the paper's primary claims and are within acceptable tolerances. The two failures are both from the $N=21$ limited sample, which is known to be fragile in the original paper itself (the authors note it as illustrative rather than primary evidence). The RECAST's candid disclosure of these failures is appropriate. However, the paper should explicitly note — as a matter of identification discipline — that the 2SLS specification that fails (Table 2, col 5) is also the only direct test of the exclusion restriction via overidentification or sensitivity analysis; its numerical instability means that IV-specific diagnostics (first-stage F, weak-instrument bounds) from the replication are not directly credible without further investigation.

@@ -1,0 +1,183 @@
+---
+title: "Pipeline Stages"
+---
+
+The pipeline executes six notebooks sequentially, followed by the Advisor Gate and the Review Loop. Each stage writes its outputs to well-defined locations; downstream stages fail fast if their expected inputs are missing.
+
+## Stage overview
+
+| # | Notebook | Input | Output |
+|---|----------|-------|--------|
+| 1 | `01_paper_intelligence` | `raw_data/paper.pdf` | `data/paper_spec.json` |
+| 2 | `02_data` | `raw_data/*.{dta,csv}` | `data/dataset.parquet` |
+| 3 | `03_replication` | `data/` | `data/results/replication_*.json`, `paper/tables/table_replication.tex` |
+| 4 | `04_dml_extension` | `data/` | `data/results/dml_results.json`, `hte_results.json`, `paper/tables/table_dml.tex`, `paper/figures/forest_plot.pdf` |
+| 4cf | `04_causal_forest` | `data/` | `data/results/causal_forest_results.json`, `paper/figures/forest_plot.pdf`, `cate_histogram.pdf` |
+| 5 | `05_diagnostics` | `data/results/` | `data/results/diagnostics_flags.json` |
+| 6 | `06_report` | `data/` + `paper/tables/` + `paper/figures/` | `paper/paper.tex`, `paper/paper.pdf` |
+
+Notebooks live in `code_build/` and are executed with `nbconvert --execute` into `code_run/`. **Never edit files in `code_run/`.**
+
+---
+
+## Stage 1 · Paper Intelligence
+
+**What happens:** A Claude sub-agent reads `paper.pdf` and extracts the paper's identification strategy, regression specifications, key results, variable descriptions, and sample restrictions into `data/paper_spec.json`.
+
+`paper_spec.json` is **read-only** after this stage. It is the single source of truth that all downstream stages reference.
+
+**Common failures:**
+
+- Scanned PDF with no text layer → pre-process with OCR before running
+- Non-standard variable names in the paper → edit `paper_spec.json` manually to match the data column names, then re-run from stage 2
+
+---
+
+## Stage 2 · Data
+
+**What happens:** Loads all files in `raw_data/`, applies the cleaning and merging rules inferred from `paper_spec.json`, and writes a single `data/dataset.parquet`.
+
+**Common failures:**
+
+- Encoding issues in `.dta` files → set `encoding` in `config.yaml`
+- Variable not found → check `paper_spec.json` variable names against actual column names
+
+---
+
+## Stage 3 · Replication
+
+**What happens:** Re-estimates the paper's main specifications (OLS/IV/2SLS) using the cleaned dataset. Compares estimates to the published tables extracted in stage 1. Writes a pass/fail replication check and generates `table_replication.tex`.
+
+`data/results/replication_check.json` records the deviation (%) between each replicated coefficient and the original published value. Deviations above 5% are flagged for the Advisor Gate.
+
+---
+
+## Stage 4 · ML Extension
+
+Stage 4 runs one of two methods depending on the command:
+
+### `/recast` → DoubleML Extension (`04_dml_extension.ipynb`)
+
+Following the methodology of Baiardi & Naghi (2024, *Econometrics Journal*), the DML extension:
+
+- **Runs all outcome × treatment specifications** from the paper (not just the primary)
+- **Uses 7 ML methods** for nuisance estimation: Lasso, Decision Tree, Gradient Boosting, Random Forest, Neural Network, Ensemble (MSE-weighted), and Best (lowest nuisance MSE)
+- **Adaptive cross-fitting:** K=2 folds for N<200 (following B&N), K=5 for larger samples
+- **20+ repetitions** with **median aggregation** across random splits and the B&N adjusted SE formula: `se_adj = median(sqrt(SE_k² + (coef_k - median)²))`
+- **Best learner selection:** by lowest out-of-sample nuisance MSE — never by p-value
+- **Lasso coefficient diagnostics:** reports which control variables are selected by Lasso in each nuisance model
+
+Produces:
+
+- `dml_results.json` — all specs × all methods, with per-rep estimates and nuisance diagnostics
+- `hte_results.json` — BLP heterogeneity test, GATE (5 quintiles), CLAN classification analysis
+- B&N-style `table_dml.tex` with 8 columns: Lasso | Tree | Boosting | Forest | NNet | Ensemble | Best | OLS
+- `forest_plot.pdf/.png` — coefficient comparison across all methods
+
+**Heterogeneous treatment effects** follow the Chernozhukov et al. (2018) Generic ML framework:
+
+1. **BLP (Best Linear Predictor):** Formal test for heterogeneity (β₂ ≠ 0)
+2. **GATE (Group Average Treatment Effects):** 5 quintiles of predicted CATE with jointly valid CIs
+3. **CLAN (Classification Analysis):** Which observable characteristics distinguish most- vs. least-affected groups
+
+### `/recast-cf` → Causal Forest Extension (`04_causal_forest.ipynb`)
+
+Estimates heterogeneous treatment effects via EconML's `CausalForestDML` (for OLS/DID) or `CausalIVForest` (for IV with binary instrument). Includes:
+
+- Above/below-median ATE comparison
+- Calibration test (slope ≈ 1 for well-calibrated forest)
+- GATE (5 quintiles of predicted CATE) + CLAN analysis
+- Feature importances identifying heterogeneity drivers
+
+Produces: `causal_forest_results.json`, `hte_results.json`, `table_cf.tex`, `forest_plot.pdf`, `cate_histogram.pdf`, `feature_importance.pdf`, `gate_plot.pdf`
+
+**SE sanity check (mandatory):** After computing the ATE, the notebook verifies that the ATE CI width is not more than 10x narrower than individual CATE CI widths. This catches the common bug of using `std/sqrt(n)` instead of `predict_interval()`.
+
+This is the stage most likely to need re-running during the review loop.
+
+---
+
+## Stage 5 · Diagnostics
+
+**What happens:** Reads all `data/results/*.json` files and runs 12 automated checks:
+
+| # | Check | Condition |
+|---|-------|-----------|
+| 1 | Replication pass | Max deviation < 15% |
+| 2 | DML direction | Best learner preserves sign of published coefficient |
+| 3 | DML CI coverage | Published coefficient inside DML CI |
+| 4 | Nuisance quality | R² > 0.1 for both nuisance models |
+| 5 | Sample size | N ≥ 30 |
+| 6 | HTE heterogeneity | At least two GATE CIs non-overlapping |
+| 7 | CF ATE consistency | CF and DML agree on sign |
+| 8 | CATE plausibility | 10% < pct_significant < 95% |
+| 9 | ATE SE plausibility | CATE/ATE CI ratio < 10 |
+| 10 | Cross-fitting stability | SD across reps < median SE |
+| 11 | Learner sign agreement | All learners agree on sign |
+| 12 | Lasso variable selection | Lasso selects > 0 variables in both nuisance models |
+
+Flags are written to `data/results/diagnostics_flags.json`.
+
+---
+
+## Stage 6 · Report
+
+**What happens:** Compiles `paper/paper.tex` from the results, inserting the B&N-style tables and figures from stages 3–5. Runs `pdflatex` twice to resolve cross-references and writes `paper/paper.pdf`.
+
+**Requires:** `pdflatex` on the system PATH.
+
+---
+
+## Advisor Gate
+
+Three independent validation checks run before the review loop. **All three must pass** or the pipeline stops.
+
+| Check | Validates |
+|-------|-----------|
+| Code Auditor | Replication coefficients within tolerance; sample sizes match |
+| Identification Checker | Estimand defined; identification strategy consistent |
+| Data Validator | No critical data quality flags in diagnostics |
+
+If any check fails, the pipeline reports which check failed and what to fix, then stops. Re-run with `/recast` (or `/recast-cf`) or `/stage N` after fixing.
+
+---
+
+## Review Loop
+
+Up to `config.yaml > review.max_rounds` rounds (default 3). Follows the principles of Berk, Harvey & Hirshleifer (2017) for effective refereeing.
+
+Each round:
+
+1. **Three isolated referees** produce independent reports:
+   - Referee 1: Causal identification
+   - Referee 2: DML/CF methods
+   - Referee 3: Replication fidelity and robustness
+
+   Each referee must first assess the **contribution** of the RECAST, then classify
+   issues as **essential** (paper unpublishable without fix — requires scientific
+   justification) or **suggestions** (would improve but optional).
+
+2. **Synthesis referee** deduplicates, validates essential/suggested classifications
+   (downgrades items lacking scientific justification), and enforces the **implicit
+   bargain**: in rounds 2+, new essential issues that were visible in round 1 are
+   downgraded to suggestions.
+
+3. **Revision agent** implements essential fixes and low-cost suggestions. High-cost
+   suggestions are documented as deferred.
+
+4. Writes `paper/review_history/round_N/changelog_N.md`.
+
+The loop exits when no essential issues remain, or after `max_rounds`. **One round is
+the target** — multiple rounds only when essential issues are partially addressed.
+
+---
+
+## Final Referee
+
+Reads all rounds' referee reports, syntheses, changelogs, and the final `paper.tex`. Writes a human-readable `paper/review_history/final_report.md` that answers:
+
+- **What does this RECAST contribute?** (Contribution assessment)
+- **"Flaws and all, would I be pleased to have written this?"** (Berk et al. 2017 test)
+- What issues were raised and resolved
+- What remains open (essential vs. suggestions)
+- Key numerical comparisons (original vs. replicated vs. DML Best vs. Ensemble)

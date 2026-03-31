@@ -1,0 +1,116 @@
+
+
+```{r}
+library(devtools)
+install_version("grf", version = "1.2.0", repos = "http://cran.us.r-project.org")
+library(readstata13)
+library(grf)
+set.seed(12345)
+```
+
+# Column 1 of Table 4 from Original, Revisited Paper
+```{r}
+# load data
+setwd("Replication_package_BaiardiNaghi/Replication_Code&Data/Code_Tariffs")
+data.raw <- read.dta13("../Data/data_tariffs.dta")
+
+# if industry=="211212"
+data <- data.raw[which(data.raw$industry=="211212"),]
+
+controls <- c("avg_tar", "init", "inv", "human_cap", "w_africa", "e_africa", "s_c_africa",
+              "n_afr_me", "e_europe", "lat_america", "e_asia", "s_e_asia", "s_w_asia",
+              "dum80_83", "dum85_87", "ln_init_q_skilla", "ln_init_q_unskilla") 
+y <- "growth"
+d <- "skill1_corr"
+
+data <- data[complete.cases(data[,c(y,d,controls)]),c(y,d,controls)]
+
+Y <- data[,y]
+W <- data[,d] 
+X <- data[, controls]
+
+tau.forest <- causal_forest(X, Y, W,
+                            num.trees=2000,
+                            sample.fraction=0.5,
+                            mtry=17,
+                            min.node.size=5,
+                            honesty.fraction=0.5,
+                            honesty.prune.leaves=TRUE,
+                            alpha=0.05,
+                            imbalance.penalty=0)
+
+# Estimate the conditional average treatment effect on the full sample (CATE).
+Column1 <- average_partial_effect(tau.forest)
+```
+
+
+# Column 2 of Table 4 from Original, Revisited Paper
+```{r}
+# load data
+data.raw <- read.dta13("../Data/data_tariffs.dta")
+
+# if industry=="211212"
+data <- data.raw[which(data.raw$industry=="211212"),]
+
+controls <- c("avg_tar", "init", "inv", "human_cap", "w_africa", "e_africa", "s_c_africa",
+              "n_afr_me", "e_europe", "lat_america", "e_asia", "s_e_asia", "s_w_asia",
+              "dum80_83", "dum85_87", "ln_init_q_skilla", "ln_init_q_unskilla") 
+y <- "growth"
+d <- "diffa"
+
+data <- data[complete.cases(data[,c(y,d,controls)]),c(y,d,controls)]
+
+Y <- data[,y]
+W <- data[,d] 
+X <- data[, controls]
+
+tau.forest <- causal_forest(X, Y, W,
+                            num.trees=5000,
+                            sample.fraction=0.5,
+                            mtry=17,
+                            min.node.size=5,
+                            honesty.fraction=0.5,
+                            honesty.prune.leaves=TRUE,
+                            alpha=0.05,
+                            imbalance.penalty=0)
+
+# Estimate the conditional average treatment effect on the full sample (CATE).
+Column2 <- average_partial_effect(tau.forest)
+```
+
+
+# Column 4 of Table 4 from Original, Revisited Paper
+```{r}
+# load data
+data.raw <- read.dta13("../Data/data_tariffs.dta")
+
+# if industry=="211212"
+data <- data.raw[which(data.raw$industry=="211212"),]
+
+controls <- c("avg_tar", "init", "inv", "human_cap", "w_africa", "e_africa", "s_c_africa",
+              "n_afr_me", "e_europe", "lat_america", "e_asia", "s_e_asia", "s_w_asia",
+              "dum80_83", "dum85_87", "ln_init_q_skilla", "ln_init_q_unskilla") 
+y <- "growth"
+d <- "diffg"
+
+data <- data[complete.cases(data[,c(y,d,controls)]),c(y,d,controls)]
+
+Y <- data[,y]
+W <- data[,d] 
+X <- data[, controls]
+
+tau.forest <- causal_forest(X, Y, W,
+                            num.trees=5000,
+                            sample.fraction=0.5,
+                            mtry=17,
+                            min.node.size=5,
+                            honesty.fraction=0.5,
+                            honesty.prune.leaves=TRUE,
+                            alpha=0.05,
+                            imbalance.penalty=0)
+
+# Estimate the conditional average treatment effect on the full sample (CATE).
+Column3 <- average_partial_effect(tau.forest)
+capture.output(cbind(Column1,Column2,Column3), file=paste("TA_S5.txt"))
+```
+

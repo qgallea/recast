@@ -1,0 +1,122 @@
+---
+title: "Skills Reference"
+---
+
+Skills are internal sub-agent skill files in `skills/`. They are not invoked directly by the user — commands load them as system prompts when spawning sub-agents. Each skill defines a narrow role, the files it reads, and the files it writes.
+
+---
+
+## Pipeline skills
+
+### `orchestrator.md`
+
+**Read by:** every slash command, before anything else.
+
+Defines the execution rules that all agents must follow: how to run notebooks, the filesystem-as-state model, immutability rules, referee isolation protocol, and error handling.
+
+Key rules enforced:
+- Agents communicate exclusively through files. No in-memory state passing.
+- `data/paper_spec.json` is read-only after stage 1.
+- `code_run/` is written by `nbconvert` only.
+- `paper/review_history/` is append-only.
+
+### `notebook_runner.md`
+
+**Read by:** `/run`, `/recast`, `/recast-cf`, `/stage`.
+
+Executes a single notebook:
+
+```bash
+jupyter nbconvert --to notebook --execute --inplace \
+  --ExecutePreprocessor.timeout=1800 \
+  --output-dir <project>/code_run/ \
+  <project>/code_build/0N_*.ipynb
+```
+
+Notebooks must be executed with `cwd = <project>/code_build/` because they import `from paths import *` to resolve all file paths. On failure, reports the failing cell number and error traceback.
+
+---
+
+## Gate
+
+### `advisor_gate.md`
+
+**Read by:** `/recast`, `/recast-cf` (after stage 6).
+
+Spawns three independent checks in sequence. Each check reads specific files and returns `PASS` or `FAIL` with a reason.
+
+| Check | Files read | Validates |
+|-------|-----------|-----------|
+| Code Auditor | All `code_run/` notebooks | No execution errors; all expected outputs exist |
+| Identification Checker | `paper_spec.json`, `replication_check.json` | Internally consistent identification strategy |
+| Data Validator | `diagnostics_flags.json` | No critical data quality flags |
+
+All three checks must return `PASS`. The orchestrator stops the pipeline on the first `FAIL`.
+
+---
+
+## Review skills
+
+### `review_loop.md`
+
+**Read by:** `/review`.
+
+Defines the loop logic: state detection (count existing `round_*/` dirs), per-round execution (3 referees → synthesis → revision), exit conditions, and progress reporting format.
+
+### `revision_agent.md`
+
+**The only agent that writes to `paper/paper.tex` and `code_build/` notebooks.**
+
+Reads the synthesis report and implements changes:
+
+| Issue severity | Action |
+|---------------|--------|
+| Blocking | Edits `code_build/0N_*.ipynb` (appends `## Revision Round N` section) + signals `RERUN_NEEDED: yes` |
+| Major | Direct edit to `paper/paper.tex` |
+| Minor | Direct edit to `paper/paper.tex` |
+
+After implementing all changes, writes `paper/review_history/round_N/changelog_N.md` documenting every change made and every issue deferred, with reasons.
+
+**Key rule:** never overwrites prior cells in notebooks — always appends. Never overwrites prior files in `review_history/`.
+
+### `synthesis_referee.md`
+
+**Read by:** review loop, after all three referee reports are written.
+
+The first agent in the chain that sees all three referee reports. Deduplicates overlapping concerns, classifies each unique issue as blocking / major / minor, and checks prior `changelog_*.md` files to avoid re-raising resolved issues.
+
+### `final_referee.md`
+
+**Read by:** `/final`.
+
+Reads all rounds' `ref*.md`, `synthesis.md`, and `changelog_*.md` files, plus the final `paper/paper.tex`. Writes `paper/review_history/final_report.md` as a human-readable summary.
+
+---
+
+## Referees
+
+Each referee is isolated: it receives only its own skill file as a system prompt and reads only the files listed below. No referee has access to any other referee's output. The synthesis referee is the first agent that sees all three reports.
+
+### `referee_1_identification.md`
+
+**Mandate:** Causal identification strategy only.
+
+**Reads:** `paper_spec.json`, `data/results/replication_results.json`, `paper/paper.tex`
+
+Evaluates: instrument validity, exclusion restriction, first-stage strength, LATE vs. ATE interpretation, external validity.
+
+### `referee_2_dml_methods.md`
+
+**Mandate:** DoubleML / Causal Forest implementation and methodological choices.
+
+**Reads:** `paper_spec.json`, `data/results/dml_results.json` and/or `causal_forest_results.json`, `hte_results.json`, `code_build/04_*.ipynb`, `paper/paper.tex`
+
+Evaluates: cross-fitting procedure, learner selection, nuisance R², GATE/CATE validity. For Causal Forest: honesty, tree count, SE plausibility (check 21 — **blocking** if ATE CI is 10x+ narrower than individual CATE CIs), feature importance interpretation.
+
+### `referee_3_robustness.md`
+
+**Mandate:** Replication fidelity and robustness.
+
+**Reads:** `paper_spec.json`, `data/results/replication_check.json`, `data/results/diagnostics_flags.json`, `paper/paper.tex`
+
+Evaluates: numerical match to published tables, sample coverage, sensitivity to specification, data quality flags from stage 5.

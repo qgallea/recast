@@ -1,0 +1,79 @@
+{
+  "overall": "WARN",
+  "checks": {
+    "replication_pass": {
+      "status": "WARN",
+      "value": 5.11,
+      "note": "5.11% max deviation"
+    },
+    "dml_direction": {
+      "status": "PASS",
+      "value": 0.019718,
+      "note": "same sign, 43.7% magnitude diff"
+    },
+    "dml_ci_coverage": {
+      "status": "PASS",
+      "value": 0.035,
+      "note": "published coef inside DML CI"
+    },
+    "nuisance_quality": {
+      "status": "WARN",
+      "value": {
+        "r2_outcome": 0.1541,
+        "r2_treatment": 0.3621
+      },
+      "note": "r2_outcome=0.154, r2_treatment=0.362"
+    },
+    "sample_size": {
+      "status": "PASS",
+      "value": 63,
+      "note": "n=63"
+    },
+    "hte_heterogeneity": {
+      "status": "PASS",
+      "value": true,
+      "note": "heterogeneity detected (non-overlapping GATE CIs)"
+    },
+    "cf_ate_consistency": {
+      "status": "SKIP",
+      "value": null,
+      "note": "causal_forest_results.json not found"
+    },
+    "cf_cate_plausibility": {
+      "status": "SKIP",
+      "value": null,
+      "note": "causal_forest_results.json not found"
+    },
+    "ate_se_plausibility": {
+      "status": "SKIP",
+      "value": null,
+      "note": "requires both CF and HTE results"
+    },
+    "cross_fitting_stability": {
+      "status": "SKIP",
+      "value": null,
+      "note": "per_rep_coefs not available in Best learner"
+    },
+    "learner_sign_agreement": {
+      "status": "PASS",
+      "value": {
+        "n_pos": 5,
+        "n_neg": 0
+      },
+      "note": "all 5 learners agree on sign (all positive)"
+    },
+    "lasso_variable_selection": {
+      "status": "PASS",
+      "value": {
+        "n_nonzero_outcome": 6,
+        "n_nonzero_treatment": 2
+      },
+      "note": "outcome n_nonzero=6, treatment n_nonzero=2"
+    }
+  },
+  "blocking_issues": [],
+  "warnings": [
+    "replication_pass: 5.11% max deviation",
+    "nuisance_quality: r2_outcome=0.154, r2_treatment=0.362"
+  ]
+}

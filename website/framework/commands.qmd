@@ -1,0 +1,192 @@
+---
+title: "Slash Commands"
+---
+
+All commands are defined in `.claude/commands/` and are invoked from Claude Code. Every command reads `skills/orchestrator.md` first before taking any action.
+
+| Command | What it does |
+|---------|-------------|
+| [`/recast`](#recast) | Full pipeline with **DoubleML** extension |
+| [`/recast-cf`](#recast-cf) | Full pipeline with **Causal Forest** extension |
+| [`/run`](#run) | Same as `/recast` (legacy alias) |
+| [`/init`](#init) | Scaffold a new project folder |
+| [`/stage`](#stage) | Re-run from stage N onwards |
+| [`/review`](#review) | Review loop only |
+| [`/final`](#final) | Final referee report only |
+| [`/publish`](#publish) | Publish a finished paper to the website |
+
+---
+
+## `/recast` {#recast}
+
+```
+/recast <project_path>
+```
+
+Full pipeline with **DoubleML** extension: stages 1–6 → Advisor Gate → Review Loop → Final Report.
+Uses `04_dml_extension.ipynb` at stage 4 (PLIV/PLR with RandomForest + LassoCV learners).
+
+---
+
+## `/recast-cf` {#recast-cf}
+
+```
+/recast-cf <project_path>
+```
+
+Full pipeline with **Causal Forest** extension: stages 1–3, then `04_causal_forest.ipynb` at stage 4,
+then stages 5–6 → Advisor Gate → Review Loop → Final Report.
+Uses `CausalForestDML` (OLS/DID) or `CausalIVForest` (IV with binary instrument) from EconML.
+
+The causal forest pipeline does **not** produce `dml_results.json`. Diagnostics and the report
+auto-detect which results exist and adapt accordingly.
+
+---
+
+## `/run` {#run}
+
+```
+/run <project_path>
+```
+
+Same as `/recast` — the legacy command name. Full pipeline with DoubleML.
+
+**Steps:**
+
+1. Validates that `<project_path>` contains `.dml_project` and `config.yaml`. If not, prompts you to run `/init` first.
+2. Reads `config.yaml` and `skills/orchestrator.md`.
+3. Runs stages 1–6 sequentially via `notebook_runner`. Stops immediately on any stage failure and reports the failing cell and error.
+4. Runs the Advisor Gate (three independent checks). Stops if any check fails.
+5. Runs the Review Loop (up to `config.yaml > review.max_rounds` rounds).
+6. Runs the Final Referee.
+7. Prints a summary: stages completed, rounds of review, final verdict, paths to key outputs.
+
+**Key rules:**
+- The Advisor Gate is never skipped.
+- The Final Referee always runs, even if the review loop exits cleanly after round 1.
+- `code_run/` receives executed notebook output — never edited directly.
+
+---
+
+## `/init`
+
+```
+/init <project_path>
+```
+
+Scaffolds a new project folder at `<project_path>`.
+
+**Creates:**
+
+```
+<project_path>/
+├── .dml_project
+├── config.yaml              ← from config_template.yaml
+├── raw_data/
+├── data/results/
+├── code_build/              ← notebooks + paths.py copied from framework
+├── code_run/
+└── paper/
+    ├── tables/ figures/
+    ├── prompts/             ← referee skill files copied here
+    └── review_history/
+```
+
+If `<project_path>` already exists and contains `.dml_project`, aborts with a warning.
+
+---
+
+## `/stage`
+
+```
+/stage <N> <project_path>
+```
+
+Re-runs the pipeline from stage N through stage 6, then runs the Advisor Gate and Review Loop.
+
+`N` must be between 1 and 6. Use this after fixing a specific issue:
+
+| Scenario | Command |
+|----------|---------|
+| Fixed the data cleaning | `/stage 2 <project>` |
+| Changed a DML specification | `/stage 4 <project>` |
+| Revised `paper.tex` manually | `/stage 6 <project>` |
+| Want to re-run only the review | `/review <project>` |
+
+**Note:** stages before N are not re-run. Their output files must already exist in `data/`.
+
+---
+
+## `/review`
+
+```
+/review <project_path>
+```
+
+Runs the Review Loop only. Assumes stages 1–6 and the Advisor Gate have already passed.
+
+Use this when you have manually edited `paper/paper.tex` and want to put it through the peer review process without re-running the analysis.
+
+Reads `skills/orchestrator.md` and `skills/review_loop.md`. State is determined by counting `paper/review_history/round_*/` directories — it resumes from the next round if prior rounds already exist.
+
+---
+
+## `/final`
+
+```
+/final <project_path>
+```
+
+Runs the Final Referee only. Reads all prior rounds' referee reports, syntheses, and changelogs, and writes `paper/review_history/final_report.md`.
+
+Use this to regenerate the final report without re-running the review loop, for example after manually editing the changelog.
+
+---
+
+## `/publish` {#publish}
+
+```
+/publish <project_path>
+```
+
+Generates a complete, populated website page for a finished pipeline project and
+copies all required assets into `website/papers/<slug>/`.
+
+**Requires the pipeline to be fully complete:** `final_report.md` must exist
+(run `/final <project_path>` first if needed).
+
+**Steps:**
+
+1. Reads `data/paper_spec.json`, `data/results/dml_results.json`,
+   `data/results/replication_check.json`, `data/results/replication_results.json`,
+   and `paper/review_history/final_report.md` to extract all metadata.
+2. Derives the slug (`lowercasesurname + year`, e.g. `acemoglu2001`).
+3. Creates `website/papers/<slug>/` and writes a fully populated `index.qmd`
+   with correct YAML frontmatter (title, authors, DML estimates, replication
+   status, categories, etc.) and populated replication and DML tables.
+4. Copies `forest_plot.png` and all five referee report `.md` files into place.
+
+**Output:**
+
+```
+website/papers/<slug>/
+├── index.qmd           ← populated page, ready for Quarto
+├── forest_plot.png
+└── reports/
+    ├── ref1.md
+    ├── ref2.md
+    ├── ref3.md
+    ├── synthesis.md
+    └── final_report.md
+```
+
+Push to `main` after running — GitHub Actions rebuilds the site automatically.
+
+**Key rules:**
+
+- Aborts if `website/papers/<slug>/` already exists (pass `--force` to overwrite).
+- Never modifies referee `.md` files — copies them verbatim.
+- If any JSON field is missing, writes `???` as a placeholder and adds an
+  HTML comment `<!-- TODO: fill in -->` so you can find it.
+- Does not copy `paper.pdf` (may be large); reminds you to add it manually if
+  you want a download link.

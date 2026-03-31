@@ -1,0 +1,43 @@
+# Quarto / website build
+website/_site/
+website/.quarto/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+.venv*/
+venv/
+env/
+
+# R
+.Rhistory
+.RData
+.Rproj.user/
+
+# OS
+.DS_Store
+desktop.ini
+Thumbs.db
+*.swp
+*~
+
+# Large data files
+*.dta
+papers/baiardi_naghi/            # reference package (37MB) — not part of pipeline
+papers/01_out_of_africa/         # earlier experiments
+papers/01b_out_of_africa/
+papers/01c_out_of_africa/
+papers/02_slave_trade_mistrust/
+papers/03_oregon_health_insurrance/
+papers/03b_oregon_health_insurrance/
+papers/referee_guide/
+
+# Executed notebooks are generated (keep code_build/, ignore code_run/)
+papers/*/code_run/
+
+# Dropbox
+.dropbox
+.dropbox.attr
+website/.git/

@@ -1,0 +1,60 @@
+{
+  "overall": "FAIL",
+  "checks": {
+    "replication_pass": {
+      "status": "PASS",
+      "value": 0.69,
+      "note": "0.69% max deviation (4/4 within threshold); all signs correct"
+    },
+    "dml_direction": {
+      "status": "PASS",
+      "value": -0.210963,
+      "note": "our=-0.2110 vs published=-0.178; same sign, rel_diff=18.5%"
+    },
+    "dml_ci_coverage": {
+      "status": "PASS",
+      "value": -0.178,
+      "note": "published=-0.178 inside DML CI [-0.3663, -0.0556]"
+    },
+    "nuisance_quality": {
+      "status": "FAIL",
+      "value": {
+        "r2_outcome": -0.4265,
+        "r2_treatment": -0.1844,
+        "best_r2_outcome": 0.0508,
+        "best_r2_treatment": 0.09
+      },
+      "note": "avg r2_outcome=-0.4265 (best=0.0508), avg r2_treatment=-0.1844 (best=0.0900)"
+    },
+    "sample_size": {
+      "status": "PASS",
+      "value": 50,
+      "note": "n_min=50, n_max=61 across 12 specs"
+    },
+    "hte_heterogeneity": {
+      "status": "PASS",
+      "value": true,
+      "note": "heterogeneity_detected=True; GATE groups: Q1 (low)=-1.722 [-3.501,0.058], Q2=-0.444 [-0.587,-0.301], Q3=-0.101 [-0.302,0.101], Q4=0.350 [0.045,0.656], Q5 (high)=1.343 [-0.285,2.971]"
+    },
+    "crossfit_stability": {
+      "status": "PASS",
+      "value": 0.2072,
+      "note": "sd_across_reps=0.0159, median_se=0.0767, ratio=0.207 (learner=Forest)"
+    },
+    "learner_sign_agreement": {
+      "status": "WARN",
+      "value": {
+        "n_negative": 5,
+        "n_positive": 1,
+        "n_learners": 6
+      },
+      "note": "5/6 negative, 1/6 positive (dominant=negative); Lasso=-0.2384, ElasticNet=-0.2014, DecisionTree=-0.1811, Boosting=-0.2343, Forest=-0.2110, NeuralNet=0.0630"
+    }
+  },
+  "blocking_issues": [
+    "nuisance_quality"
+  ],
+  "warnings": [
+    "learner_sign_agreement: 5/6 negative, 1/6 positive (dominant=negative); Lasso=-0.2384, ElasticNet=-0.2014, DecisionTree=-0.1811, Boosting=-0.2343, Forest=-0.2110, NeuralNet=0.0630"
+  ]
+}

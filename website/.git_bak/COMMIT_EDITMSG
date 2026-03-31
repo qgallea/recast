@@ -1,0 +1,9 @@
+Publish Nunn & Trefler (2010) RECAST
+
+- Replication: 3/3 PASS (max 5.11% rounding artefact), N=63
+- DML: 40-55% smaller than OLS, tariff effect not robust to nonlinear controls
+- BLP: strongly significant heterogeneity (p<0.001)
+- GATE: opposing effects across countries (-0.206 to +0.235)
+- Final verdict: Ready
+
+Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>

@@ -1,0 +1,49 @@
+---
+title: "Framework Documentation"
+page-layout: full
+toc: false
+---
+
+RECAST is built as a set of Claude Code slash commands and internal skills. All orchestration is done by AI agents communicating through the filesystem — no custom Python runtime is required to operate the framework.
+
+## Methodological foundations
+
+The RECAST pipeline is grounded in two key academic references:
+
+- **DML methodology:** [Baiardi & Naghi (2024)](https://doi.org/10.1093/ectj/utae004), "The value added of machine learning to causal inference: evidence from revisited studies," *Econometrics Journal*. The pipeline's DML extension — 7 ML methods, adaptive K-fold cross-fitting, median aggregation across sample splits, B&N adjusted standard errors, BLP/GATE/CLAN heterogeneity analysis — is directly based on their approach and replication code.
+
+- **Referee process:** [Berk, Harvey & Hirshleifer (2017)](https://doi.org/10.1257/jep.31.1.231), "How to Write an Effective Referee Report and Improve the Scientific Review Process," *Journal of Economic Perspectives*. The review loop follows their principles: contribution assessment before criticism, essential vs. suggested separation with scientific justification required, cost-benefit weighting, the implicit revise-and-resubmit bargain, and the synthesis referee as quality control against signal-jamming.
+
+::: {.docs-grid}
+
+::: {.doc-card}
+### [Pipeline Architecture](framework/pipeline-diagram.qmd)
+Visual diagram of the full pipeline — from paper ingestion to published report, including both DML and Causal Forest paths.
+:::
+
+::: {.doc-card}
+### [Quick Start](framework/quickstart.qmd)
+Install, scaffold a project, add your files, and launch the pipeline in four steps.
+:::
+
+::: {.doc-card}
+### [Pipeline Stages](framework/pipeline.qmd)
+Reference for each of the six analysis notebooks, the Advisor Gate, the Review Loop, and the Final Referee.
+:::
+
+::: {.doc-card}
+### [Slash Commands](framework/commands.qmd)
+Usage and rules for `/recast`, `/recast-cf`, `/init`, `/stage`, `/review`, `/final`, and `/publish`.
+:::
+
+::: {.doc-card}
+### [Skills Reference](framework/skills.qmd)
+Internal sub-agent skills: orchestrator, notebook runner, gate validators, referees, synthesis, and revision agent.
+:::
+
+::: {.doc-card}
+### [Project Structure](framework/paper-structure.qmd)
+The folder layout created by `/init`, immutability rules, and what to read when the pipeline finishes.
+:::
+
+:::

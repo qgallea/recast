@@ -1,0 +1,24 @@
+---
+title: "RECASTed Papers"
+subtitle: "Replication and DoubleML extension results"
+page-layout: full
+toc: false
+listing:
+  id: papers-listing
+  contents: papers/*/index.qmd
+  type: grid
+  grid-columns: 3
+  fields: [title, author, date, description, categories, image]
+  field-display-names:
+    author: "Original authors"
+    date: "Year"
+    description: "Identification strategy"
+  sort: "date desc"
+  filter-ui: [title, categories]
+  sort-ui: [date, title]
+  categories: true
+  image-height: "160px"
+---
+
+Each paper below has been **RECASTed** — replicated, extended with DoubleML, and reviewed by three isolated AI referees.
+Filter by identification strategy, topic, or replication status using the controls below.

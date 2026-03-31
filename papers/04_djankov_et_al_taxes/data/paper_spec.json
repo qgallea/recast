@@ -1,0 +1,169 @@
+{
+  "title": "The Effect of Corporate Taxes on Investment and Entrepreneurship",
+  "authors": [
+    "Djankov, S.",
+    "Ganser, T.",
+    "McLiesh, C.",
+    "Ramalho, R.",
+    "Shleifer, A."
+  ],
+  "year": 2010,
+  "journal": "American Economic Journal: Macroeconomics",
+  "slug": "djankov2010",
+  "revisited_by": {
+    "title": "The value added of machine learning to causal inference: evidence from revisited studies",
+    "authors": [
+      "Baiardi, A.",
+      "Naghi, A. A."
+    ],
+    "year": 2024,
+    "journal": "Econometrics Journal"
+  },
+  "identification": {
+    "type": "OLS",
+    "narrative": "Djankov et al. (2010) estimate the effect of corporate tax rates on investment and entrepreneurship using cross-country OLS regressions for the year 2004. Three measures of corporate taxes (statutory rate, first-year effective rate, five-year effective rate) are regressed on four outcome variables (investment/GDP, FDI/GDP, business density, entry rate) with up to 12 control variables. The key finding is that higher corporate taxes reduce investment and entrepreneurship, but estimates become insignificant when all controls are included simultaneously. Baiardi & Naghi (2024) revisit the 'kitchen sink' specification (Table 5D) using DML, finding larger and often significant effects because DML handles the high-dimensional controls more efficiently.",
+    "outcome_variable": "Investment2005",
+    "outcome_label": "Investment as % of GDP, 2003-2005 average",
+    "treatment_variable": "effective_5yr",
+    "treatment_label": "Five-year effective corporate tax rate",
+    "instrument": null,
+    "instrument_label": null,
+    "functional_form": "linear",
+    "controls": [
+      "other_taxes",
+      "vatsales",
+      "pit2004",
+      "lnpayments2004",
+      "lngdppc2003",
+      "propertyrights",
+      "sb_proc2004",
+      "emplo_i2004",
+      "freedomtotradeinternationally",
+      "seign2004",
+      "inf10yearavg",
+      "index_gcr"
+    ],
+    "fixed_effects": [],
+    "cluster_se": null,
+    "primary_data_file": "data_taxes.csv",
+    "secondary_datasets": [],
+    "additional_outcomes": [
+      {
+        "variable": "Investment2005",
+        "label": "Investment as % of GDP (Panel A)"
+      },
+      {
+        "variable": "FDI2005",
+        "label": "FDI as % of GDP (Panel B)"
+      },
+      {
+        "variable": "nbusinessdensitycf",
+        "label": "Business density per 100 people (Panel C)"
+      },
+      {
+        "variable": "nentryrateav",
+        "label": "Average entry rate 2000-2004 (Panel D)"
+      }
+    ],
+    "additional_treatments": [
+      {
+        "variable": "statutory",
+        "label": "Statutory corporate tax rate"
+      },
+      {
+        "variable": "effective",
+        "label": "First-year effective tax rate"
+      },
+      {
+        "variable": "effective_5yr",
+        "label": "Five-year effective tax rate"
+      }
+    ]
+  },
+  "main_results": [
+    {
+      "table": "Table 1, Panel A",
+      "spec": "DML (Lasso) \u2014 Investment ~ five-year effective rate, all 12 controls",
+      "coef": -0.178,
+      "se": 0.096,
+      "ci_lo": -0.366,
+      "ci_hi": 0.01,
+      "n_obs": 61,
+      "notes": "Baiardi & Naghi (2024) DML estimate; original OLS = -0.189 (SE 0.118)"
+    },
+    {
+      "table": "Table 1, Panel A",
+      "spec": "OLS baseline \u2014 Investment ~ five-year effective rate, all 12 controls",
+      "coef": -0.189,
+      "se": 0.118,
+      "ci_lo": -0.42,
+      "ci_hi": 0.042,
+      "n_obs": 61,
+      "notes": "Original Djankov et al. (2010) Table 5D estimate"
+    },
+    {
+      "table": "Table 1, Panel B",
+      "spec": "DML (Lasso) \u2014 FDI ~ five-year effective rate, all 12 controls",
+      "coef": -0.162,
+      "se": 0.093,
+      "ci_lo": -0.344,
+      "ci_hi": 0.02,
+      "n_obs": 61,
+      "notes": "Baiardi & Naghi (2024) DML estimate; original OLS = -0.095 (SE 0.081)"
+    },
+    {
+      "table": "Table 1, Panel B",
+      "spec": "OLS baseline \u2014 FDI ~ five-year effective rate, all 12 controls",
+      "coef": -0.095,
+      "se": 0.081,
+      "ci_lo": -0.254,
+      "ci_hi": 0.064,
+      "n_obs": 61,
+      "notes": "Original Djankov et al. (2010) Table 5D estimate"
+    },
+    {
+      "table": "Table 1, Panel C",
+      "spec": "DML (Lasso) \u2014 Business density ~ five-year effective rate, all 12 controls",
+      "coef": -0.093,
+      "se": 0.075,
+      "ci_lo": -0.24,
+      "ci_hi": 0.054,
+      "n_obs": 60,
+      "notes": "Baiardi & Naghi (2024) DML estimate; original OLS = -0.070 (SE 0.103)"
+    },
+    {
+      "table": "Table 1, Panel D",
+      "spec": "DML (Lasso) \u2014 Entry rate ~ five-year effective rate, all 12 controls",
+      "coef": -0.156,
+      "se": 0.076,
+      "ci_lo": -0.305,
+      "ci_hi": -0.007,
+      "n_obs": 50,
+      "notes": "Baiardi & Naghi (2024) DML estimate; original OLS = -0.133 (SE 0.103). DML estimate is significant at 5%."
+    },
+    {
+      "table": "Table 1, Panel A",
+      "spec": "DML (Boosting) \u2014 Investment ~ five-year effective rate, all 12 controls",
+      "coef": -0.199,
+      "se": 0.091,
+      "ci_lo": -0.377,
+      "ci_hi": -0.021,
+      "n_obs": 61,
+      "notes": "Baiardi & Naghi (2024) DML Boosting estimate \u2014 significant at 5%"
+    },
+    {
+      "table": "Table 1, Panel A",
+      "spec": "DML (Forest) \u2014 Investment ~ five-year effective rate, all 12 controls",
+      "coef": -0.204,
+      "se": 0.094,
+      "ci_lo": -0.388,
+      "ci_hi": -0.02,
+      "n_obs": 61,
+      "notes": "Baiardi & Naghi (2024) DML Random Forest estimate \u2014 significant at 5%"
+    }
+  ],
+  "dml": {
+    "model_type": "PLR",
+    "rationale": "PLR (Partial Linear Regression) is appropriate because the original study uses OLS with no instruments \u2014 the treatment (corporate tax rate) is continuous and directly observed. The DML-PLR framework allows flexible ML-based estimation of nuisance functions (outcome ~ controls and treatment ~ controls) while preserving valid inference on the linear treatment effect, exactly as in Baiardi & Naghi (2024)."
+  }
+}

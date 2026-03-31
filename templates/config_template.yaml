@@ -1,0 +1,65 @@
+# RECAST Project Configuration
+# Edit this file before running /recast <project_path>
+# -------------------------------------------------------
+
+paper:
+  title: "Full paper title"
+  authors: "Last, F. and Last, F."   # as you want it cited
+  year: 2000
+  journal: "Journal Name"
+  slug: "authorYYYY"                 # used as website URL slug
+
+identification:
+  type: OLS                          # OLS | IV | DID
+  primary_data_file: "data.dta"      # filename in raw_data/
+  outcome_variable: "y"              # exact column name in the data
+  treatment_variable: "d"            # exact column name in the data
+  # instrument: "z"                  # uncomment for IV
+  functional_form: linear            # linear | quadratic | log-log
+  controls:                          # list exact column names
+    - control1
+    - control2
+  # fixed_effects:                   # uncomment if used
+  #   - region
+  # cluster_se: country_code         # uncomment if clustered SE
+  secondary_datasets: []             # additional .dta/.csv files in raw_data/
+
+  # --- Multi-specification support ---
+  # List additional outcomes/treatments to run all combinations.
+  # The primary outcome/treatment above is always included.
+  # additional_outcomes:
+  #   - variable: "y2"
+  #     label: "Second outcome"
+  # additional_treatments:
+  #   - variable: "d2"
+  #     label: "Second treatment"
+
+dml:
+  model_type: PLR                    # PLR (OLS) | PLIV (IV) | IRM (DID)
+  ml_methods:                        # 7 learners following Baiardi & Naghi (2024)
+    - LassoCV
+    - DecisionTree
+    - GradientBoosting
+    - RandomForest
+    - NeuralNetwork
+    - Ensemble                       # MSE-inverse-weighted combination
+    # Best is always computed (lowest nuisance MSE)
+  n_folds: auto                      # auto = 2 if N<200, 5 if N>=200 (B&N use K=2)
+  n_rep: 20                          # cross-fitting repetitions (B&N use 100; 20 is practical minimum)
+  aggregation: median                # median across reps (B&N approach), not mean
+  se_formula: adjusted               # adjusted = B&N formula accounting for cross-split variation
+
+causal_forest:
+  enabled: true                      # set false to skip causal forest stage
+  method: CausalForestDML            # CausalForestDML | CausalForest | CausalIVForest
+  n_estimators: 1000
+  max_depth: null                    # null = unlimited
+  min_samples_leaf: 5
+  honest: true
+  criterion: mse                     # mse | het (heterogeneity-maximizing splits)
+  cv: 5                              # cross-fitting folds (CausalForestDML only)
+  # sample_weights: null             # column name for sample weights (optional)
+
+review:
+  max_rounds: 3                      # max referee-revision cycles
+  blocking_threshold: major          # major | minor (what stops the pipeline)

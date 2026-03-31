@@ -1,0 +1,241 @@
+/*-- scss:rules --*/
+
+/* ── Construction banner (above navbar) ──────────────────────────────────── */
+
+.construction-banner {
+  background: #7b2d8e;
+  color: #fff;
+  text-align: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  width: 100%;
+  z-index: 1100;
+}
+
+.construction-banner a {
+  color: #e0c0f0;
+  text-decoration: underline;
+}
+
+/* ── Typography & layout ──────────────────────────────────────────────────── */
+
+body {
+  font-size: 16px;
+  overflow-x: hidden;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+.quarto-title h1.title {
+  font-size: 2rem;
+}
+
+/* Narrow content width for readability on detail pages */
+.page-columns .column-body,
+.page-layout-article .column-body {
+  max-width: 820px;
+}
+
+/* ── Navbar ───────────────────────────────────────────────────────────────── */
+
+.navbar {
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* ── RECAST acronym block ─────────────────────────────────────────────────── */
+
+.acronym-block {
+  font-size: 1.2rem;
+  font-weight: 500;
+  text-align: center;
+  letter-spacing: 0.01em;
+  color: #212529;
+  background: #f0f4ff;
+  border: 1px solid #c7d4f5;
+  border-radius: 6px;
+  padding: 1rem 2rem;
+  margin: 1.5rem auto;
+  max-width: 600px;
+}
+
+/* ── Home page hero ───────────────────────────────────────────────────────── */
+
+.hero-banner {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px;
+  padding: 3rem 2rem;
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.hero-text h2 {
+  font-size: 2.2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.hero-text p {
+  font-size: 1.15rem;
+  color: #495057;
+  max-width: 680px;
+  margin: 0 auto 1.8rem;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ── Pipeline steps ───────────────────────────────────────────────────────── */
+
+.pipeline-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin: 1.5rem 0 2.5rem;
+}
+
+.step {
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 1.25rem 1.5rem;
+}
+
+.step h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0d6efd;
+  margin-bottom: 0.5rem;
+}
+
+/* ── Features grid ────────────────────────────────────────────────────────── */
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.feature {
+  background: #f8f9fa;
+  border-left: 3px solid #0d6efd;
+  padding: 1rem 1.25rem;
+  border-radius: 0 4px 4px 0;
+}
+
+.feature strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-weight: 600;
+}
+
+/* ── Framework docs grid ──────────────────────────────────────────────────── */
+
+.docs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.doc-card {
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 1.25rem 1.5rem;
+  transition: box-shadow 0.15s ease;
+}
+
+.doc-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.doc-card h3 {
+  font-size: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.doc-card p {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin: 0;
+}
+
+/* ── Listing cards (papers gallery) ──────────────────────────────────────── */
+
+/* Replication status badge colours via category pills */
+.quarto-category[data-value="PASS"],
+span.badge.bg-primary:has(> .quarto-category[data-value="PASS"]) {
+  background-color: #198754 !important;
+  color: #fff;
+}
+
+.quarto-category[data-value="FAIL"],
+span.badge.bg-primary:has(> .quarto-category[data-value="FAIL"]) {
+  background-color: #dc3545 !important;
+  color: #fff;
+}
+
+/* Listing grid card hover */
+div.quarto-post {
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+div.quarto-post:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+
+/* ── Paper detail page ────────────────────────────────────────────────────── */
+
+/* Referee report tabset */
+.panel-tabset .tab-content {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  padding: 1.5rem;
+  font-size: 0.95rem;
+}
+
+/* Referee blockquotes (for "comments to authors" sections) */
+.panel-tabset blockquote {
+  border-left: 3px solid #adb5bd;
+  color: #495057;
+  padding-left: 1rem;
+  margin: 1rem 0;
+}
+
+/* Tables: compact journal style */
+table {
+  font-size: 0.9rem;
+}
+
+table thead th {
+  background: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+}
+
+table tbody tr:nth-child(even) {
+  background: #fbfbfb;
+}
+
+table.table-sm td,
+table.table-sm th {
+  padding: 0.3rem 0.6rem;
+}
+
+/* ── Utilities ────────────────────────────────────────────────────────────── */
+
+.text-muted-sm {
+  font-size: 0.85rem;
+  color: #6c757d;
+}

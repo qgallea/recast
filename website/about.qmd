@@ -1,0 +1,139 @@
+---
+title: "About RECAST"
+---
+
+## What is RECAST?
+
+**RECAST** stands for *Replication and Extension with Causal AI Statistical Toolkit*.
+It is an autonomous multi-agent pipeline that takes a published econometrics paper
+and its replication data and produces a **RECAST** — a complete package of replicated
+results, a DoubleML extension, and a referee-reviewed report.
+
+### Terminology
+
+| Term | Meaning |
+|------|---------|
+| **to RECAST** a paper | To run the full pipeline: replicate + extend + review |
+| **RECASTed** | A paper that has completed the full pipeline |
+| **a RECAST** | The output package: results, DML extension, and peer-reviewed report |
+| **RECASTing** | The process of running the pipeline |
+
+Usage examples: *"This paper has been RECASTed."* · *"Run `/recast` to RECAST your paper."* · *"The RECAST of Finkelstein (2012) finds..."*
+
+---
+
+## What is DoubleML?
+
+[Double/Debiased Machine Learning](https://docs.doubleml.org) is a framework for causal inference that uses cross-fitting to remove the regularization bias introduced when machine learning methods estimate nuisance parameters. Proposed by Chernozhukov et al. (2018), it yields root-n consistent, asymptotically normal estimates of structural parameters even when the first stage is estimated with high-dimensional or nonparametric ML models.
+
+DML is particularly useful for replication because it relaxes the functional-form assumptions of traditional IV and OLS estimators while retaining their causal identification arguments.
+
+## What is a Causal Forest?
+
+A [Causal Forest](https://econml.azurewebsites.net/) is a nonparametric method for estimating
+heterogeneous treatment effects (Athey, Tibshirani, and Wager, 2019). Built on honest random
+forests, it estimates individual-level Conditional Average Treatment Effects (CATEs) — how much
+each unit benefits from treatment — and provides valid confidence intervals through sample splitting.
+
+RECAST uses EconML's `CausalForestDML` (which combines DML residualization with forest-based
+heterogeneity estimation) and `CausalIVForest` (for IV designs with binary instruments).
+
+## Two pipelines
+
+RECAST offers two extension methods, run via separate commands:
+
+| Command | Method | Best for |
+|---------|--------|----------|
+| `/recast` | DoubleML (PLIV/PLR) | Robust ATE under flexible nuisance; comparing learners |
+| `/recast-cf` | Causal Forest | Individual-level treatment effects; heterogeneity drivers |
+
+Both share the same replication stage (1–3) and review loop (referees + revision).
+
+## When does causal ML help? An honest assessment
+
+These methods are not always an improvement over traditional econometrics. Here is when
+they add value — and when they don't:
+
+**DoubleML adds value when:**
+
+- The original specification relies on strong functional form assumptions (linear, log-linear)
+- There are many potential controls and concern about model selection
+- You want to check robustness of the ATE to flexible first-stage estimation
+
+**DoubleML adds little when:**
+
+- The experiment is clean and well-randomized (e.g., Oregon lottery) — the parametric and DML estimates will be similar
+- The nuisance functions are inherently unpredictable (randomized instrument → near-zero R²)
+- Sample size is very small (cross-fitting with K=5 needs decent fold sizes)
+
+**Causal Forest adds value when:**
+
+- You have rich individual-level covariates that could drive heterogeneity
+- The policy question is "who benefits most?" not just "does it work on average?"
+- Treatment varies at the individual level
+
+**Causal Forest adds little when:**
+
+- Treatment is assigned at the group level (e.g., ethnic group) — no individual variation to split on
+- Covariates are sparse (only fixed effects / dummies) — the forest splits on design artifacts, not substance
+- N is very small — honest splitting requires sufficient leaf samples
+
+## Why automate replication?
+
+Replication studies are methodologically valuable but labour-intensive. Researchers must:
+
+1. Reconstruct the original author's cleaning and specification decisions from sparse documentation
+2. Re-implement the analysis in a reproducible environment
+3. Design and justify an ML-based extension
+4. Write up and defend the results
+
+RECAST automates steps 2–4. The framework cannot replace human judgment on the identification strategy (step 1), but the paper intelligence notebook extracts the key decisions from the PDF, making them explicit and auditable.
+
+## Limitations
+
+- The pipeline automates **structure**, not **judgment**. Referee reports are AI-generated and may miss domain-specific subtleties.
+- The DoubleML extension inherits the original paper's identification assumptions. If the instrument is weak or the exclusion restriction is questionable, the DML estimate will be equally questionable.
+- Stage 1 (paper intelligence) depends on PDF quality. Scanned or poorly formatted papers may produce an incomplete `paper_spec.json`.
+
+## Author
+
+**Quentin Gallea, Ph.D.**
+
+With deep expertise and a passion for causality, Quentin brings scientific rigor to answering causal questions and applying Causal AI to real-world problems, particularly to help deploy reliable and safe AI strategies.
+
+- Delivered workshops for billion-dollar companies (including Google)
+- Advised C-suites and data leaders worldwide on causal inference and AI impact
+- Trained 15,000+ students and professionals across industries
+- Published research in top scientific journals
+- Speaker at leading international events, and author of *The Causal Mindset Handbook*
+
+RECAST was built entirely with [Claude Code](https://claude.ai/code) as part of the [Claude Code for Research](https://thecausalmindset.com/training/claude-code-for-research) workshop, which teaches researchers how to leverage AI agents for rigorous empirical work.
+
+[thecausalmindset.com](https://thecausalmindset.com) | [Claude Code for Research workshop](https://thecausalmindset.com/training/claude-code-for-research)
+
+---
+
+## Suggest a paper
+
+Want to see a paper RECASTed? [Submit it here](submit.qmd) — just provide the paper link and replication data URL. We'll review it and run the pipeline.
+
+Track the status of all submissions on the [Tracker](submissions.qmd) page.
+
+## Citation
+
+If you use RECAST in your research, please cite:
+
+```bibtex
+@software{recast_gallea,
+  title  = {{RECAST}: Replication and Extension with Causal AI Statistical Toolkit},
+  author = {Gallea, Quentin},
+  year   = {2025},
+  url    = {https://github.com/qgallea/recast-causal-ai}
+}
+```
+
+## References
+
+Athey, S., Tibshirani, J., & Wager, S. (2019). Generalized random forests. *The Annals of Statistics*, 47(2), 1148–1178.
+
+Chernozhukov, V., Chetverikov, D., Demirer, M., Duflo, E., Hansen, C., Newey, W., & Robins, J. (2018). Double/debiased machine learning for treatment and structural parameters. *The Econometrics Journal*, 21(1), C1–C68.

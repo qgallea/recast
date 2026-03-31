@@ -1,0 +1,10 @@
+/.quarto/
+*.DS_Store
+desktop.ini
+Thumbs.db
+.Rhistory
+.RData
+*.swp
+*~
+
+**/*.quarto_ipynb

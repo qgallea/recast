@@ -1,0 +1,148 @@
+{
+  "blp": {
+    "beta1_ate": -0.15535206862283368,
+    "beta1_se": 0.0018217502673667566,
+    "beta1_pval": 0.0,
+    "beta2_het": 1.019376737349666,
+    "beta2_se": 0.011047521160796617,
+    "beta2_pval": 0.0,
+    "heterogeneity_significant": true
+  },
+  "gate": {
+    "method": "GATE",
+    "grouping_variable": "predicted_CATE_quintile",
+    "n_groups": 5,
+    "groups": [
+      {
+        "label": "Q1 (low)",
+        "coef": -1.5195414469785389,
+        "ci_lo": -3.3695397941180776,
+        "ci_hi": 0.3304569001609998
+      },
+      {
+        "label": "Q2",
+        "coef": -0.3837089210243094,
+        "ci_lo": -0.57804326264552,
+        "ci_hi": -0.18937457940309885
+      },
+      {
+        "label": "Q3",
+        "coef": 0.027575579227759217,
+        "ci_lo": -0.3343975316738762,
+        "ci_hi": 0.38954869012939464
+      },
+      {
+        "label": "Q4",
+        "coef": 0.3932192147717475,
+        "ci_lo": 0.0843949903262628,
+        "ci_hi": 0.7020434392172321
+      },
+      {
+        "label": "Q5 (high)",
+        "coef": 1.641913576089747,
+        "ci_lo": -0.04579032933320493,
+        "ci_hi": 3.329617481512699
+      }
+    ],
+    "heterogeneity_detected": true
+  },
+  "clan": [
+    {
+      "variable": "other_taxes",
+      "mean_most_affected": 1.5646,
+      "mean_least_affected": 1.0723,
+      "difference": 0.4923,
+      "pval": 0.4983,
+      "significant_10pct": false
+    },
+    {
+      "variable": "vatsales",
+      "mean_most_affected": 14.5917,
+      "mean_least_affected": 15.429,
+      "difference": -0.8373,
+      "pval": 0.703,
+      "significant_10pct": false
+    },
+    {
+      "variable": "pit2004",
+      "mean_most_affected": 36.5385,
+      "mean_least_affected": 35.8846,
+      "difference": 0.6539,
+      "pval": 0.8948,
+      "significant_10pct": false
+    },
+    {
+      "variable": "lnpayments2004",
+      "mean_most_affected": 3.4515,
+      "mean_least_affected": 3.2324,
+      "difference": 0.2191,
+      "pval": 0.4846,
+      "significant_10pct": false
+    },
+    {
+      "variable": "lngdppc2003",
+      "mean_most_affected": 8.5514,
+      "mean_least_affected": 8.5109,
+      "difference": 0.0405,
+      "pval": 0.9415,
+      "significant_10pct": false
+    },
+    {
+      "variable": "propertyrights",
+      "mean_most_affected": 56.1538,
+      "mean_least_affected": 56.1538,
+      "difference": 0.0,
+      "pval": 1.0,
+      "significant_10pct": false
+    },
+    {
+      "variable": "sb_proc2004",
+      "mean_most_affected": 9.6154,
+      "mean_least_affected": 8.2308,
+      "difference": 1.3846,
+      "pval": 0.3394,
+      "significant_10pct": false
+    },
+    {
+      "variable": "emplo_i2004",
+      "mean_most_affected": 40.1538,
+      "mean_least_affected": 36.5385,
+      "difference": 3.6153,
+      "pval": 0.6045,
+      "significant_10pct": false
+    },
+    {
+      "variable": "freedomtotradeinternationally",
+      "mean_most_affected": 7.3769,
+      "mean_least_affected": 6.8692,
+      "difference": 0.5077,
+      "pval": 0.2142,
+      "significant_10pct": false
+    },
+    {
+      "variable": "seign2004",
+      "mean_most_affected": 5.6336,
+      "mean_least_affected": 5.6762,
+      "difference": -0.0426,
+      "pval": 0.9767,
+      "significant_10pct": false
+    },
+    {
+      "variable": "inf10yearavg",
+      "mean_most_affected": 6.055,
+      "mean_least_affected": 20.7056,
+      "difference": -14.6506,
+      "pval": 0.1395,
+      "significant_10pct": false
+    },
+    {
+      "variable": "index_gcr",
+      "mean_most_affected": 3.1769,
+      "mean_least_affected": 3.4231,
+      "difference": -0.2462,
+      "pval": 0.5625,
+      "significant_10pct": false
+    }
+  ],
+  "cate_summary": null
+}

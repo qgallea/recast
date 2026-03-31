@@ -1,0 +1,6 @@
+{
+  "pass": false,
+  "summary": "2/3 specs replicated within 5%",
+  "worst_rel_diff_pct": 5.11,
+  "failure_notes": "1 spec(s) exceeded 5% threshold: Table 2, Panel C (5.11%)"
+}

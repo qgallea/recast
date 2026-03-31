@@ -1,0 +1,35 @@
+\begin{table}[htbp]
+\centering
+\caption{DML estimates of tariff structure effects on growth (PLR, K=2, median aggregation)}
+\small
+\begin{tabular}{lcccccccc}
+\toprule
+ & (1) & (2) & (3) & (4) & (5) & (6) & (7) & (8) \\
+ & Lasso & Tree & Boosting & Forest & NNet & Ensemble & Best & OLS \\
+\midrule
+\multicolumn{9}{l}{\textit{Panel A: Skill-tariff correlation (skill1\_corr)}} \\
+Treatment effect & 0.020 & 0.013 & 0.020 & 0.018* & 0.267*** & 0.019 & 0.020 & 0.035*** \\
+ & (0.013) & (0.011) & (0.012) & (0.011) & (0.099) & (0.012) & (0.012) & (0.012) \\
+Observations & 63 & 63 & 63 & 63 & 63 & 63 & 63 & 63 \\
+Controls & 17 & 17 & 17 & 17 & 17 & 17 & 17 & 17 \\
+\midrule
+\multicolumn{9}{l}{\textit{Panel B: Tariff differential, low cut-off (diffa)}} \\
+Treatment effect & 0.008 & 0.006 & 0.011* & 0.010* & 0.109** & 0.009 & 0.011* & 0.016*** \\
+ & (0.006) & (0.005) & (0.006) & (0.005) & (0.045) & (0.006) & (0.006) & (0.006) \\
+Observations & 63 & 63 & 63 & 63 & 63 & 63 & 63 & 63 \\
+Controls & 17 & 17 & 17 & 17 & 17 & 17 & 17 & 17 \\
+\midrule
+\multicolumn{9}{l}{\textit{Panel C: Tariff differential, high cut-off (diffg)}} \\
+Treatment effect & 0.006 & 0.003 & 0.006 & 0.006 & 0.103** & 0.006 & 0.006 & 0.019*** \\
+ & (0.006) & (0.005) & (0.005) & (0.005) & (0.049) & (0.005) & (0.005) & (0.005) \\
+Observations & 63 & 63 & 63 & 63 & 63 & 63 & 63 & 63 \\
+Controls & 17 & 17 & 17 & 17 & 17 & 17 & 17 & 17 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item Notes: DML2 with 2-fold cross-fitting, 20 repetitions, median aggregation. SEs adjusted following Baiardi \& Naghi (2024).
+\item * $p<0.10$, ** $p<0.05$, *** $p<0.01$.
+\item Best learner selected by lowest out-of-sample nuisance MSE.
+\end{tablenotes}
+\end{table}

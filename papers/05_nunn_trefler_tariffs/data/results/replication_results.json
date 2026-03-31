@@ -1,0 +1,52 @@
+{
+  "specs": [
+    {
+      "spec": "OLS \u2014 growth on skill1_corr, 17 controls, country-level",
+      "table": "Table 2, Panel A",
+      "published_coef": 0.035,
+      "replicated_coef": 0.03483858746537481,
+      "abs_diff": 0.000161412534625191,
+      "rel_diff_pct": 0.46,
+      "published_se": 0.01,
+      "replicated_se": 0.012183536639320027,
+      "match": true,
+      "threshold_pct": 5.0,
+      "n_obs": 63,
+      "r_squared": 0.7080822433040718,
+      "pvalue": 0.004243352833163472
+    },
+    {
+      "spec": "OLS \u2014 growth on diffa, 17 controls, country-level",
+      "table": "Table 2, Panel B",
+      "published_coef": 0.016,
+      "replicated_coef": 0.016262443378164494,
+      "abs_diff": 0.00026244337816449387,
+      "rel_diff_pct": 1.64,
+      "published_se": 0.006,
+      "replicated_se": 0.005716167143222052,
+      "match": true,
+      "threshold_pct": 5.0,
+      "n_obs": 63,
+      "r_squared": 0.7004240874220768,
+      "pvalue": 0.004441269496075063
+    },
+    {
+      "spec": "OLS \u2014 growth on diffg, 17 controls, country-level",
+      "table": "Table 2, Panel C",
+      "published_coef": 0.02,
+      "replicated_coef": 0.018978296815519286,
+      "abs_diff": 0.0010217031844807142,
+      "rel_diff_pct": 5.11,
+      "published_se": 0.004,
+      "replicated_se": 0.004935403910328477,
+      "match": false,
+      "threshold_pct": 5.0,
+      "n_obs": 63,
+      "r_squared": 0.7481668880302217,
+      "pvalue": 0.0001203863177261626
+    }
+  ],
+  "overall_pass": false,
+  "n_specs": 3,
+  "n_pass": 2
+}

@@ -1,0 +1,21 @@
+\begin{table}[h]
+\centering
+\caption{Group Average Treatment Effects (GATE)}
+\begin{tabular}{lccc}
+\toprule
+Quintile & Coef. & 95\% CI (joint) \\
+\midrule
+Q1 (low) & -0.206 & [-0.355, -0.057] \\
+Q2 & -0.022 & [-0.049, 0.006] \\
+Q3 & 0.014 & [-0.005, 0.033] \\
+Q4 & 0.076 & [0.042, 0.110] \\
+Q5 (high) & 0.235 & [0.097, 0.373] \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item Notes: Groups defined by quintiles of predicted CATE proxy.
+\item Jointly valid 95\% CIs via Gaussian multiplier bootstrap.
+\item Heterogeneity detected (non-overlapping CIs): Yes.
+\end{tablenotes}
+\end{table}

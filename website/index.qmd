@@ -1,0 +1,130 @@
+---
+title: "RECAST"
+subtitle: "Replication and Extension with Causal AI Statistical Toolkit"
+page-layout: full
+toc: false
+---
+
+::: {.hero-banner}
+::: {.hero-text}
+## RECAST a paper: Replicate, Extend, and Enrich Key Findings with Causal AI
+
+**RECAST** *(v.)* — to take an econometrics paper and its replication data,
+reproduce the original results, extend them with
+[Double/Debiased Machine Learning](https://docs.doubleml.org) and
+[Causal Forests](https://econml.azurewebsites.net/),
+put the findings through a structured AI peer review,
+and publish a report — autonomously, end to end.
+
+> *"This paper has been **RECASTed**."*
+
+::: {.hero-buttons}
+[Browse RECASTed papers](papers.qmd){.btn .btn-primary .btn-lg}
+[RECAST your own paper](framework/quickstart.qmd){.btn .btn-outline-secondary .btn-lg}
+:::
+:::
+:::
+
+---
+
+## What RECAST stands for
+
+::: {.acronym-block}
+**R**eplication and **E**xtension with **C**ausal **A**I **S**tatistical **T**oolkit
+:::
+
+RECAST is an autonomous multi-agent pipeline built on [Claude Code](https://claude.ai/code).
+It takes a published econometrics paper and its replication data and produces a
+**RECAST** — a complete package of replicated results, a DoubleML extension,
+and a referee-reviewed report — without manual intervention.
+
+---
+
+## How RECASTing works
+
+::: {.pipeline-steps}
+
+::: {.step}
+### 1 · Read
+Claude reads the paper PDF and extracts the identification strategy, key
+specifications, and data structure into a structured manifest.
+:::
+
+::: {.step}
+### 2 · Replicate
+The original OLS/IV regressions are reproduced and cross-checked coefficient
+by coefficient against the published tables.
+:::
+
+::: {.step}
+### 3 · Extend
+Following [Baiardi & Naghi (2024)](https://doi.org/10.1093/ectj/utae004),
+**DoubleML** compares 7 ML methods (Lasso, Trees, Boosting, Forest, Neural Net,
+Ensemble, Best) with median aggregation across 20+ sample splits. **Causal Forest**
+estimates individual-level treatment effects. Both include BLP heterogeneity testing,
+GATE quintile analysis, and CLAN classification of who benefits most.
+:::
+
+::: {.step}
+### 4 · Review
+Three isolated AI referees — identification, DML methods, robustness — each
+file an independent report following [Berk, Harvey & Hirshleifer (2017)](https://doi.org/10.1257/jep.31.1.231)
+principles: contribution assessment first, essential vs. suggested separation,
+scientific justification required, implicit bargain enforced. One round is the target.
+:::
+
+:::
+
+---
+
+## RECASTed papers
+
+```{=html}
+<div class="papers-preview">
+  <p><em>RECASTed papers appear here automatically once published with <code>/publish</code>. Run <code>/recast</code> (DML) or <code>/recast-cf</code> (Causal Forest) to RECAST a paper.</em></p>
+</div>
+```
+
+[View all RECASTed papers →](papers.qmd)
+
+---
+
+## Why RECAST?
+
+::: {.features-grid}
+
+::: {.feature}
+**7 ML methods, compared**
+Following Baiardi & Naghi (2024), RECAST tests every result with Lasso, Trees,
+Boosting, Random Forest, Neural Networks, Ensemble, and Best (by nuisance MSE).
+Median aggregation across 20+ sample splits with adjusted standard errors.
+:::
+
+::: {.feature}
+**Principled peer review**
+Three isolated AI referees follow Berk, Harvey & Hirshleifer (2017): contribution
+first, essential vs. suggested separation, scientific justification required.
+Synthesis quality-controls the referees and enforces the implicit R&R bargain.
+:::
+
+::: {.feature}
+**Heterogeneity, quantified**
+BLP pre-test for heterogeneity, 5-quintile GATE analysis with jointly valid CIs,
+CLAN classification of who benefits most. Causal forests add individual-level
+CATEs, feature importances, and calibration diagnostics.
+:::
+
+::: {.feature}
+**Full audit trail**
+Every revision round is logged in append-only `review_history/`. Nothing is
+overwritten. The RECAST is fully reproducible and inspectable.
+:::
+
+::: {.feature}
+**One command**
+`/recast <project>` extends with DoubleML. `/recast-cf <project>` extends with Causal Forest.
+Both handle everything — analysis, gate, review, final report.
+`/publish <project>` adds the paper to this site.
+:::
+
+:::

@@ -1,0 +1,30 @@
+\begin{table}[htbp]
+\centering
+\caption{Replication Check: Published vs.\ Replicated Coefficients (Ashraf \& Galor 2013)}
+\label{tab:replication}
+\small
+\begin{tabular}{lcccccccc}
+\toprule
+ & \multicolumn{2}{c}{Linear term ($\hat\beta_1$)} & \multicolumn{2}{c}{Squared term ($\hat\beta_2$)} & & & \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+Specification & Published & Replicated & Published & Replicated & $N$ & Diff\% & Match \\
+\midrule
+Table 1 col 4 & 225.44 & 291.70 & -161.16 & -212.56 & 21 & 29.4\% & $\times$ \\
+Table 3 col 5 & 195.42 & 210.36 & -137.98 & -149.71 & 145 & 7.7\% & $\checkmark$ \\
+Table 3 col 6 & 199.73 & 200.41 & -146.17 & -148.59 & 145 & 0.3\% & $\checkmark$ \\
+Table 6 col 1 & 203.44 & 210.34 & -142.66 & -146.98 & 143 & 3.4\% & $\checkmark$ \\
+Table 7 col 5 & 281.17 & 263.54 & -195.01 & -183.30 & 106 & 6.3\% & $\checkmark$ \\
+Table 2 col 5 & 285.19 & 380.62 & -206.58 & -279.87 & 21 & 33.5\% & $\times$ \\
+\bottomrule
+\end{tabular}
+\begin{minipage}{\linewidth}
+\vspace{2pt}
+\footnotesize
+\textit{Notes:} Diff\% is the relative difference in the linear diversity coefficient.
+Match threshold: 5\% for pure OLS (Table~1); 10\% for bootstrap-SE or IV specs.
+All OLS regressions use HC1 heteroskedasticity-robust standard errors.
+The 2SLS spec (Table~2 col~5) uses linearmodels IV2SLS with robust SE.
+Sample indicators from the original replication data: \texttt{cleanlim}=1 ($N=21$),
+\texttt{cleanpd1500}=1 ($N=145$), \texttt{cleancomp}=1 ($N=143$), \texttt{cleangdp}=1 ($N=109$).
+\end{minipage}
+\end{table}
