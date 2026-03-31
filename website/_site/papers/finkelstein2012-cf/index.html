@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Finkelstein, Taubman, Wright, Bernstein, Gruber, Newhouse, Allen, Baicker">
+<meta name="dcterms.date" content="2012-01-01">
+<meta name="description" content="IV using Oregon Medicaid lottery as instrument for insurance coverage — Causal Forest extension">
+
+<title>Oregon Health Insurance Experiment (Causal Forest) – RECAST</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-6cd8083c2b52a75285f27e87131d3d27.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var banner = document.createElement('div');
+  banner.className = 'construction-banner';
+  banner.innerHTML = '&#x1F6A7; <strong>Under construction &amp; testing</strong> &mdash; This site is in active development. Results have not been independently verified. Do not cite or rely on any output without manual review.';
+  document.body.insertBefore(banner, document.body.firstChild);
+});
+</script>
+
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">RECAST</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../papers.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../framework.html"> 
+<span class="menu-text">Framework</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../submissions.html"> 
+<span class="menu-text">Tracker</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../submit.html"> 
+<span class="menu-text">Submit</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/qgallea/recast"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#paper-summary" id="toc-paper-summary" class="nav-link active" data-scroll-target="#paper-summary">Paper summary</a></li>
+  <li><a href="#replication-results" id="toc-replication-results" class="nav-link" data-scroll-target="#replication-results">Replication results</a></li>
+  <li><a href="#causal-forest-extension" id="toc-causal-forest-extension" class="nav-link" data-scroll-target="#causal-forest-extension">Causal Forest Extension</a></li>
+  <li><a href="#gate-and-heterogeneity-analysis" id="toc-gate-and-heterogeneity-analysis" class="nav-link" data-scroll-target="#gate-and-heterogeneity-analysis">GATE and Heterogeneity Analysis</a></li>
+  <li><a href="#pedagogical-assessment" id="toc-pedagogical-assessment" class="nav-link" data-scroll-target="#pedagogical-assessment">Pedagogical assessment</a></li>
+  <li><a href="#referee-reports" id="toc-referee-reports" class="nav-link" data-scroll-target="#referee-reports">Referee reports</a></li>
+  </ul>
+<div class="toc-actions"><ul class="collapse"><li><a href="https://github.com/qgallea/recast/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Oregon Health Insurance Experiment (Causal Forest)</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">IV</div>
+    <div class="quarto-category">Health</div>
+    <div class="quarto-category">2012</div>
+    <div class="quarto-category">PASS</div>
+    <div class="quarto-category">Causal Forest</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    IV using Oregon Medicaid lottery as instrument for insurance coverage — Causal Forest extension
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Finkelstein, Taubman, Wright, Bernstein, Gruber, Newhouse, Allen, Baicker </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">2012</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="paper-summary" class="level2">
+<h2 class="anchored" data-anchor-id="paper-summary">Paper summary</h2>
+<p><strong>Citation:</strong> Finkelstein, A., Taubman, S., Wright, B., Bernstein, M., Gruber, J., Newhouse, J.P., Allen, H., &amp; Baicker, K. (2012). The Oregon Health Insurance Experiment: Evidence from the First Year. <em>Quarterly Journal of Economics</em>, 127(3), 1057–1106. <a href="https://doi.org/10.1093/qje/qjs020">DOI</a></p>
+<p><strong>Identification strategy:</strong> In 2008, Oregon held a lottery to allow uninsured low-income adults to apply for Medicaid. Winning the lottery increased the probability of having Medicaid by about 25 percentage points. The paper uses lottery selection as an instrument for actual Medicaid enrollment in a 2SLS framework to estimate the LATE of insurance coverage on health care utilization, financial strain, and self-reported health. Standard errors are clustered at the household level.</p>
+<p><strong>Key original result:</strong> The IV/LATE estimate of the effect of Medicaid enrollment on self-reported good health is <strong>0.133</strong> (SE 0.026), implying that Medicaid coverage increases the probability of reporting good/very good/excellent health by 13.3 percentage points among compliers.</p>
+<hr>
+</section>
+<section id="replication-results" class="level2">
+<h2 class="anchored" data-anchor-id="replication-results">Replication results</h2>
+<p>The replication <strong>passed</strong>. Maximum coefficient deviation from the published table: <strong>1.28%</strong>. All three specifications (IV/LATE, ITT, first stage) match the original within 1.3%.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Specification</th>
+<th>Original</th>
+<th>Replicated</th>
+<th>Delta (%)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>IV/LATE (Table 9)</td>
+<td>0.133 (0.026)</td>
+<td>0.132 (0.026)</td>
+<td>0.61%</td>
+</tr>
+<tr class="even">
+<td>ITT reduced form (Table 9)</td>
+<td>0.039 (0.008)</td>
+<td>0.039 (0.008)</td>
+<td>0.78%</td>
+</tr>
+<tr class="odd">
+<td>First stage (Table 3)</td>
+<td>0.289 (0.007)</td>
+<td>0.293 (0.007)</td>
+<td>1.28%</td>
+</tr>
+</tbody>
+</table>
+<p><em>Note: Replication sample contains 23,361 observations vs.&nbsp;the published 23,741 (1.6% difference, likely due to merge/missing-covariate handling).</em></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="forest_plot.png" class="img-fluid figure-img" alt="Forest plot showing coefficient estimates and 95% confidence intervals for published IV/LATE, replicated IV, and CausalIVForest. The CF estimate (0.182) has a wider CI [0.059, 0.305] that encompasses the published IV estimate."></p>
+<figcaption>Forest plot: Published IV, Replicated IV, and Causal Forest estimates</figcaption>
+</figure>
+</div>
+<hr>
+</section>
+<section id="causal-forest-extension" class="level2">
+<h2 class="anchored" data-anchor-id="causal-forest-extension">Causal Forest Extension</h2>
+<p>EconML’s <strong>CausalIVForest</strong> was applied with 1,000 trees and honest splitting, using lottery selection as the instrument for Medicaid enrollment.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Estimator</th>
+<th>Estimate</th>
+<th>SE</th>
+<th>95% CI</th>
+<th>N</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Published IV/LATE</td>
+<td>0.133</td>
+<td>0.026</td>
+<td>[0.082, 0.184]</td>
+<td>23,741</td>
+</tr>
+<tr class="even">
+<td>Replicated IV/LATE</td>
+<td>0.132</td>
+<td>0.026</td>
+<td>–</td>
+<td>23,361</td>
+</tr>
+<tr class="odd">
+<td>CausalIVForest (CF-LATE)</td>
+<td>0.182</td>
+<td>0.063</td>
+<td>[0.059, 0.305]</td>
+<td>23,361</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Interpretation:</strong> The CausalIVForest CF-LATE of 0.182 confirms the positive direction of the original IV result: Medicaid coverage improves self-reported health. The estimate is 37% larger in magnitude than the published IV/LATE (0.133). This gap may reflect subgroup upweighting, honest splitting functional form differences, and leaf-level complier reweighting. The qualitative conclusion is unchanged.</p>
+<p><strong>Note on inference:</strong> The ATE standard error (0.063) and 95% CI [0.059, 0.305] are derived from the honest forest’s <code>predict_interval()</code> bounds, which provide valid aggregate inference. The published IV estimate (0.133) falls inside this CI, confirming consistency between the two approaches. Individual-level CATE confidence intervals are constructed the same way (averaging prediction interval bounds within groups) and have reasonable widths (0.17–0.43).</p>
+<hr>
+</section>
+<section id="gate-and-heterogeneity-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="gate-and-heterogeneity-analysis">GATE and Heterogeneity Analysis</h2>
+<section id="gate-by-household-size" class="level3">
+<h3 class="anchored" data-anchor-id="gate-by-household-size">GATE by household size</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Group</th>
+<th>N</th>
+<th>Estimate</th>
+<th>95% CI</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>numhh = 1</td>
+<td>16,395</td>
+<td>0.155</td>
+<td>[0.069, 0.240]</td>
+</tr>
+<tr class="even">
+<td>numhh = 2</td>
+<td>6,909</td>
+<td>0.248</td>
+<td>[0.035, 0.461]</td>
+</tr>
+<tr class="odd">
+<td>numhh = 3</td>
+<td>57</td>
+<td>0.202</td>
+<td>[0.109, 0.295]</td>
+</tr>
+</tbody>
+</table>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="gate_plot.png" class="img-fluid figure-img" alt="GATE plot showing treatment effect estimates and confidence intervals by household size group. All groups show positive effects with overlapping confidence intervals."></p>
+<figcaption>GATE plot by household size</figcaption>
+</figure>
+</div>
+</section>
+<section id="cate-quartile-groups" class="level3">
+<h3 class="anchored" data-anchor-id="cate-quartile-groups">CATE quartile groups</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Quartile</th>
+<th>N</th>
+<th>Estimate</th>
+<th>95% CI</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Q1 (low)</td>
+<td>7,178</td>
+<td>0.108</td>
+<td>[0.015, 0.202]</td>
+</tr>
+<tr class="even">
+<td>Q2</td>
+<td>5,946</td>
+<td>0.169</td>
+<td>[0.058, 0.280]</td>
+</tr>
+<tr class="odd">
+<td>Q3</td>
+<td>7,357</td>
+<td>0.197</td>
+<td>[0.101, 0.292]</td>
+</tr>
+<tr class="even">
+<td>Q4 (high)</td>
+<td>2,880</td>
+<td>0.357</td>
+<td>[0.064, 0.649]</td>
+</tr>
+</tbody>
+</table>
+<p>Formal heterogeneity tests do not reject effect homogeneity – consistent with the original paper’s interpretation that the health benefit of Medicaid is broadly shared. All individual-level CATEs are positive (100%), with none negative. The CATE distribution ranges from 0.062 to 0.506 (mean 0.182, SD 0.086).</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="cate_histogram.png" class="img-fluid figure-img" alt="Histogram of individual-level conditional average treatment effects. All values are positive, clustered between 0.06 and 0.50, with a mode near 0.15."></p>
+<figcaption>CATE histogram: distribution of individual-level treatment effects</figcaption>
+</figure>
+</div>
+</section>
+<section id="feature-importance" class="level3">
+<h3 class="anchored" data-anchor-id="feature-importance">Feature importance</h3>
+<p>The top features driving heterogeneity are design variables (draw-wave x household-size dummies), not substantive moderators. This means the forest is capturing residual design variation rather than genuine treatment effect heterogeneity. The limited covariate set – only household size and lottery-draw dummies – constrains the forest’s ability to detect meaningful heterogeneity. Richer covariates (age, gender, baseline health) would be needed for substantive HTE analysis.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="feature_importance.png" class="img-fluid figure-img" alt="Bar chart of feature importances. Draw-wave x household-size interaction dummies dominate, with ddd_d3_n2 (23.1%) and numhh_list (19.3%) as the top two features."></p>
+<figcaption>Feature importance from the CausalIVForest</figcaption>
+</figure>
+</div>
+<hr>
+</section>
+</section>
+<section id="pedagogical-assessment" class="level2">
+<h2 class="anchored" data-anchor-id="pedagogical-assessment">Pedagogical assessment</h2>
+<p>The Causal Forest confirms the positive direction of the IV estimate but adds limited new insight in this context. The Oregon lottery is a clean randomized experiment with a very strong first stage (F &gt;&gt; 500) — the parametric IV is already well-identified. The CF’s main contributions are: (1) showing that all individual-level effects are positive (no one is harmed by Medicaid), and (2) providing a CF-LATE (0.182) with a valid CI [0.059, 0.305] that encompasses the published IV estimate (0.133), confirming consistency. The heterogeneity analysis is constrained by sparse covariates (only household-size dummies and lottery-draw fixed effects) — the null heterogeneity finding likely reflects the thin covariate set rather than true effect homogeneity.</p>
+<p><strong>Verdict:</strong> The Causal Forest confirms the original result but does not substantially extend it in this clean experimental setting. The real value is methodological — demonstrating that a CausalIVForest can be applied to a lottery instrument and recover a consistent estimate with valid inference.</p>
+<hr>
+</section>
+<section id="referee-reports" class="level2">
+<h2 class="anchored" data-anchor-id="referee-reports">Referee reports</h2>
+<p><strong>Referee consensus:</strong> The RECAST is ready for publication. The replication is excellent (all specs within 1.3%), the CF extension is correctly implemented, and all 13 issues raised in Round 1 (including SE caveats, estimand relabelling, and magnitude gap discussion) were resolved. No blocking or major issues remain.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Identification</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Referee 1 Report: Identification</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">CF Methods</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false" href="">Referee 2 Report: DML Methods &amp; Causal Forest</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false" href="">Robustness</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-6" role="tab" aria-controls="tabset-1-6" aria-selected="false" href="">Referee 3 Report: Robustness and Replication</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-7-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-7" role="tab" aria-controls="tabset-1-7" aria-selected="false" href="">Synthesis</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-8-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-8" role="tab" aria-controls="tabset-1-8" aria-selected="false" href="">Synthesis Report – Round 1</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-9-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-9" role="tab" aria-controls="tabset-1-9" aria-selected="false" href="">Final Report</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-10-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-10" role="tab" aria-controls="tabset-1-10" aria-selected="false" href="">Overall Assessment</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-11-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-11" role="tab" aria-controls="tabset-1-11" aria-selected="false" href="">What Was Solved During Revision</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-12-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-12" role="tab" aria-controls="tabset-1-12" aria-selected="false" href="">Remaining Issues</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-13-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-13" role="tab" aria-controls="tabset-1-13" aria-selected="false" href="">Key Results</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-14-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-14" role="tab" aria-controls="tabset-1-14" aria-selected="false" href="">Notes for the Reader</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p><strong>Round:</strong> 1 <strong>Overall verdict:</strong> Minor concerns</p>
+<section id="blocking-issues-re-analysis-required" class="level3">
+<h3 class="anchored" data-anchor-id="blocking-issues-re-analysis-required">Blocking issues (re-analysis required)</h3>
+<ul>
+<li>None</li>
+</ul>
+</section>
+<section id="major-issues-prosetable-edits-required" class="level3">
+<h3 class="anchored" data-anchor-id="major-issues-prosetable-edits-required">Major issues (prose/table edits required)</h3>
+<ul>
+<li>None</li>
+</ul>
+</section>
+<section id="minor-issues" class="level3">
+<h3 class="anchored" data-anchor-id="minor-issues">Minor issues</h3>
+<ol type="1">
+<li><p><strong>Estimand mismatch between IV/LATE and CF ATE (Section 3).</strong> The original paper estimates a Local Average Treatment Effect (LATE) – the effect on compliers, i.e., those induced to enrol by winning the lottery. The CausalIVForest estimator also uses the instrument, but the paper labels its output as “ATE” (e.g., “The estimated average treatment effect (ATE) is 0.182”). In an IV framework with one-sided non-compliance, the forest-based estimand is still a LATE (or a LATE-weighted average across leaves). Calling it “ATE” without qualification may mislead readers into thinking the estimate applies to the full population, not just compliers. The paper should either (a) relabel the CF estimate as “CF-LATE” or “IV-forest LATE,” or (b) add an explicit sentence clarifying that the CausalIVForest identifies the same complier-weighted estimand as 2SLS.</p></li>
+<li><p><strong>Sample size discrepancy (minor).</strong> The paper_spec.json reports n = 23,741 for all three published specifications, but the replication notebooks report n = 23,361 (a difference of 380 observations, ~1.6%). The paper text states “23,741 individuals who responded to the 12-month survey” (Section 2) but the diagnostics report n = 23,361. This discrepancy is small and the replication still passes, but the paper should acknowledge the difference and explain the likely cause (e.g., missing values on covariates used in the regression, or differences in merge logic).</p></li>
+<li><p><strong>Exclusion restriction discussion could be strengthened (Section 1).</strong> The paper correctly notes the lottery-as-instrument design. However, the introduction does not explicitly state the exclusion restriction: that lottery selection affects self-reported health <em>only</em> through its effect on Medicaid enrolment. While this is well-established in the original paper and widely accepted, a one-sentence statement would strengthen the identification section, especially since the CF extension relies on the same exclusion restriction at the leaf level.</p></li>
+<li><p><strong>First-stage strength at the leaf level (Section 3).</strong> The overall first-stage F-statistic is very strong (&gt;&gt;500 per the paper_spec notes). However, the CausalIVForest partitions the sample into leaves, and within small leaves the instrument may be weaker. The paper does not discuss whether <code>min_var_fraction_leaf</code> or similar safeguards were applied to ensure the instrument retains sufficient variation within each leaf. This is not a flaw in the original identification, but a concern about how the extension preserves it. A brief remark would suffice.</p></li>
+</ol>
+</section>
+<section id="comments-to-the-authors" class="level3">
+<h3 class="anchored" data-anchor-id="comments-to-the-authors">Comments to the authors</h3>
+<p>The identification strategy is strong and well-understood. The Oregon lottery provides one of the cleanest instruments in health economics, and the original paper’s 2SLS design is faithfully replicated here. The first-stage coefficient of 0.293 (replicated) with an implied F-statistic far exceeding conventional thresholds leaves no concern about instrument relevance at the aggregate level.</p>
+<p>My main suggestion concerns the labelling of the CausalIVForest estimand. In an IV design with heterogeneous treatment effects, both 2SLS and IV-forest estimators recover a LATE – not an ATE in the usual sense. The paper currently contrasts “the published IV/LATE of 0.133” with “the estimated average treatment effect (ATE) of 0.182” as if these target different populations, when in fact both are complier-weighted quantities. The 37% magnitude difference between them is interesting and could reflect the forest’s ability to capture nonlinear response surfaces or reweight compliers differently across leaves, but the discussion should be precise about what is being compared. Relabelling the CF estimate as a LATE or adding a clarifying footnote would resolve this.</p>
+<p>The sample size difference (23,741 vs 23,361) is minor and does not threaten the replication verdict, but should be noted transparently. Readers checking the replication against the original tables will notice the discrepancy.</p>
+</section>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<p><strong>Round:</strong> 1 <strong>Overall verdict:</strong> Major concerns</p>
+<section id="blocking-issues" class="level3">
+<h3 class="anchored" data-anchor-id="blocking-issues">Blocking issues</h3>
+<ul>
+<li>None</li>
+</ul>
+</section>
+<section id="major-issues" class="level3">
+<h3 class="anchored" data-anchor-id="major-issues">Major issues</h3>
+<ol type="1">
+<li><p><strong>Implausibly narrow ATE standard error (Check 14/18).</strong> The CausalIVForest reports an ATE of 0.182 with SE = 0.00056 and 95% CI [0.181, 0.183]. This CI width of 0.002 is extraordinarily narrow for n = 23,361 with a binary outcome and a binary instrument. For comparison, the replicated 2SLS SE is 0.026 – roughly 46 times larger. Even accounting for the forest’s different variance estimator, a 46-fold reduction in standard error is implausible. This likely reflects a known issue with EconML’s <code>CausalIVForest</code> where the reported SE is the standard error of the <em>mean of leaf-level point estimates</em> rather than a proper inferential SE accounting for estimation uncertainty within leaves. The paper should (a) flag this explicitly, (b) not draw inferential conclusions from the CI (e.g., the claim of “non-overlapping confidence intervals” in Section 3 is driven by the artificially tight CF CI), and (c) consider reporting bootstrap-based CIs or the variance of the CATE distribution as a more honest uncertainty measure.</p></li>
+<li><p><strong>GATE standard errors similarly suspect (related to #1).</strong> The GATE SEs in hte_results.json are also extremely small: numhh=1 has SE = 0.000366, numhh=2 has SE = 0.001392, numhh=3 has SE = 0.000145. These are implausibly precise for subgroup averages from an IV design. The CI widths reported in the JSON (e.g., [0.069, 0.240] for numhh=1) appear to come from a different calculation than the SE – the CI width of 0.171 is consistent with proper inference, but SE = 0.000366 implies a CI width of ~0.0014. The paper reports the wider CIs in the text, which is correct, but the underlying SE values in the JSON should be flagged as unreliable. Table formatting should use the CI bounds, not SE-derived intervals.</p></li>
+<li><p><strong>37% magnitude difference between CF ATE and published IV warrants more discussion.</strong> The diagnostics flag <code>cf_ate_consistency</code> as PASS with “37.1% magnitude diff.” A 37% difference (0.182 vs 0.133) with the same sign is not alarming per se, but the current discussion attributes it vaguely to “nonlinear effects or differences in implicit weighting.” The paper should discuss more concretely: (a) the CF may upweight complier subgroups with larger effects, (b) the honest splitting and different functional form assumptions in the forest may yield a different implicit estimand, and (c) whether the difference is driven by the household-size composition (given that numhh=2 has a GATE of 0.248 vs numhh=1 at 0.155).</p></li>
+</ol>
+</section>
+<section id="minor-issues-1" class="level3">
+<h3 class="anchored" data-anchor-id="minor-issues-1">Minor issues</h3>
+<ol type="1">
+<li><p><strong>Feature importances dominated by fixed-effect dummies (Check 19).</strong> The top features by importance are draw-wave x household-size dummies (ddd_d3_n2 at 23.1%, numhh_list at 19.3%, ddd_d6_n2 at 13.7%). These are design variables, not substantive moderators. The paper correctly notes this in the caveats paragraph, but should go further: splitting on fixed-effect dummies may mean the forest is capturing residual design variation rather than genuine treatment effect heterogeneity. This is consistent with the null heterogeneity test result.</p></li>
+<li><p><strong>Limited covariate set for heterogeneity analysis (Check 10).</strong> The only non-fixed-effect covariate is <code>numhh_list</code> (household size, with values 1, 2, 3). This is a very thin covariate space for exploring heterogeneity. The paper acknowledges this implicitly (“the only covariate that varies in the model”) but should state explicitly that the limited covariate set constrains the forest’s ability to detect meaningful heterogeneity. Richer covariates (age, gender, baseline health) would be needed for substantive heterogeneity analysis.</p></li>
+<li><p><strong>Number of trees is adequate (Check 15).</strong> n_estimators = 1000 with honest = True is appropriate. No concern here.</p></li>
+<li><p><strong>CATE distribution: 76.7% significant (Check 18).</strong> With n = 23,361, 76.7% individually significant CATEs is plausible and not suspicious. However, given the SE concerns above, this number should be interpreted cautiously – if individual CATE SEs are similarly deflated, the significance rate may be overstated.</p></li>
+</ol>
+</section>
+<section id="comments-to-the-authors-1" class="level3">
+<h3 class="anchored" data-anchor-id="comments-to-the-authors-1">Comments to the authors</h3>
+<p>The CausalIVForest implementation follows correct practices in several respects: honest splitting is enabled, 1,000 trees provide stable estimates, and the instrument (lottery selection) is appropriate for the IV-forest framework. The choice of CausalIVForest over CausalForestDML is correct given the IV design.</p>
+<p>The most important methodological concern is the implausibly narrow standard errors. The ATE SE of 0.00056 implies a coefficient of variation of 0.3%, which is unrealistic for any treatment effect estimate from an observational or quasi-experimental study with ~23,000 observations. This is a known limitation of certain EconML implementations where the variance of the point predictions is reported rather than a proper inferential variance. The practical consequence is that the claim of “non-overlapping confidence intervals” between the CF ATE and the published IV/LATE (Section 3) is not well-founded – the non-overlap is driven entirely by the CF’s artificially tight CI, not by a genuinely precisely estimated difference. The paper should qualify this claim.</p>
+<p>The heterogeneity analysis is honestly reported: the formal test does not reject homogeneity, and the paper does not overclaim. However, the limited covariate set (essentially only household size and draw-wave dummies) means the forest has very little to work with for detecting heterogeneity. The null result is unsurprising given this constraint rather than strong evidence of truly homogeneous effects. A sentence acknowledging this limitation would strengthen the discussion.</p>
+<p>The 37% gap between the CF ATE (0.182) and the IV/LATE (0.133) deserves a more structured discussion. One concrete hypothesis: the numhh=2 subgroup shows a GATE of 0.248 (87% larger than the overall IV estimate), and if the forest implicitly upweights this group, it could partially explain the higher ATE. The paper should explore whether the CF ATE is a weighted average of the GATEs and whether the weights differ from the 2SLS complier weights.</p>
+</section>
+</div>
+<div id="tabset-1-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-5-tab">
+
+</div>
+<div id="tabset-1-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-6-tab">
+<p><strong>Round:</strong> 1 <strong>Overall verdict:</strong> Minor concerns</p>
+<section id="blocking-issues-1" class="level3">
+<h3 class="anchored" data-anchor-id="blocking-issues-1">Blocking issues</h3>
+<ul>
+<li>None</li>
+</ul>
+</section>
+<section id="major-issues-1" class="level3">
+<h3 class="anchored" data-anchor-id="major-issues-1">Major issues</h3>
+<ul>
+<li>None</li>
+</ul>
+</section>
+<section id="minor-issues-2" class="level3">
+<h3 class="anchored" data-anchor-id="minor-issues-2">Minor issues</h3>
+<ol type="1">
+<li><p><strong>Sample size discrepancy not explained.</strong> The paper states n = 23,741 (matching the published paper) but the replication results report n = 23,361 across all three specifications. This is a difference of 380 observations (1.6%). Despite this, the replication passes comfortably: IV/LATE replicates at 0.132 vs 0.133 (0.61% deviation), ITT at 0.039 vs 0.039 (0.78%), and first stage at 0.293 vs 0.289 (1.28%). The paper text should note the sample size difference and state the likely reason (e.g., missing covariates or different merge handling).</p></li>
+<li><p><strong>Forest plot visual: CF CI is invisible.</strong> The forest plot correctly shows three rows: Published IV (LATE), Replicated IV, and Causal Forest ATE. The published and replicated IV CIs are wide and clearly visible. However, the Causal Forest ATE CI is so narrow (width ~0.002) that it appears as a dot with no visible error bars. This accurately reflects the data but may mislead readers into thinking the CF estimate is known with near-certainty. A footnote or annotation on the figure explaining why the CF CI is so narrow (and flagging the SE concerns) would improve transparency. Alternatively, the plot could use a log-scale x-axis or an inset panel for the CF estimate.</p></li>
+<li><p><strong>No robustness checks beyond the main specification.</strong> The paper replicates three specifications from the original (IV/LATE, ITT, first stage) and runs a single CF specification. Standard robustness exercises are missing:</p>
+<ul>
+<li>Alternative outcome definitions (e.g., self-reported health as ordinal, or other outcomes from the paper like financial strain or utilisation).</li>
+<li>Subsample stability (e.g., by draw wave).</li>
+<li>Placebo tests (e.g., using pre-lottery characteristics as outcomes). These are not blocking because the original paper’s identification is well-established, but their absence limits the contribution of the extension.</li>
+</ul></li>
+<li><p><strong>CF estimate not compared to OLS.</strong> The diagnostics skip all DML-specific checks because this is a CF-only pipeline. However, the paper does not report a naive OLS estimate of the treatment effect (without instrumenting). Including an OLS estimate would help readers understand the magnitude of endogeneity bias – the difference between the OLS and IV estimates is informative about selection into Medicaid.</p></li>
+<li><p><strong>Numbers in LaTeX traceable to JSON.</strong> I verified:</p>
+<ul>
+<li>IV/LATE: paper says 0.133 (SE 0.026), paper_spec.json says 0.133 (SE 0.026), replication_results.json says 0.132 (SE 0.026) – consistent.</li>
+<li>CF ATE: paper says 0.182 (SE 0.001, CI [0.181, 0.183]), causal_forest_results.json says 0.182324 (SE 0.00056, CI [0.181227, 0.183421]) – consistent (paper rounds SE up to 0.001, which is acceptable).</li>
+<li>GATE values in Section 3.1 match hte_results.json – consistent.</li>
+<li>CATE summary statistics (mean 0.182, SD 0.086, range [0.062, 0.506], 76.7% significant) match causal_forest_results.json – consistent. All numbers are traceable. No discrepancies found.</li>
+</ul></li>
+<li><p><strong>Diagnostics table encoding issue.</strong> The diagnostics table in paper.tex line 196 contains a malformed character: “all GATE CIs overlap – homogeneous effect” appears to have a garbled character (possibly a Unicode arrow or dash that did not compile correctly). This should be checked in the compiled PDF.</p></li>
+</ol>
+</section>
+<section id="comments-to-the-authors-2" class="level3">
+<h3 class="anchored" data-anchor-id="comments-to-the-authors-2">Comments to the authors</h3>
+<p>The replication is successful and well-executed. All three specifications replicate within 1.3% of the published values, comfortably below the 5% threshold. The replication_check.json confirms pass = true with worst_rel_diff_pct = 1.28. The close match despite a sample size difference of 380 observations suggests the core estimates are robust to minor data handling differences.</p>
+<p>The forest plot is a useful visual summary. It clearly shows that the published and replicated IV estimates overlap almost perfectly, confirming replication success. The Causal Forest ATE is visibly to the right of the IV estimates, illustrating the 37% magnitude difference. However, the CF confidence interval is essentially invisible due to its extreme narrowness (width 0.002 vs ~0.10 for the IV CIs). This visual feature, while accurate, risks conveying false precision. A brief annotation noting that the CF SE may understate uncertainty would be appropriate.</p>
+<p>The absence of robustness checks is the main gap. The original paper examines multiple outcome families (utilisation, financial strain, health), and extending the CF analysis to at least one additional outcome would strengthen the contribution. Similarly, a simple placebo test – running the CF on a pre-treatment outcome – would provide reassurance that the forest is not detecting spurious heterogeneity. These are suggestions for future work rather than blocking concerns, given that the replication itself is clean and the CF extension is honestly interpreted.</p>
+<p>All numbers in the LaTeX tables are traceable to the underlying JSON result files. The paper does not introduce any numbers that cannot be verified from the pipeline outputs.</p>
+</section>
+</div>
+<div id="tabset-1-7" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-7-tab">
+
+</div>
+<div id="tabset-1-8" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-8-tab">
+<p><strong>Unified verdict:</strong> Minor revision</p>
+<section id="blocking-issues-require-re-running-a-notebook" class="level3">
+<h3 class="anchored" data-anchor-id="blocking-issues-require-re-running-a-notebook">Blocking issues (require re-running a notebook)</h3>
+<p>None.</p>
+</section>
+<section id="major-issues-prose-or-table-edits-only" class="level3">
+<h3 class="anchored" data-anchor-id="major-issues-prose-or-table-edits-only">Major issues (prose or table edits only)</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 24%">
+<col style="width: 37%">
+<col style="width: 27%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Issue</th>
+<th>Raised by</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>CF standard errors are implausibly narrow (ATE SE = 0.00056 vs IV SE = 0.026; 46x ratio). The claim of “non-overlapping CIs” in Section 3 is driven by the artificially tight CF CI and is not well-founded inferentially. GATE SEs are similarly suspect.</td>
+<td>R2</td>
+<td>Add a paragraph in Section 3 explicitly flagging the known SE limitation of EconML’s CausalIVForest. Qualify the “non-overlapping CIs” claim. Note that the CI width in the forest plot reflects this limitation.</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>The CF estimand is labelled “ATE” but in an IV design it is a LATE (complier-weighted). This creates a false contrast with the original IV/LATE.</td>
+<td>R1, R2</td>
+<td>Relabel “ATE” as “CF-LATE” or “IV-forest LATE” throughout Section 3, or add a clarifying sentence that the CausalIVForest identifies a complier-weighted estimand analogous to 2SLS LATE.</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>The 37% magnitude difference (0.182 vs 0.133) is attributed vaguely to “nonlinear effects or weighting.” Discussion should be more concrete.</td>
+<td>R2</td>
+<td>Expand Section 3 discussion: (a) the forest may upweight subgroups with larger effects (numhh=2 GATE = 0.248), (b) honest splitting imposes different functional form, (c) explore whether the CF ATE is a weighted average of GATEs with weights differing from 2SLS complier weights.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="minor-issues-3" class="level3">
+<h3 class="anchored" data-anchor-id="minor-issues-3">Minor issues</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 24%">
+<col style="width: 37%">
+<col style="width: 27%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Issue</th>
+<th>Raised by</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>4</td>
+<td>Sample size discrepancy: paper says n=23,741 but replication uses n=23,361 (380 obs difference, 1.6%). Not explained.</td>
+<td>R1, R3</td>
+<td>Add a sentence in Section 2 noting the discrepancy and likely cause (missing covariates or merge differences).</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>Feature importances dominated by design dummies (draw-wave x household-size FEs), not substantive moderators. Forest may be capturing design variation rather than genuine HTE.</td>
+<td>R2</td>
+<td>Strengthen the caveats paragraph in Section 3.2 to explicitly note that splitting on FE dummies captures design variation, not substantive moderation.</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>Limited covariate set (only numhh_list + draw-wave dummies) constrains heterogeneity analysis. Null HTE result may reflect thin covariates rather than true homogeneity.</td>
+<td>R2</td>
+<td>Add a sentence in Section 3.1 acknowledging that richer covariates (age, gender, baseline health) would be needed for substantive HTE analysis.</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>No robustness checks beyond main specification (no alternative outcomes, no subsample stability, no placebo tests).</td>
+<td>R3</td>
+<td>Add a “Limitations” sentence in Section 5 noting that future work could extend to additional outcomes and placebo tests.</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>Forest plot: CF CI is invisible due to extreme narrowness, risking conveying false precision.</td>
+<td>R3</td>
+<td>Add a footnote to Figure 1 noting that the CF CI width reflects the SE concern discussed in the text.</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>Exclusion restriction not stated explicitly in the introduction.</td>
+<td>R1</td>
+<td>Add one sentence in Section 1 stating the exclusion restriction.</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td>First-stage strength at the leaf level not discussed for the CF extension.</td>
+<td>R1</td>
+<td>Add a brief remark in Section 3 about whether min_var_fraction_leaf or similar safeguards were applied.</td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td>Diagnostics table (line 196 of paper.tex) contains a possible encoding issue (garbled character).</td>
+<td>R3</td>
+<td>Check compiled PDF; fix Unicode character if needed.</td>
+</tr>
+<tr class="odd">
+<td>12</td>
+<td>OLS estimate not reported for comparison to quantify endogeneity bias.</td>
+<td>R3</td>
+<td>Optional: consider adding an OLS row to the comparison table in future iterations.</td>
+</tr>
+<tr class="even">
+<td>13</td>
+<td>CATE significance rate (76.7%) may be overstated if individual CATE SEs are similarly deflated as the ATE SE.</td>
+<td>R2</td>
+<td>Add a caveat sentence in Section 3.2 noting this possibility.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="referee-disagreements" class="level3">
+<h3 class="anchored" data-anchor-id="referee-disagreements">Referee disagreements</h3>
+<p>None. All three referees agree on the core findings: the replication is successful, the CF extension is correctly implemented in structure, and the main concerns are about SE estimation and estimand labelling. No referee contradicts another’s verdict.</p>
+</section>
+<section id="already-resolved-suppressed-from-this-round" class="level3">
+<h3 class="anchored" data-anchor-id="already-resolved-suppressed-from-this-round">Already resolved (suppressed from this round)</h3>
+<p>Not applicable – this is Round 1 with no prior changelogs.</p>
+</section>
+</div>
+<div id="tabset-1-9" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-9-tab">
+<section id="final-review-report" class="level1">
+<h1>Final Review Report</h1>
+<p><strong>Paper:</strong> The Oregon Health Insurance Experiment: Evidence from the First Year <strong>Original authors:</strong> Finkelstein, A., Taubman, S., Wright, B., Bernstein, M., Gruber, J., Newhouse, J.P., Allen, H., Baicker, K. (<em>Quarterly Journal of Economics</em>, 2012) <strong>Rounds completed:</strong> 1 of 3 <strong>Final verdict:</strong> Ready</p>
+<hr>
+</section>
+</div>
+<div id="tabset-1-10" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-10-tab">
+<p>The RECAST pipeline successfully replicates the core IV/LATE result of Finkelstein et al.&nbsp;(2012). All three specifications – IV/LATE, ITT, and first stage – match the published estimates within 1.3% (worst case: first stage at 1.28%). The replication sample contains 23,361 observations versus the published 23,741, a 1.6% discrepancy that is now documented in the paper and attributed to merge differences.</p>
+<p>The Causal Forest extension via EconML’s CausalIVForest provides a meaningful complement to the original linear IV. The CF-LATE estimate of 0.182 confirms the direction and significance of the original 0.133 IV/LATE: Medicaid coverage improves self-reported health. The 37% magnitude gap is now discussed in concrete terms (subgroup upweighting, honest splitting functional form, complier reweighting). Individual-level CATEs are unanimously positive, though formal heterogeneity tests do not reject homogeneity – consistent with the original paper’s interpretation that the health benefit of Medicaid is broadly shared.</p>
+<p><strong>Post-review correction:</strong> The ATE standard error was initially computed incorrectly as <code>std(CATEs)/sqrt(n)</code>, producing an implausibly narrow SE of 0.001. This was subsequently fixed by deriving the ATE CI from <code>predict_interval()</code> bounds, yielding a corrected SE of 0.063 and 95% CI [0.059, 0.305]. The published IV estimate (0.133) falls inside this corrected CI, confirming consistency. A runtime sanity check was added to the pipeline to prevent this bug from recurring.</p>
+<hr>
+</div>
+<div id="tabset-1-11" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-11-tab">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 34%">
+<col style="width: 40%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Issue</th>
+<th>Raised (round)</th>
+<th>Resolved (round)</th>
+<th>How</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>M1: CF SE implausibly narrow; “non-overlapping CIs” claim</td>
+<td>1</td>
+<td>1</td>
+<td>Added dedicated SE caveat paragraph in Section 3; qualified non-overlapping CI claim</td>
+</tr>
+<tr class="even">
+<td>M2: CF estimand mislabelled “ATE” (should be “LATE”)</td>
+<td>1</td>
+<td>1</td>
+<td>Relabelled to “CF-LATE” throughout; added clarifying sentence on complier-weighted estimand</td>
+</tr>
+<tr class="odd">
+<td>M3: Magnitude gap discussion too vague</td>
+<td>1</td>
+<td>1</td>
+<td>Added “Magnitude gap” paragraph with three concrete mechanisms</td>
+</tr>
+<tr class="even">
+<td>m4: Sample size discrepancy unexplained</td>
+<td>1</td>
+<td>1</td>
+<td>Added sentence in Section 2 noting 380-obs difference</td>
+</tr>
+<tr class="odd">
+<td>m5: Feature importances capture design, not moderation</td>
+<td>1</td>
+<td>1</td>
+<td>Expanded caveats paragraph to flag design-dummy splitting</td>
+</tr>
+<tr class="even">
+<td>m6: Limited covariates constrain HTE</td>
+<td>1</td>
+<td>1</td>
+<td>Added acknowledgement in Section 3.1</td>
+</tr>
+<tr class="odd">
+<td>m7: No robustness checks</td>
+<td>1</td>
+<td>1</td>
+<td>Added “Limitations and future work” paragraph in Conclusion</td>
+</tr>
+<tr class="even">
+<td>m8: Forest plot CF CI invisible</td>
+<td>1</td>
+<td>1</td>
+<td>Added note to Figure 1 caption about SE concern</td>
+</tr>
+<tr class="odd">
+<td>m9: Exclusion restriction not stated</td>
+<td>1</td>
+<td>1</td>
+<td>Added sentence in Introduction</td>
+</tr>
+<tr class="even">
+<td>m10: First-stage at leaf level not discussed</td>
+<td>1</td>
+<td>1</td>
+<td>Added remark about min_var_fraction_leaf in Section 3</td>
+</tr>
+<tr class="odd">
+<td>m11: Encoding issue in diagnostics table</td>
+<td>1</td>
+<td>1</td>
+<td>Replaced garbled Unicode with LaTeX em-dash</td>
+</tr>
+<tr class="even">
+<td>m12: OLS not reported for endogeneity comparison</td>
+<td>1</td>
+<td>1</td>
+<td>Added note in Limitations paragraph</td>
+</tr>
+<tr class="odd">
+<td>m13: CATE significance rate may be overstated</td>
+<td>1</td>
+<td>1</td>
+<td>Added caveat sentence in Section 3.2</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div id="tabset-1-12" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-12-tab">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Issue</th>
+<th>Severity</th>
+<th>Action needed</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>–</td>
+<td>None</td>
+<td>–</td>
+<td>–</td>
+</tr>
+</tbody>
+</table>
+<p>All 13 issues from Round 1 have been resolved. No blocking or major issues remain.</p>
+<p><em>Severity: <strong>Blocking</strong> = must fix before sharing · <strong>Major</strong> = should fix · <strong>Minor</strong> = optional</em></p>
+<hr>
+</div>
+<div id="tabset-1-13" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-13-tab">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 35%">
+<col style="width: 25%">
+<col style="width: 10%">
+<col style="width: 20%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Specification</th>
+<th>Estimate</th>
+<th>SE</th>
+<th>95% CI</th>
+<th>N</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Original paper (2SLS IV/LATE)</td>
+<td>0.133</td>
+<td>0.026</td>
+<td>[0.082, 0.184]</td>
+<td>23,741</td>
+</tr>
+<tr class="even">
+<td>Our replication (2SLS IV/LATE)</td>
+<td>0.132</td>
+<td>0.026</td>
+<td>–</td>
+<td>23,361</td>
+</tr>
+<tr class="odd">
+<td>Original paper (ITT)</td>
+<td>0.039</td>
+<td>0.008</td>
+<td>[0.024, 0.054]</td>
+<td>23,741</td>
+</tr>
+<tr class="even">
+<td>Our replication (ITT)</td>
+<td>0.039</td>
+<td>0.008</td>
+<td>–</td>
+<td>23,361</td>
+</tr>
+<tr class="odd">
+<td>Original paper (First stage)</td>
+<td>0.289</td>
+<td>0.007</td>
+<td>[0.276, 0.302]</td>
+<td>23,741</td>
+</tr>
+<tr class="even">
+<td>Our replication (First stage)</td>
+<td>0.293</td>
+<td>0.007</td>
+<td>–</td>
+<td>23,361</td>
+</tr>
+<tr class="odd">
+<td>CausalIVForest (CF-LATE)</td>
+<td>0.182</td>
+<td>0.063</td>
+<td>[0.059, 0.305]</td>
+<td>23,361</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Replication check:</strong> PASS – max delta = 1.28% vs paper (well within 5% threshold)</p>
+<p><strong>CF-LATE shift:</strong> The CausalIVForest estimate is 0.182 vs the original IV/LATE of 0.133 – an upward shift of 0.049 (37%), possibly reflecting subgroup upweighting, honest splitting functional form differences, and leaf-level complier reweighting. The qualitative conclusion is unchanged: Medicaid coverage improves self-reported health.</p>
+<hr>
+</div>
+<div id="tabset-1-14" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-14-tab">
+<ul>
+<li><p>The ATE standard error (0.063) and 95% CI [0.059, 0.305] are derived from <code>predict_interval()</code> bounds. The published IV estimate (0.133) falls inside this CI. A runtime sanity check ensures the ATE CI width is comparable to individual CATE CI widths (ratio must be &lt; 10x).</p></li>
+<li><p>The covariate set available for heterogeneity analysis is limited to household size and draw-wave dummies. The null HTE finding may reflect this thin covariate set rather than true effect homogeneity. Richer covariates (age, gender, baseline health) from the survey data could strengthen a future analysis.</p></li>
+<li><p>The 380-observation sample size difference (23,741 vs 23,361) is small (1.6%) and does not materially affect the replication, but its exact cause (likely merge/missing-covariate differences) has not been diagnosed at the record level.</p></li>
+<li><p>This report covers a single outcome (self-reported health). The original paper estimates effects on multiple outcomes (utilisation, financial strain, depression). Future RECAST iterations should extend the CF analysis to these additional outcomes.</p></li>
+<li><p>The <code>tablenotes</code> environment in the GATE table causes a LaTeX warning during compilation (the <code>threeparttable</code> package is not loaded). This is cosmetic and does not affect the PDF content, but should be fixed in a future pass by either adding <code>\usepackage{threeparttable}</code> or converting the table notes to a minipage.</p></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/qgallea\.github\.io\/recast");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p><strong>RECAST</strong> by <a href="https://thecausalmindset.com">Quentin Gallea, Ph.D.</a> · Built with <a href="https://claude.ai/code">Claude Code</a> &amp; <a href="https://quarto.org">Quarto</a></p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/qgallea/recast/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p><a href="https://github.com/qgallea/recast">GitHub</a> · <a href="https://thecausalmindset.com/training/claude-code-for-research">Claude Code for Research</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

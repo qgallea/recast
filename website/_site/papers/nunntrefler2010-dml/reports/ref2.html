@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>ref2 – RECAST</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-6cd8083c2b52a75285f27e87131d3d27.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var banner = document.createElement('div');
+  banner.className = 'construction-banner';
+  banner.innerHTML = '&#x1F6A7; <strong>Under construction &amp; testing</strong> &mdash; This site is in active development. Results have not been independently verified. Do not cite or rely on any output without manual review.';
+  document.body.insertBefore(banner, document.body.firstChild);
+});
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">RECAST</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../papers.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../framework.html"> 
+<span class="menu-text">Framework</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../submissions.html"> 
+<span class="menu-text">Tracker</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../submit.html"> 
+<span class="menu-text">Submit</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/qgallea/recast"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#referee-2-report-dml-methods-causal-forest" id="toc-referee-2-report-dml-methods-causal-forest" class="nav-link active" data-scroll-target="#referee-2-report-dml-methods-causal-forest">Referee 2 Report: DML Methods &amp; Causal Forest</a></li>
+  </ul>
+<div class="toc-actions"><ul class="collapse"><li><a href="https://github.com/qgallea/recast/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+
+
+
+
+<section id="referee-2-report-dml-methods-causal-forest" class="level2">
+<h2 class="anchored" data-anchor-id="referee-2-report-dml-methods-causal-forest">Referee 2 Report: DML Methods &amp; Causal Forest</h2>
+<p><strong>Round:</strong> 1 <strong>Overall verdict:</strong> Minor revision</p>
+<section id="methodological-contribution" class="level3">
+<h3 class="anchored" data-anchor-id="methodological-contribution">Methodological contribution</h3>
+<p>The DML extension is well-suited to this setting. Nunn and Trefler (2010) use OLS with 17 controls in a sample of only 63 countries (<span class="math inline">\(p/N \approx 0.27\)</span>), making regularisation bias a first-order concern. PLR is the correct model class for continuous treatment with selection-on-observables identification. The comparison of 7 ML methods (5 base + Ensemble + Best) provides genuine evidence about whether the positive tariff–growth relationship survives flexible nonlinear control adjustment — and it does, directionally, though at roughly half the OLS magnitude. The close agreement with Baiardi and Naghi (2024) benchmarks (within 0.001–0.002 across all three treatments) provides strong external validation.</p>
+</section>
+<section id="essential-issues" class="level3">
+<h3 class="anchored" data-anchor-id="essential-issues">Essential issues</h3>
+<ol type="1">
+<li><p><strong>n_rep = 5 is below the recommended minimum of 20 (Checklist item 3).</strong> The code explicitly overrides the config value (<code>n_rep = 5</code>, line 155: “Override n_rep to 5 for speed”) and the SE formula correctly applies the B&amp;N median-aggregation adjustment. However, with only 5 repetitions the median coefficient and the variance term <span class="math inline">\((\hat\theta_k - \tilde\theta)^2\)</span> in the adjusted SE are estimated from very few draws. This matters because <span class="math inline">\(N = 63\)</span> with <span class="math inline">\(K = 2\)</span> folds means each fold has $$31 observations, so cross-fitting variability can be substantial. <strong>Scientific justification:</strong> With 5 reps, the inter-rep variance component in the adjusted SE is estimated with effectively 4 degrees of freedom. A single aberrant fold split could shift the median coefficient or inflate/deflate the adjusted SE by 20–30%. Since all three primary specifications have CIs that just barely include or exclude zero (p-values in the 0.03–0.20 range), the marginal significance conclusions are sensitive to cross-fitting noise. <strong>Recommended fix:</strong> Re-run with n_rep = 20 (the config default). This is computationally cheap for <span class="math inline">\(N = 63\)</span> and 5 learners. If the point estimates and p-value ordering remain unchanged, the current conclusions are confirmed; if they shift, the paper must update its significance statements.</p></li>
+<li><p><strong>“Best” learner copies the Forest result wholesale rather than combining the best-outcome and best-treatment learners (Checklist item 4).</strong> The code (line 520) copies all results from <code>best_outcome_method</code> (Forest for Panel A), including its coefficient and SE. But the <code>best_treatment_method</code> is Lasso for Panel A. In the Baiardi and Naghi (2024) methodology, “Best” should re-fit the PLR using the best outcome learner (Forest) for <code>ml_l</code> and the best treatment learner (Lasso) for <code>ml_m</code>. Instead, the current “Best” is simply the Forest result (Forest for both nuisance equations). <strong>Scientific justification:</strong> The treatment nuisance <span class="math inline">\(R^2\)</span> for Forest is 0.286 vs.&nbsp;0.312 for Lasso (Panel A). Using the wrong treatment learner means the first-stage residualisation of <span class="math inline">\(D\)</span> is suboptimal, which inflates the DML standard error and may attenuate the point estimate. The paper explicitly states “Best learner (Forest for outcome, Lasso for treatment)” but the reported coefficient (0.018) and SE (0.0106) are identical to the Forest row, confirming that the best-treatment learner was not actually used. <strong>Recommended fix:</strong> Re-fit the Best specification using Forest for <code>ml_l</code> and Lasso for <code>ml_m</code>. This requires one additional <code>DoubleMLPLR</code> call per specification.</p></li>
+</ol>
+</section>
+<section id="suggestions" class="level3">
+<h3 class="anchored" data-anchor-id="suggestions">Suggestions</h3>
+<ol type="1">
+<li><p><strong>Ensemble SE is computed as a weighted average of individual SEs (Checklist item 8).</strong> The code (lines 500–501) computes <code>ensemble_se = sum(weights * se)</code>. This is not a valid standard error — it does not account for covariance between learner estimates. The correct approach is either (a) to use the delta method with the stacking covariance matrix, or (b) to report the ensemble as a point estimate only and note that no valid SE is available. The current CIs are therefore unreliable for the Ensemble column, though since the paper’s main conclusions rest on the “Best” learner this is not blocking.</p></li>
+<li><p><strong>Low nuisance <span class="math inline">\(R^2\)</span> merits a more structured discussion (Checklist item 6).</strong> The outcome <span class="math inline">\(R^2\)</span> ranges from <span class="math inline">\(-38.8\)</span> (NeuralNet, catastrophic) to <span class="math inline">\(0.19\)</span> (Boosting, Panel B). The paper correctly notes that low <span class="math inline">\(R^2\)</span> inflates SEs without biasing point estimates via Neyman orthogonality, and correctly identifies external validation via B&amp;N. This is adequate but could be strengthened by reporting a table of nuisance <span class="math inline">\(R^2\)</span> values for all learners across all three panels, making transparent which learners achieve positive <span class="math inline">\(R^2\)</span> and which do not.</p></li>
+<li><p><strong>NeuralNet should be formally excluded or downweighted in interpretation (Checklist item 6).</strong> The NeuralNet outcome <span class="math inline">\(R^2\)</span> is catastrophic (<span class="math inline">\(-38.8\)</span> to <span class="math inline">\(-44.3\)</span>) across all three panels, meaning its nuisance predictions are worse than a constant. The paper describes this as “unreliable” but still includes NeuralNet in the forest plot and the main results table. A cleaner approach is to report it in a footnote or appendix and note that the Ensemble correctly downweights it (weight 0.5–0.6%).</p></li>
+<li><p><strong>BLP implementation uses manual OLS rather than the DoubleML API (Checklist items 10–11).</strong> The code (lines 750–752) constructs the BLP regression manually via <code>sm.OLS(Y_res, X_blp)</code> with HC1 standard errors, rather than using <code>obj_hte.blp()</code>. The manual approach is methodologically valid if the residuals <span class="math inline">\(Y_{res}\)</span> and <span class="math inline">\(D_{res}\)</span> are correctly extracted from the DML object, which appears to be the case (lines 733–734). However, using the built-in API would reduce the risk of implementation error and ensure consistency with the GATE computation.</p></li>
+<li><p><strong>CLAN lacks statistical power and could note this more explicitly (Checklist item 13).</strong> CLAN is reported with <span class="math inline">\(N = 13\)</span> per extreme quintile and no covariate reaches significance. The paper mentions this is “expected given the small sample” but could add that with 13 observations per group, a standardised effect of <span class="math inline">\(d \approx 1.1\)</span> would be needed for 80% power, making CLAN essentially uninformative here.</p></li>
+<li><p><strong>Cross-fitting stability diagnostic is skipped (Checklist item, diagnostics_flags.json).</strong> The <code>cross_fitting_stability</code> check returns SKIP because <code>per_rep_coefs</code> are not stored in the Best learner. Storing and reporting the per-rep coefficients (trivially available from <code>obj.all_coef</code>) would allow readers to assess fold-split sensitivity, which is particularly relevant at <span class="math inline">\(N = 63\)</span>.</p></li>
+</ol>
+</section>
+<section id="dml-checklist-summary" class="level3">
+<h3 class="anchored" data-anchor-id="dml-checklist-summary">DML Checklist Summary</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 33%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Item</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Model class (PLR)</td>
+<td>PASS</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>K-fold adaptive to N</td>
+<td>PASS (K=2 for N=63 &lt; 200)</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>n_rep &gt;= 20</td>
+<td>ESSENTIAL (n_rep=5, see issue 1)</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Best by lowest nuisance MSE</td>
+<td>ESSENTIAL (copies outcome-best wholesale, see issue 2)</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>&gt;= 5 method classes</td>
+<td>PASS (Lasso, Tree, Boosting, Forest, NNet + Ensemble + Best)</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>Nuisance R2 reported honestly</td>
+<td>PASS (reported; see suggestion 2 for improvement)</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Score function appropriate</td>
+<td>PASS (default PLR score)</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>CIs from DML SEs</td>
+<td>SUGGESTION (Ensemble SE invalid; Best/individual correct)</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>Lasso diagnostics reported</td>
+<td>PASS (3/17 and 5/17 non-zero for Panel A)</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>BLP reported before GATE</td>
+<td>PASS (beta2 = 1.083, p &lt; 0.001)</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>GATE on predicted CATE quintiles</td>
+<td>PASS</td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td>Jointly valid GATE CIs</td>
+<td>PASS (confint(joint=True) confirmed in code)</td>
+</tr>
+<tr class="odd">
+<td>13</td>
+<td>CLAN included</td>
+<td>PASS (reported; underpowered as expected)</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="comments-to-the-authors" class="level3">
+<h3 class="anchored" data-anchor-id="comments-to-the-authors">Comments to the authors</h3>
+<p>The DML implementation is generally sound and produces results that are well-aligned with the Baiardi and Naghi (2024) benchmarks, which is the strongest possible external validation for this paper. The PLR model class is appropriate, K=2 is correct for the small sample, the B&amp;N adjusted SE formula is correctly implemented, and the GATE analysis with jointly valid CIs is properly executed via the DoubleML API. The finding that DML coefficients are roughly half the OLS values across all three treatment measures, with all well-behaved learners agreeing on a positive sign, is a genuinely informative result.</p>
+<p>The two essential issues are both fixable with modest computational effort. First, increasing n_rep from 5 to 20 will stabilise the median coefficient and the adjusted SE, which is important because the marginal significance of several specifications (p-values in the 0.05–0.20 range) could shift with different cross-fitting draws. Second, the “Best” learner should combine the best outcome learner (Forest) with the best treatment learner (Lasso) in a single PLR fit, rather than simply copying the Forest row. This discrepancy is visible in the data: the Best and Forest rows in dml_results.json are identical (coef = 0.01764, SE = 0.01058), yet the paper claims “Best” uses Forest for outcome and Lasso for treatment. Fixing this will likely produce a slightly different coefficient and potentially a tighter SE (since Lasso achieves higher treatment <span class="math inline">\(R^2\)</span> than Forest: 0.312 vs.&nbsp;0.286).</p>
+<p>Neither issue is likely to change the paper’s qualitative conclusions — the DML estimates will almost certainly remain positive, smaller than OLS, and marginally significant — but they are needed for methodological correctness.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/qgallea\.github\.io\/recast");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p><strong>RECAST</strong> by <a href="https://thecausalmindset.com">Quentin Gallea, Ph.D.</a> · Built with <a href="https://claude.ai/code">Claude Code</a> &amp; <a href="https://quarto.org">Quarto</a></p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/qgallea/recast/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p><a href="https://github.com/qgallea/recast">GitHub</a> · <a href="https://thecausalmindset.com/training/claude-code-for-research">Claude Code for Research</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

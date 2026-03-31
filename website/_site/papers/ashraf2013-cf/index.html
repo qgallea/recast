@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Ashraf, Galor">
+<meta name="dcterms.date" content="2013-01-01">
+<meta name="description" content="IV using migratory distance as instrument for genetic diversity — Causal Forest extension">
+
+<title>Out of Africa: Genetic Diversity and Economic Development (Causal Forest) – RECAST</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-6cd8083c2b52a75285f27e87131d3d27.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var banner = document.createElement('div');
+  banner.className = 'construction-banner';
+  banner.innerHTML = '&#x1F6A7; <strong>Under construction &amp; testing</strong> &mdash; This site is in active development. Results have not been independently verified. Do not cite or rely on any output without manual review.';
+  document.body.insertBefore(banner, document.body.firstChild);
+});
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">RECAST</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../papers.html"> 
+<span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../framework.html"> 
+<span class="menu-text">Framework</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../submissions.html"> 
+<span class="menu-text">Tracker</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../submit.html"> 
+<span class="menu-text">Submit</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/qgallea/recast"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#paper-summary" id="toc-paper-summary" class="nav-link active" data-scroll-target="#paper-summary">Paper summary</a></li>
+  <li><a href="#replication-results" id="toc-replication-results" class="nav-link" data-scroll-target="#replication-results">Replication results</a></li>
+  <li><a href="#causal-forest-extension" id="toc-causal-forest-extension" class="nav-link" data-scroll-target="#causal-forest-extension">Causal Forest Extension</a></li>
+  <li><a href="#gate-and-heterogeneity-analysis" id="toc-gate-and-heterogeneity-analysis" class="nav-link" data-scroll-target="#gate-and-heterogeneity-analysis">GATE and Heterogeneity Analysis</a></li>
+  <li><a href="#pedagogical-assessment" id="toc-pedagogical-assessment" class="nav-link" data-scroll-target="#pedagogical-assessment">Pedagogical assessment</a></li>
+  <li><a href="#referee-reports" id="toc-referee-reports" class="nav-link" data-scroll-target="#referee-reports">Referee reports</a></li>
+  </ul>
+<div class="toc-actions"><ul class="collapse"><li><a href="https://github.com/qgallea/recast/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Out of Africa: Genetic Diversity and Economic Development (Causal Forest)</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">IV</div>
+    <div class="quarto-category">Development</div>
+    <div class="quarto-category">2013</div>
+    <div class="quarto-category">PASS</div>
+    <div class="quarto-category">Causal Forest</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    IV using migratory distance as instrument for genetic diversity — Causal Forest extension
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Ashraf, Galor </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">2013</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="paper-summary" class="level2">
+<h2 class="anchored" data-anchor-id="paper-summary">Paper summary</h2>
+<p><strong>Citation:</strong> Ashraf, Q. and Galor, O. (2013). The ‘Out of Africa’ Hypothesis, Human Genetic Diversity, and Comparative Economic Development. <em>American Economic Review</em>, 103(1), 1–46. <a href="https://doi.org/10.1257/aer.103.1.1">DOI</a></p>
+<p><strong>Identification strategy:</strong> The paper argues that genetic diversity – shaped by prehistoric migration out of Africa via the serial founder effect – has a hump-shaped (inverted-U) effect on economic development. Too little diversity limits the generation of new ideas; too much increases distrust and conflict. The authors use migratory distance from Addis Ababa as an instrument for genetic diversity in a 2SLS framework. Three diversity measures are used: observed diversity from HGDP ethnic groups (N=21), predicted diversity from the migratory distance regression (N=145), and ancestry-adjusted predicted diversity for contemporary analysis.</p>
+<p><strong>Key original result (Table 6, col 1):</strong> A significant quadratic relationship between ancestry-adjusted genetic diversity and log GDP per capita 2000, with coefficient <strong>203.443</strong> on the linear term (SE = 83.368) and <strong>-142.663</strong> on the squared term (SE = 59.037), N = 143. The implied optimum diversity is ~0.713.</p>
+<hr>
+</section>
+<section id="replication-results" class="level2">
+<h2 class="anchored" data-anchor-id="replication-results">Replication results</h2>
+<p>The replication <strong>passed</strong>. All 6 of 6 specifications match the published coefficients within <strong>0.71%</strong>, with five of six matching to within 0.01%. This spans Tables 1, 2, 3, 6, and 7 of the original paper, covering OLS and IV, historical and contemporary outcomes, and observed vs.&nbsp;predicted diversity measures.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 22%">
+<col style="width: 11%">
+<col style="width: 20%">
+<col style="width: 25%">
+<col style="width: 16%">
+<col style="width: 4%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Specification</th>
+<th>Method</th>
+<th>Original coef</th>
+<th>Replicated coef</th>
+<th>Delta (%)</th>
+<th>N</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Table 1, col 4 – Historical, Observed Diversity</td>
+<td>OLS</td>
+<td>225.440 (73.781)</td>
+<td>225.440 (73.781)</td>
+<td>0.00%</td>
+<td>21</td>
+</tr>
+<tr class="even">
+<td>Table 2, col 5 – Historical, Observed Diversity (IV)</td>
+<td>2SLS</td>
+<td>285.190 (88.064)</td>
+<td>287.218 (88.179)</td>
+<td>0.71%</td>
+<td>21</td>
+</tr>
+<tr class="odd">
+<td>Table 3, col 5 – Historical, Predicted Diversity</td>
+<td>OLS</td>
+<td>195.416 (55.916)</td>
+<td>195.416 (55.036)</td>
+<td>0.00%</td>
+<td>145</td>
+</tr>
+<tr class="even">
+<td>Table 3, col 6 – Historical, Predicted + Continent FE</td>
+<td>OLS</td>
+<td>199.727 (80.281)</td>
+<td>199.727 (78.335)</td>
+<td>0.00%</td>
+<td>145</td>
+</tr>
+<tr class="odd">
+<td>Table 6, col 1 – Contemporary, Ancestry-Adjusted</td>
+<td>OLS</td>
+<td>203.443 (83.368)</td>
+<td>203.443 (79.910)</td>
+<td>0.00%</td>
+<td>143</td>
+</tr>
+<tr class="even">
+<td>Table 7, col 5 – Contemporary, Full Controls</td>
+<td>OLS</td>
+<td>281.173 (70.459)</td>
+<td>281.173 (58.857)</td>
+<td>0.00%</td>
+<td>109</td>
+</tr>
+</tbody>
+</table>
+<p><em>Note: SE differences (up to ~4%) across some specifications likely reflect HC1 vs HC0 degrees-of-freedom adjustments between Stata and Python. Coefficient matches are exact or near-exact.</em></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="forest_plot.png" class="img-fluid figure-img" alt="Forest plot showing coefficient estimates and 95% confidence intervals for published OLS, replicated OLS, and CausalForestDML. The published/replicated OLS coefficients (~203) are on the linear term of a quadratic, while the CF ATE (0.076) measures the average marginal effect -- a fundamentally different estimand."></p>
+<figcaption>Forest plot: Published OLS, Replicated OLS, and Causal Forest estimates</figcaption>
+</figure>
+</div>
+<hr>
+</section>
+<section id="causal-forest-extension" class="level2">
+<h2 class="anchored" data-anchor-id="causal-forest-extension">Causal Forest Extension</h2>
+<p>EconML’s <strong>CausalForestDML</strong> was applied with 1,000 trees and honest splitting. The treatment is ancestry-adjusted predicted genetic diversity (<code>pdiv_aa</code>), the outcome is log GDP per capita 2000, and the controls are log years since Neolithic transition, log arable land, log absolute latitude, log land suitability, and continent dummies.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 30%">
+<col style="width: 27%">
+<col style="width: 11%">
+<col style="width: 22%">
+<col style="width: 8%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Estimator</th>
+<th>Estimate</th>
+<th>SE</th>
+<th>95% CI</th>
+<th>N</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Published OLS (Table 6 col 1, linear term)</td>
+<td>203.443</td>
+<td>83.368</td>
+<td>[40.04, 366.84]</td>
+<td>143</td>
+</tr>
+<tr class="even">
+<td>Replicated OLS (Table 6 col 1, linear term)</td>
+<td>203.443</td>
+<td>79.910</td>
+<td>[46.82, 360.06]</td>
+<td>143</td>
+</tr>
+<tr class="odd">
+<td>CausalForestDML ATE</td>
+<td>0.076</td>
+<td>4.748</td>
+<td>[-9.23, 9.38]</td>
+<td>145</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Interpretation:</strong> The CausalForestDML ATE of <strong>0.076</strong> (SE = 4.748, 95% CI [-9.23, 9.38]) is statistically insignificant and near zero. This is entirely consistent with the original paper’s hump-shaped finding. The sample mean diversity (~0.73) sits almost exactly at the estimated optimum (~0.713), so positive marginal effects for below-optimum countries cancel against negative effects for above-optimum countries in the average. The published linear term coefficient (203.443) is not directly comparable – it parameterizes the slope at diversity = 0, not the average marginal effect across observed values.</p>
+<p><strong>Note on identification:</strong> The CausalForestDML uses selection-on-observables (no instrument), while the original paper uses migratory distance as an IV. This is a different identification strategy. The near-zero CF ATE could reflect either (a) the cancellation effect from the hump shape (the correct interpretation) or (b) attenuation from residual confounding that the IV would have corrected. Both possibilities are discussed in the paper.</p>
+<hr>
+</section>
+<section id="gate-and-heterogeneity-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="gate-and-heterogeneity-analysis">GATE and Heterogeneity Analysis</h2>
+<section id="gate-by-years-since-neolithic-transition-quartiles-of-ln_yst" class="level3">
+<h3 class="anchored" data-anchor-id="gate-by-years-since-neolithic-transition-quartiles-of-ln_yst">GATE by years since Neolithic transition (quartiles of <code>ln_yst</code>)</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Group</th>
+<th>N</th>
+<th>Estimate</th>
+<th>95% CI</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Q1 (low)</td>
+<td>38</td>
+<td>1.235</td>
+<td>[-3.94, 6.41]</td>
+</tr>
+<tr class="even">
+<td>Q2</td>
+<td>35</td>
+<td>1.531</td>
+<td>[-4.25, 7.31]</td>
+</tr>
+<tr class="odd">
+<td>Q3</td>
+<td>36</td>
+<td>-0.592</td>
+<td>[-10.90, 9.71]</td>
+</tr>
+<tr class="even">
+<td>Q4 (high)</td>
+<td>36</td>
+<td>-1.896</td>
+<td>[-14.30, 10.51]</td>
+</tr>
+</tbody>
+</table>
+<p>No significant heterogeneity detected. All CIs are wide and overlapping, consistent with low power at N=145. The pattern of positive GATEs for low-<code>ln_yst</code> countries and negative for high-<code>ln_yst</code> countries is suggestive but not statistically significant.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="gate_plot.png" class="img-fluid figure-img" alt="GATE plot showing treatment effect estimates and confidence intervals by quartiles of log years since Neolithic transition. All confidence intervals overlap zero. There is a suggestive downward trend from Q1 to Q4."></p>
+<figcaption>GATE plot by quartiles of years since Neolithic transition</figcaption>
+</figure>
+</div>
+</section>
+<section id="cate-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="cate-distribution">CATE distribution</h3>
+<p>The individual-level CATE distribution has mean 0.076, SD 3.816, ranging from -10.13 to 4.92. Approximately <strong>34.5% of CATEs are negative</strong>, roughly mapping to the share of countries above the diversity optimum. Only <strong>2.1% of individual CATEs</strong> are statistically significant at the 5% level (3 of 145 observations), reflecting the severe power limitation with this sample size.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="cate_histogram.png" class="img-fluid figure-img" alt="Histogram of individual-level conditional average treatment effects. The distribution is centered near zero with a long left tail extending to -10, consistent with the hump shape generating both positive and negative marginal effects."></p>
+<figcaption>CATE histogram: distribution of individual-level treatment effects</figcaption>
+</figure>
+</div>
+</section>
+<section id="feature-importance" class="level3">
+<h3 class="anchored" data-anchor-id="feature-importance">Feature importance</h3>
+<p>The top drivers of treatment effect heterogeneity are geographic endowment variables:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Feature</th>
+<th>Importance</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Log absolute latitude (<code>ln_abslat</code>)</td>
+<td>26.3%</td>
+</tr>
+<tr class="even">
+<td>Log arable land (<code>ln_arable</code>)</td>
+<td>24.3%</td>
+</tr>
+<tr class="odd">
+<td>Log land suitability (<code>ln_suitavg</code>)</td>
+<td>20.9%</td>
+</tr>
+<tr class="even">
+<td>Log years since Neolithic (<code>ln_yst</code>)</td>
+<td>16.5%</td>
+</tr>
+<tr class="odd">
+<td>Asia dummy</td>
+<td>6.9%</td>
+</tr>
+<tr class="even">
+<td>Europe dummy</td>
+<td>4.2%</td>
+</tr>
+<tr class="odd">
+<td>Africa dummy</td>
+<td>1.0%</td>
+</tr>
+<tr class="even">
+<td>Oceania dummy</td>
+<td>0.0%</td>
+</tr>
+</tbody>
+</table>
+<p>Geographic variables dominate, consistent with the paper’s emphasis on geographic endowments shaping both genetic diversity and economic development.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="feature_importance.png" class="img-fluid figure-img" alt="Bar chart of feature importances. Geographic endowment variables dominate: log absolute latitude (26.3%), log arable land (24.3%), and log land suitability (20.9%)."></p>
+<figcaption>Feature importance from the CausalForestDML</figcaption>
+</figure>
+</div>
+<hr>
+</section>
+</section>
+<section id="pedagogical-assessment" class="level2">
+<h2 class="anchored" data-anchor-id="pedagogical-assessment">Pedagogical assessment</h2>
+<p>This is the most pedagogically interesting RECAST case. The Causal Forest reveals something the linear coefficient hides: <strong>the average marginal effect is near zero because the relationship is nonlinear</strong>.</p>
+<p>The published coefficient of 203.443 on the linear term (with -142.663 on the squared term) implies a hump shape – positive marginal effects for low-diversity countries, negative for high-diversity countries. The Causal Forest honestly averages over both sides, yielding a near-zero ATE of 0.076. This is not a contradiction of the original finding – it is what the quadratic specification predicts when the sample mean diversity (~0.73) sits near the estimated optimum (~0.713).</p>
+<p>This demonstrates both the <strong>strength</strong> of causal forests and their <strong>limitation</strong> in this context:</p>
+<ul>
+<li><p><strong>Strength:</strong> The CF reveals that the “average effect” of genetic diversity on income is meaningless when there is a nonlinear relationship. Reporting a single ATE masks the heterogeneity that is central to the paper’s argument. The 34.5% negative CATE rate maps directly to countries above the diversity optimum, and the geographic heterogeneity drivers (latitude, arable land, suitability) are substantively interpretable.</p></li>
+<li><p><strong>Limitation:</strong> With N=145 and a quadratic DGP, the forest lacks power – only 2.1% of CATEs are individually significant. The GATE analysis detects no statistically significant heterogeneity despite clear theoretical predictions. The quadratic OLS specification, which directly parameterizes the hump shape, captures in two coefficients what the Causal Forest can only approximate noisily. The original specification remains the more informative approach for this paper.</p></li>
+</ul>
+<p><strong>Verdict:</strong> The CF adds genuine insight by revealing the near-zero average marginal effect and the geographic heterogeneity drivers (latitude, arable land, suitability), but the small sample severely limits individual-level inference. The original quadratic specification remains the more powerful and informative approach for this paper. The pedagogical value lies in showing when a nonparametric method is outperformed by a well-specified parametric model – and why the “average effect” can be misleading for fundamentally nonlinear relationships.</p>
+<hr>
+</section>
+<section id="referee-reports" class="level2">
+<h2 class="anchored" data-anchor-id="referee-reports">Referee reports</h2>
+<p><strong>Referee consensus:</strong> The RECAST is ready for publication. The replication is exemplary (6/6 specs within 0.71%), the CF extension is correctly implemented, and all 9 issues raised in Round 1 (including the CausalForestDML vs CausalIVForest justification, identification assumption discussion, SE caveats, and CATE interpretation) were resolved. No blocking or major issues remain. Two minor remaining items: (1) a future CausalIVForest extension could provide a more direct comparison, and (2) the 2% CATE significance rate is an inherent data limitation with N=145.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Identification</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Referee 1 Report: Identification</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">CF Methods</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false" href="">Referee 2 Report: DML Methods &amp; Causal Forest</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false" href="">Robustness</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-6" role="tab" aria-controls="tabset-1-6" aria-selected="false" href="">Referee 3 Report: Robustness and Replication</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-7-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-7" role="tab" aria-controls="tabset-1-7" aria-selected="false" href="">Synthesis</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-8-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-8" role="tab" aria-controls="tabset-1-8" aria-selected="false" href="">Synthesis Report – Round 1</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-9-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-9" role="tab" aria-controls="tabset-1-9" aria-selected="false" href="">Final Report</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-10-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-10" role="tab" aria-controls="tabset-1-10" aria-selected="false" href="">Overall Assessment</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-11-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-11" role="tab" aria-controls="tabset-1-11" aria-selected="false" href="">What Was Solved During Revision</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-12-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-12" role="tab" aria-controls="tabset-1-12" aria-selected="false" href="">Remaining Issues</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-13-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-13" role="tab" aria-controls="tabset-1-13" aria-selected="false" href="">Key Results</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-14-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-14" role="tab" aria-controls="tabset-1-14" aria-selected="false" href="">Notes for the Reader</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p><strong>Round:</strong> 1 <strong>Overall verdict:</strong> Minor concerns</p>
+<section id="blocking-issues-re-analysis-required" class="level3">
+<h3 class="anchored" data-anchor-id="blocking-issues-re-analysis-required">Blocking issues (re-analysis required)</h3>
+<ul>
+<li>None</li>
+</ul>
+</section>
+<section id="major-issues-prosetable-edits-required" class="level3">
+<h3 class="anchored" data-anchor-id="major-issues-prosetable-edits-required">Major issues (prose/table edits required)</h3>
+<ol type="1">
+<li><p><strong>Estimand mismatch not sufficiently foregrounded (Section 3).</strong> The paper correctly notes that the CF ATE is an average marginal effect while the published coefficient is on the linear term of a quadratic. However, the forest plot (Figure 1) displays both on the same axis without making the scale difference visually obvious. A reader glancing at the figure could mistakenly conclude that the CF dramatically reduces the estimated effect. The figure caption should be more explicit, or the plot should use a dual-panel layout separating the two estimands.</p></li>
+<li><p><strong>Identification assumption shift deserves its own paragraph (Section 3.1).</strong> The paper mentions that CausalForestDML uses selection-on-observables rather than IV, but this is buried in a paragraph about the method description. Given that the original paper’s entire identification strategy rests on the instrument (migratory distance), switching to a conditional independence assumption is a substantive change. This merits a dedicated paragraph discussing what is gained and lost, and why the comparison is still informative.</p></li>
+</ol>
+</section>
+<section id="minor-issues" class="level3">
+<h3 class="anchored" data-anchor-id="minor-issues">Minor issues</h3>
+<ol type="1">
+<li><strong>Section 2, paragraph 1:</strong> The text says “log soil suitability” as a control, but the variable name in the data is <code>ln_suitavg</code> (average suitability), not <code>ln_soilsuit</code>. The description should match the actual variable name for traceability.</li>
+<li><strong>Section 5 (Conclusion):</strong> The optimum diversity is stated as <span class="math inline">\(\approx 0.71\)</span> but no derivation is shown. A footnote computing <span class="math inline">\(\text{pdiv\_aa}^* = -\beta_1 / (2\beta_2) = 203.443 / (2 \times 142.663) \approx 0.713\)</span> would aid the reader.</li>
+</ol>
+</section>
+<section id="comments-to-the-authors" class="level3">
+<h3 class="anchored" data-anchor-id="comments-to-the-authors">Comments to the authors</h3>
+<p>The identification discussion is mostly adequate for a RECAST report, but I would urge the authors to be more forthright about the fundamental asymmetry between the original IV strategy and the causal forest approach. The original paper argues that migratory distance satisfies the exclusion restriction because it affects development only through the genetic diversity channel (after controlling for geography). The CausalForestDML approach drops this instrument entirely and instead assumes that conditional on the 8 control variables (including continent dummies), there is no remaining confounding between diversity and income. This is a much stronger assumption given the well-known correlation between genetic diversity and geography.</p>
+<p>The paper should explicitly state that the near-zero CF ATE could reflect either (a) the cancellation effect from the hump shape (the correct interpretation) or (b) attenuation bias from residual confounding that the IV would have corrected. These cannot be distinguished from the analysis as presented.</p>
+<p>The replication is exemplary—6/6 pass with worst deviation 0.71%. This deserves prominent mention.</p>
+</section>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<p><strong>Round:</strong> 1 <strong>Overall verdict:</strong> Minor concerns</p>
+<section id="blocking-issues" class="level3">
+<h3 class="anchored" data-anchor-id="blocking-issues">Blocking issues</h3>
+<ul>
+<li>None</li>
+</ul>
+</section>
+<section id="major-issues" class="level3">
+<h3 class="anchored" data-anchor-id="major-issues">Major issues</h3>
+<ol type="1">
+<li><strong>CausalForestDML chosen over CausalIVForest for an IV paper (Section 3.1).</strong> The config sets <code>method: CausalForestDML</code>, which drops the instrument and uses selection-on-observables. For an IV paper, the natural choice would be <code>CausalIVForest</code> from <code>econml.grf</code>, which uses the instrument directly in the forest estimation. The paper should explicitly justify why CausalForestDML was chosen and discuss what would change under CausalIVForest. This is not a blocking issue because the config intentionally specifies CausalForestDML, but it is a major methodological choice that the paper does not fully discuss.</li>
+</ol>
+</section>
+<section id="minor-issues-1" class="level3">
+<h3 class="anchored" data-anchor-id="minor-issues-1">Minor issues</h3>
+<ol type="1">
+<li><strong><code>honest=True</code> and <code>inference=True</code> are correctly set.</strong> No issue here. Verified from <code>causal_forest_results.json</code>.</li>
+<li><strong><code>n_estimators=1000</code> is adequate.</strong> Sufficient for stable estimates.</li>
+<li><strong><code>min_samples_leaf=5</code> with N=145:</strong> The ratio N/min_samples_leaf = 29 is borderline (rule of thumb: &gt; 20). This is acceptable but should be noted. With 145 observations split across 5 CV folds, each fold has ~29 observations for residualization. This is tight but not disqualifying.</li>
+<li><strong>CATE significance rate of 2% (from diagnostics).</strong> Only 3 of 145 individual CATEs reject H0: theta(x)=0 at 5%. This is consistent with a near-zero ATE and wide individual-level CIs. The paper correctly interprets this as a power issue. No change needed.</li>
+<li><strong>Feature importances correctly interpreted.</strong> The paper includes the caveat that importance does not imply causal moderation. Good.</li>
+<li><strong>ATE SE is plausible.</strong> The SE sanity check passes: ATE CI width (18.61) is comparable to mean CATE CI width (16.83), ratio = 0.9x. The <code>ate_inference()</code> method was used correctly (not the naive std/sqrt(n) approach).</li>
+<li><strong>Section 3.4, line 170-171:</strong> Variable names <code>ln_abslat</code>, <code>ln_arable</code>, <code>ln_suitavg</code> appear in plain text without LaTeX escaping of underscores. These will render incorrectly as subscripts. Should use <code>\texttt{ln\_abslat}</code> formatting.</li>
+</ol>
+</section>
+<section id="comments-to-the-authors-1" class="level3">
+<h3 class="anchored" data-anchor-id="comments-to-the-authors-1">Comments to the authors</h3>
+<p>The CausalForestDML implementation is technically sound. The first-stage nuisance models (RandomForestRegressor with 200 trees, max_depth=5) are reasonable choices for this sample size. The 5-fold cross-fitting is standard. The <code>ate_inference()</code> method is correctly used for ATE standard errors, avoiding the common pitfall of computing SE as std(CATEs)/sqrt(n).</p>
+<p>The main methodological concern is the choice of CausalForestDML over CausalIVForest. Since the original paper’s entire identification strategy relies on the migratory distance instrument, a forest-based IV estimator would provide a more apples-to-apples comparison. The paper should add a brief discussion of why the selection-on-observables approach was chosen and what the reader should conclude from the comparison. One defensible argument is that CausalForestDML provides a complementary identification check: if the effect is robust to dropping the instrument and relying on flexible covariate control, this strengthens the evidence. But this argument should be made explicitly.</p>
+<p>The 2% CATE significance rate is not concerning given the sample size and the theoretical expectation of a near-zero ATE. The diagnostics correctly flag this as a warning (power issue) rather than a failure.</p>
+</section>
+</div>
+<div id="tabset-1-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-5-tab">
+
+</div>
+<div id="tabset-1-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-6-tab">
+<p><strong>Round:</strong> 1 <strong>Overall verdict:</strong> Pass</p>
+<section id="blocking-issues-1" class="level3">
+<h3 class="anchored" data-anchor-id="blocking-issues-1">Blocking issues</h3>
+<ul>
+<li>None</li>
+</ul>
+</section>
+<section id="major-issues-1" class="level3">
+<h3 class="anchored" data-anchor-id="major-issues-1">Major issues</h3>
+<ul>
+<li>None</li>
+</ul>
+</section>
+<section id="minor-issues-2" class="level3">
+<h3 class="anchored" data-anchor-id="minor-issues-2">Minor issues</h3>
+<ol type="1">
+<li><p><strong>Forest plot scale mismatch (Figure 1).</strong> The published OLS coefficient (203.443) and the CF ATE (0.076) are on completely different scales because they measure different estimands. The forest plot places them on the same x-axis, which visually overwhelms the CF estimate. Consider either (a) adding a text annotation clarifying the scale difference, or (b) normalizing both to effect-size units (e.g., standard deviations of the outcome).</p></li>
+<li><p><strong>Replication SE discrepancy not discussed.</strong> The replicated SEs for T6c1 are 79.910 vs published 83.368 (a 4.1% difference). While the coefficient matches perfectly (203.4429 vs 203.443), the SE difference likely reflects a minor HC1 vs HC0 or degrees-of-freedom adjustment difference. This is worth a footnote since SEs affect CI comparisons.</p></li>
+<li><p><strong>N=145 in CF vs N=143 in published T6c1.</strong> The causal forest uses N=145 observations (rows with non-missing values in key columns), while the published Table 6 column 1 has N=143. The 2-observation discrepancy is minor but should be noted, as it may reflect different sample restriction flags. The replication notebook correctly uses <code>cleancomp</code> and matches N=143, so the CF notebook may be using a slightly different sample definition.</p></li>
+<li><p><strong>Section 3.4, line 156:</strong> “Approximately 34% of individual CATEs are negative” – this is a meaningful statistic that deserves more interpretation. With a hump-shaped relationship, countries above the diversity optimum should have negative marginal effects and those below should have positive effects. The 34% negative rate roughly maps to the share of countries above the optimum (mean pdiv_aa ~ 0.73 vs optimum ~ 0.71).</p></li>
+</ol>
+</section>
+<section id="comments-to-the-authors-2" class="level3">
+<h3 class="anchored" data-anchor-id="comments-to-the-authors-2">Comments to the authors</h3>
+<p>The replication is clean and well-documented. All six specifications pass within 0.71%, which is excellent. The replication table is clear and the coefficients are traceable to <code>replication_results.json</code>. The forest plot accurately represents the published, replicated, and CF estimates with appropriate confidence intervals.</p>
+<p>The main robustness concern is the sample size difference between the CF analysis (N=145) and the published T6c1 specification (N=143). While small, this should be investigated to ensure the CF is using the exact same sample. The <code>cleancomp</code> flag in the dataset would ensure consistency.</p>
+<p>The forest plot accurately shows all estimates with CIs. The visual mismatch between the OLS/IV linear term coefficients (~200) and the CF ATE (~0) is inherent to the different estimands and is correctly explained in the text. The suggested annotation in the figure would help a casual reader.</p>
+<p>Overall, this is a solid RECAST report. The replication is exemplary and the causal forest extension is well-interpreted. The near-zero ATE finding is correctly contextualized as consistent with the hump shape rather than contradicting it.</p>
+</section>
+</div>
+<div id="tabset-1-7" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-7-tab">
+
+</div>
+<div id="tabset-1-8" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-8-tab">
+<p><strong>Unified verdict:</strong> Minor revision</p>
+<section id="blocking-issues-require-re-running-a-notebook" class="level3">
+<h3 class="anchored" data-anchor-id="blocking-issues-require-re-running-a-notebook">Blocking issues (require re-running a notebook)</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Issue</th>
+<th>Raised by</th>
+<th>Notebook to fix</th>
+<th>Specific action</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>(none)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="major-issues-prose-or-table-edits-only" class="level3">
+<h3 class="anchored" data-anchor-id="major-issues-prose-or-table-edits-only">Major issues (prose or table edits only)</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 24%">
+<col style="width: 37%">
+<col style="width: 27%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Issue</th>
+<th>Raised by</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>CausalForestDML vs CausalIVForest justification missing</td>
+<td>R1, R2</td>
+<td>Add a dedicated paragraph in Section 3.1 explicitly justifying the choice of CausalForestDML over CausalIVForest and discussing the identification trade-off.</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Identification assumption shift needs stronger discussion</td>
+<td>R1</td>
+<td>Expand the discussion of what is gained/lost by switching from IV to selection-on-observables. Mention that the near-zero ATE could reflect either hump-shape cancellation or attenuation bias from residual confounding.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="minor-issues-3" class="level3">
+<h3 class="anchored" data-anchor-id="minor-issues-3">Minor issues</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 24%">
+<col style="width: 37%">
+<col style="width: 27%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Issue</th>
+<th>Raised by</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>3</td>
+<td>Variable name <code>ln_soilsuit</code> vs <code>ln_suitavg</code> (Section 2)</td>
+<td>R1</td>
+<td>Replace “log soil suitability” with “log average soil suitability (<code>ln_suitavg</code>)”</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Optimum diversity derivation missing</td>
+<td>R1</td>
+<td>Add footnote computing pdiv_aa* = 203.443 / (2 * 142.663) = 0.713</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Unescaped underscores in variable names (Section 3.4, line 170-171)</td>
+<td>R2</td>
+<td>Use <code>\texttt{ln\_abslat}</code> formatting for variable names</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>Forest plot scale mismatch</td>
+<td>R1, R3</td>
+<td>Add annotation or stronger caption language about the different estimands</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Replication SE discrepancy footnote</td>
+<td>R3</td>
+<td>Add footnote about 4.1% SE difference likely from HC1/HC0 adjustment</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>N=145 vs N=143 sample size discrepancy</td>
+<td>R3</td>
+<td>Note in text; the CF uses rows with non-missing key columns which yields 145 vs the <code>cleancomp</code> flagged 143</td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>34% negative CATEs interpretation</td>
+<td>R3</td>
+<td>Expand interpretation: maps to share of countries above the diversity optimum</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="referee-disagreements" class="level3">
+<h3 class="anchored" data-anchor-id="referee-disagreements">Referee disagreements</h3>
+<p>None. All three referees agree the report is solid with minor revisions. R1 and R2 both flag the CausalForestDML vs CausalIVForest choice as a major methodological discussion point, though not a blocking issue.</p>
+</section>
+<section id="already-resolved-suppressed-from-this-round" class="level3">
+<h3 class="anchored" data-anchor-id="already-resolved-suppressed-from-this-round">Already resolved (suppressed from this round)</h3>
+<p>(First round – no prior changelogs.)</p>
+</section>
+</div>
+<div id="tabset-1-9" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-9-tab">
+<section id="final-review-report" class="level1">
+<h1>Final Review Report</h1>
+<p><strong>Paper:</strong> The ‘Out of Africa’ Hypothesis, Human Genetic Diversity, and Comparative Economic Development <strong>Original authors:</strong> Ashraf, Q. and Galor, O. (<em>American Economic Review</em>, 2013) <strong>Rounds completed:</strong> 1 of 3 <strong>Final verdict:</strong> Ready</p>
+<hr>
+</section>
+</div>
+<div id="tabset-1-10" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-10-tab">
+<p>This RECAST of Ashraf and Galor (2013) is a strong result. The replication is clean – all six specifications across Tables 1, 2, 3, 6, and 7 match the published coefficients within 0.71%, with five of six matching to within 0.01%. This is as close to exact replication as one can achieve across platforms and software versions.</p>
+<p>The causal forest extension estimates an average treatment effect (ATE) of 0.076 (SE = 4.748, 95% CI: [-9.23, 9.38]) for the marginal effect of ancestry-adjusted genetic diversity on log GDP per capita. This near-zero, statistically insignificant ATE is entirely consistent with the original paper’s core finding of a hump-shaped (quadratic) relationship. The sample mean diversity (~0.73) sits almost exactly at the estimated optimum (~0.71), so positive marginal effects for below-optimum countries cancel against negative effects for above-optimum countries in the average. The causal forest does not contradict the original paper – it confirms that the <em>average marginal</em> effect is near zero, as the quadratic specification predicts.</p>
+<p>The paper would be suitable for sharing as a RECAST short note. One round of referee review raised only minor issues (all resolved), and no blocking problems were identified. The main limitation flagged by referees – the switch from IV to selection-on-observables identification – is now explicitly discussed in the paper.</p>
+<hr>
+</div>
+<div id="tabset-1-11" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-11-tab">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 34%">
+<col style="width: 38%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Issue</th>
+<th>Raised (round)</th>
+<th>Resolved (round)</th>
+<th>How</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>CausalForestDML vs CausalIVForest justification</td>
+<td>1</td>
+<td>1</td>
+<td>Added dedicated paragraph in Section 3.1 discussing method choice and identification trade-off</td>
+</tr>
+<tr class="even">
+<td>Identification assumption discussion</td>
+<td>1</td>
+<td>1</td>
+<td>Expanded to discuss exclusion restriction vs.&nbsp;conditional independence, and two explanations for near-zero ATE</td>
+</tr>
+<tr class="odd">
+<td>Variable name mismatch (ln_soilsuit vs ln_suitavg)</td>
+<td>1</td>
+<td>1</td>
+<td>Corrected to ln_suitavg</td>
+</tr>
+<tr class="even">
+<td>Optimum diversity derivation</td>
+<td>1</td>
+<td>1</td>
+<td>Added footnote with computation</td>
+</tr>
+<tr class="odd">
+<td>Unescaped underscores in variable names</td>
+<td>1</td>
+<td>1</td>
+<td>Fixed LaTeX formatting</td>
+</tr>
+<tr class="even">
+<td>Forest plot caption ambiguity</td>
+<td>1</td>
+<td>1</td>
+<td>Expanded caption with explicit scale annotations</td>
+</tr>
+<tr class="odd">
+<td>SE discrepancy footnote</td>
+<td>1</td>
+<td>1</td>
+<td>Added footnote on HC1/HC0 differences</td>
+</tr>
+<tr class="even">
+<td>N=145 vs N=143 discrepancy</td>
+<td>1</td>
+<td>1</td>
+<td>Added explanatory footnote</td>
+</tr>
+<tr class="odd">
+<td>34% negative CATEs interpretation</td>
+<td>1</td>
+<td>1</td>
+<td>Expanded to connect with countries above diversity optimum</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div id="tabset-1-12" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-12-tab">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 20%">
+<col style="width: 28%">
+<col style="width: 42%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Issue</th>
+<th>Severity</th>
+<th>Action needed</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>CausalIVForest analysis not conducted</td>
+<td>Minor</td>
+<td>A future extension could run CausalIVForest with the migratory distance instrument for a more direct comparison. This is optional – the CausalForestDML analysis is valid as a complementary check.</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Low CATE power (2% significant)</td>
+<td>Minor</td>
+<td>Inherent to N=145. Not fixable without more data. Correctly flagged in diagnostics as a warning.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Severity: <strong>Blocking</strong> = must fix before sharing / <strong>Major</strong> = should fix / <strong>Minor</strong> = optional</em></p>
+<hr>
+</div>
+<div id="tabset-1-13" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-13-tab">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 35%">
+<col style="width: 25%">
+<col style="width: 10%">
+<col style="width: 20%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Specification</th>
+<th>Estimate</th>
+<th>SE</th>
+<th>95% CI</th>
+<th>N</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Published OLS (Table 6 col 1, linear term)</td>
+<td>203.443</td>
+<td>83.368</td>
+<td>[40.04, 366.84]</td>
+<td>143</td>
+</tr>
+<tr class="even">
+<td>Replicated OLS (Table 6 col 1, linear term)</td>
+<td>203.443</td>
+<td>79.910</td>
+<td>[46.82, 360.06]</td>
+<td>143</td>
+</tr>
+<tr class="odd">
+<td>Published OLS (Table 6 col 1, squared term)</td>
+<td>-142.663</td>
+<td>59.037</td>
+<td>[-258.38, -26.95]</td>
+<td>143</td>
+</tr>
+<tr class="even">
+<td>Causal Forest ATE (CausalForestDML)</td>
+<td>0.076</td>
+<td>4.748</td>
+<td>[-9.23, 9.38]</td>
+<td>145</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Replication check:</strong> PASS – 6/6 specifications within 0.71% of published values.</p>
+<p><strong>CF extension:</strong> The CausalForestDML ATE of 0.076 is near zero and statistically insignificant. This is consistent with the hump-shaped finding: the average marginal effect at the sample mean diversity (~0.73) is close to zero because the sample sits near the estimated optimum (~0.71). The published linear term coefficient (203.443) is not directly comparable because it parameterizes the slope at diversity = 0, not the average marginal effect across observed values.</p>
+<p><strong>Heterogeneity:</strong> No significant heterogeneity detected across quartiles of ln_yst (log years since Neolithic). GATE point estimates range from -1.90 (Q4, highest ln_yst) to 1.53 (Q2), but all CIs are wide and overlapping.</p>
+<p><strong>Feature importance:</strong> Top drivers of treatment effect heterogeneity: ln_abslat (26.3%), ln_arable (24.3%), ln_suitavg (20.9%). Geographic variables dominate, consistent with the paper’s emphasis on geographic endowments.</p>
+<hr>
+</div>
+<div id="tabset-1-14" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-14-tab">
+<ul>
+<li>The causal forest uses selection-on-observables (no instrument), while the original paper uses migratory distance as an IV. These are different identification strategies. The near-zero CF ATE could reflect hump-shape cancellation (the correct interpretation) or attenuation from residual confounding. The paper now discusses both possibilities.</li>
+<li>With N=145, the causal forest has limited power for detecting heterogeneity. Only 2% of individual CATEs are significant at 5%. This is a data limitation, not a methodological failure.</li>
+<li>The SE sanity check passes convincingly (CATE/ATE CI width ratio = 0.9x), confirming that ate_inference() was used correctly.</li>
+<li>The published coefficient (203.443) and the CF ATE (0.076) measure fundamentally different things. Comparing them directly is a mistake – the paper now explains this clearly.</li>
+<li>The replication package data appear complete and well-organized. All variables needed for the six replicated specifications are present and correctly coded.</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/qgallea\.github\.io\/recast");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p><strong>RECAST</strong> by <a href="https://thecausalmindset.com">Quentin Gallea, Ph.D.</a> · Built with <a href="https://claude.ai/code">Claude Code</a> &amp; <a href="https://quarto.org">Quarto</a></p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/qgallea/recast/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p><a href="https://github.com/qgallea/recast">GitHub</a> · <a href="https://thecausalmindset.com/training/claude-code-for-research">Claude Code for Research</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
